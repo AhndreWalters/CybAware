@@ -23,10 +23,10 @@
                     
                     <div class="hero-buttons">
                         <a href="game.php" class="btn btn-primary">
-                            <i class="fas fa-play-circle"></i> Play Now
+                            <i class=""></i> Play Now
                         </a>
                         <a href="signin.php" class="btn btn-secondary">
-                            <i class="fas fa-user-plus"></i> Sign In
+                            <i class=""></i> Sign In
                         </a>
                     </div>
                 </div>
