@@ -10,7 +10,6 @@
     
     <ul class="nav-links" id="navLinks">
         <li><a href="about.php">About</a></li>
-        <li><a href="team.php">Team</a></li>
         <li><a href="game.php">Game</a></li>
         <li><a href="contact.php">Contact</a></li>
     </ul>
