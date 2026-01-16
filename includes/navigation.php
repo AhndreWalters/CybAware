@@ -5,7 +5,7 @@
 <!-- Navigation -->
 <nav>
     <div class="logo">
-        <a href="index.php">
+        <a href="index.php" style="text-decoration: none !important; display: inline-block;">
             <div class="logo-text">CybAware</div>
         </a>
     </div>
