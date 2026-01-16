@@ -15,7 +15,11 @@
     </ul>
     
     <div class="mobile-menu-btn" id="mobileMenuBtn">
-        <i class="fas fa-bars"></i>
+        <svg class="hamburger" viewBox="0 0 100 100" width="30">
+            <rect class="line top" width="80" height="8" x="10" y="25" rx="5"></rect>
+            <rect class="line middle" width="80" height="8" x="10" y="45" rx="5"></rect>
+            <rect class="line bottom" width="80" height="8" x="10" y="65" rx="5"></rect>
+        </svg>
     </div>
 </nav>
 
