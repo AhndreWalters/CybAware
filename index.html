@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CybAware - Cybersecurity Game</title>
     <link rel="stylesheet" href="css/cybaware.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
     <div class="container">
@@ -16,7 +17,7 @@
               </a>
             </div>
             
-            <ul class="nav-links">
+            <ul class="nav-links" id="navLinks">
                 <li><a href="about.html">About</a></li>
                 <li><a href="team.html">Team</a></li>
                 <li><a href="game.html">Game</a></li>
@@ -62,46 +63,84 @@
                 </ul>
             </div>
         </div>
+        
+        <!-- Mobile Menu Overlay -->
+        <div class="menu-overlay" id="menuOverlay"></div>
     </div>
 
     <script>
-        // Mobile menu toggle
+        // Mobile menu toggle with hamburger animation
         const mobileMenuBtn = document.getElementById('mobileMenuBtn');
-        const navLinks = document.querySelector('.nav-links');
+        const navLinks = document.getElementById('navLinks');
+        const menuOverlay = document.getElementById('menuOverlay');
+        const barsIcon = mobileMenuBtn.querySelector('i');
         
-        mobileMenuBtn.addEventListener('click', () => {
-            const isVisible = navLinks.style.display === 'flex';
+        function toggleMobileMenu() {
+            const isActive = navLinks.classList.contains('active');
             
-            if (isVisible) {
-                navLinks.style.display = 'none';
-                mobileMenuBtn.innerHTML = '<i class="fas fa-bars"></i>';
+            if (isActive) {
+                // Close menu
+                navLinks.classList.remove('active');
+                menuOverlay.classList.remove('active');
+                barsIcon.classList.remove('fa-times');
+                barsIcon.classList.add('fa-bars');
+                document.body.style.overflow = 'auto'; // Re-enable scrolling
             } else {
-                navLinks.style.display = 'flex';
-                mobileMenuBtn.innerHTML = '<i class="fas fa-times"></i>';
-                
-                // Make it responsive on mobile
+                // Open menu
+                navLinks.classList.add('active');
+                menuOverlay.classList.add('active');
+                barsIcon.classList.remove('fa-bars');
+                barsIcon.classList.add('fa-times');
+                document.body.style.overflow = 'hidden'; // Prevent scrolling when menu is open
+            }
+        }
+        
+        // Toggle menu when hamburger button is clicked
+        mobileMenuBtn.addEventListener('click', toggleMobileMenu);
+        
+        // Close menu when overlay is clicked
+        menuOverlay.addEventListener('click', toggleMobileMenu);
+        
+        // Close menu when a nav link is clicked (for single-page navigation)
+        document.querySelectorAll('.nav-links a').forEach(link => {
+            link.addEventListener('click', () => {
                 if (window.innerWidth <= 768) {
-                    navLinks.style.flexDirection = 'column';
-                    navLinks.style.position = 'absolute';
-                    navLinks.style.top = '80px';
-                    navLinks.style.left = '0';
-                    navLinks.style.width = '100%';
-                    navLinks.style.backgroundColor = '#1e293b';
-                    navLinks.style.padding = '20px';
-                    navLinks.style.gap = '15px';
-                    navLinks.style.zIndex = '1000';
+                    toggleMobileMenu();
                 }
+            });
+        });
+        
+        // Close menu when window is resized to desktop size
+        window.addEventListener('resize', () => {
+            if (window.innerWidth > 768) {
+                navLinks.classList.remove('active');
+                menuOverlay.classList.remove('active');
+                barsIcon.classList.remove('fa-times');
+                barsIcon.classList.add('fa-bars');
+                document.body.style.overflow = 'auto';
+                
+                // Reset styles for desktop
+                navLinks.style.display = 'flex';
+                navLinks.style.transform = 'none';
+                navLinks.style.position = 'static';
+                navLinks.style.width = 'auto';
+                navLinks.style.height = 'auto';
+                navLinks.style.flexDirection = 'row';
+                navLinks.style.backgroundColor = 'transparent';
+                navLinks.style.padding = '0';
+                navLinks.style.boxShadow = 'none';
+            } else {
+                // For mobile, ensure menu is hidden initially
+                navLinks.style.display = 'none';
+                navLinks.style.transform = 'translateX(100%)';
             }
         });
         
-        // Adjust on window resize
-        window.addEventListener('resize', () => {
-            if (window.innerWidth > 768) {
-                navLinks.style.display = 'flex';
-                navLinks.style.flexDirection = 'row';
-                navLinks.style.position = 'static';
-                navLinks.style.backgroundColor = 'transparent';
-                navLinks.style.padding = '0';
+        // Initialize menu state on page load
+        window.addEventListener('load', () => {
+            if (window.innerWidth <= 768) {
+                navLinks.style.display = 'none';
+                navLinks.style.transform = 'translateX(100%)';
             }
         });
     </script>
