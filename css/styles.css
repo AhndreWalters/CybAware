@@ -6,7 +6,7 @@
 }
 
 body {
-    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%) fixed;
+    background: #0f172a;
     color: white;
     min-height: 100vh;
     overflow-y: auto;
@@ -47,7 +47,7 @@ nav {
     background: linear-gradient(to right, #60a5fa, #3b82f6);
     -webkit-background-clip: text;
     background-clip: text;
-    color: transparent;
+    color: #cbd5e1;
 }
 
 .nav-links {
