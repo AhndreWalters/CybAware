@@ -6,10 +6,10 @@
 }
 
 body {
-    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%) fixed; /* Added 'fixed' */
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%) fixed;
     color: white;
-    min-height: 100vh; /* Changed from height to min-height */
-    overflow-y: auto; /* Changed from hidden to auto */
+    min-height: 100vh;
+    overflow-y: auto;
 }
 
 .container {
@@ -17,7 +17,7 @@ body {
     max-width: 1200px;
     margin: 0 auto;
     padding: 0 20px;
-    min-height: 100vh; /* Changed from height to min-height */
+    min-height: 100vh;
     display: flex;
     flex-direction: column;
 }
@@ -76,7 +76,6 @@ nav {
     z-index: 1001;
 }
 
-/* Hero Section - PERFECTLY CENTERED */
 .main-content {
     flex: 1;
     display: flex;
@@ -152,7 +151,6 @@ nav {
     background-color: rgba(255, 255, 255, 0.05);
 }
 
-/* Footer - Left and Right Alignment */
 .simple-footer {
     padding: 25px 0;
     border-top: 1px solid rgba(255, 255, 255, 0.1);
@@ -184,7 +182,6 @@ nav {
     color: #60a5fa;
 }
 
-/* Mobile Menu Styles */
 @media (max-width: 768px) {
     .mobile-menu-btn {
         display: block;
@@ -228,7 +225,6 @@ nav {
         background-color: rgba(59, 130, 246, 0.1);
     }
     
-    /* Overlay when menu is open */
     .menu-overlay {
         display: none;
         position: fixed;
@@ -263,7 +259,6 @@ nav {
         text-align: center;
     }
     
-    /* Footer responsive - stack on mobile */
     .footer-content {
         flex-direction: column;
         gap: 15px;
