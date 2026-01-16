@@ -23,10 +23,10 @@
                     </p>
                     
                     <div class="hero-buttons">
-                        <a href="game.html" class="btn btn-primary">
+                        <a href="game.php" class="btn btn-primary">
                             <i class="fas fa-play-circle"></i> Play Now
                         </a>
-                        <a href="register.html" class="btn btn-secondary">
+                        <a href="signin.php" class="btn btn-secondary">
                             <i class="fas fa-user-plus"></i> Sign In
                         </a>
                     </div>
@@ -40,7 +40,7 @@
         
         <!-- Mobile Menu Overlay -->
         <div class="menu-overlay" id="menuOverlay"></div>
-        
+
     </div>
 
     <script>
