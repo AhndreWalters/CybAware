@@ -4,31 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>CybAware - Cybersecurity Game</title>
-    <link rel="stylesheet" href="css/cybaware.css">
+    <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
     <div class="container">
-        <!-- Navigation -->
-        <nav>
-            <div class="logo">
-              <a href="index.html">
-                <div class="logo-text">CybAware</div>
-              </a>
-            </div>
-            
-            <ul class="nav-links" id="navLinks">
-                <li><a href="about.html">About</a></li>
-                <li><a href="team.html">Team</a></li>
-                <li><a href="game.html">Game</a></li>
-                <li><a href="certificate.html">Certificate</a></li>
-                <li><a href="contact.html">Contact</a></li>
-            </ul>
-            
-            <div class="mobile-menu-btn" id="mobileMenuBtn">
-                <i class="fas fa-bars"></i>
-            </div>
-        </nav>
+        <!-- Include Navigation -->
+        <?php include 'includes/navigation.php'; ?>
 
         <!-- Main Content - PERFECTLY CENTERED -->
         <div class="main-content">
@@ -52,20 +34,13 @@
             </div>
         </div>
 
-        <!-- Footer - Left and Right Alignment -->
-        <div class="simple-footer">
-            <div class="footer-content">
-                <div class="copyright">
-                    © 2026 CybAware
-                </div>
-                <ul class="footer-links">
-                    <li><a href="terms.html">Terms</a></li>
-                </ul>
-            </div>
+        <!-- Include Footer -->
+        <?php include 'includes/footer.php'; ?>
         </div>
         
         <!-- Mobile Menu Overlay -->
         <div class="menu-overlay" id="menuOverlay"></div>
+        
     </div>
 
     <script>
