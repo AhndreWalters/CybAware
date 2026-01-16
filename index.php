@@ -24,9 +24,6 @@
                         <a href="game.php" class="btn btn-primary">
                             <i class=""></i> Play Now
                         </a>
-                        <a href="signin.php" class="btn btn-secondary">
-                            <i class=""></i> Sign In
-                        </a>
                     </div>
                 </div>
             </div>

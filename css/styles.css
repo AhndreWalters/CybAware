@@ -6,8 +6,8 @@
 }
 
 body {
-    background: #0f172a;
-    color: white;
+    background: #64abd6;
+    color: #0f172a; /* Changed to dark text for main content */
     min-height: 100vh;
     overflow-y: auto;
 }
@@ -27,7 +27,7 @@ nav {
     justify-content: space-between;
     align-items: center;
     padding: 25px 0;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.3); /* Lighter border */
 }
 
 .logo {
@@ -39,15 +39,15 @@ nav {
 }
 
 .logo-icon {
-    color: #3b82f6;
+    color: white; /* Changed to white */
     font-size: 2rem;
 }
 
 .logo-text {
-    background: linear-gradient(to right, #60a5fa, #3b82f6);
+    background: linear-gradient(to right, white, #f0f0f0); /* White gradient */
     -webkit-background-clip: text;
     background-clip: text;
-    color: #cbd5e1;
+    color: transparent; /* Changed back to transparent for gradient */
 }
 
 .nav-links {
@@ -57,14 +57,14 @@ nav {
 }
 
 .nav-links a {
-    color: #cbd5e1;
+    color: white; /* Changed to white */
     text-decoration: none;
     font-weight: 500;
     transition: color 0.3s;
 }
 
 .nav-links a:hover {
-    color: #60a5fa;
+    color: #e0e0e0; /* Lighter white on hover */
 }
 
 .mobile-menu-btn {
@@ -80,7 +80,7 @@ nav {
 }
 
 .hamburger .line {
-    fill: #cbd5e1;
+    fill: white; /* Changed to white */
     transition: transform 0.3s ease, opacity 0.3s ease;
     transform-origin: center;
 }
@@ -120,18 +120,19 @@ nav {
     font-size: 3rem;
     margin-bottom: 20px;
     line-height: 1.1;
+    color: #0f172a; /* Dark text for contrast */
 }
 
 .tagline {
     font-size: 1.8rem;
-    color: #60a5fa;
+    color: #1e40af; /* Darker blue for visibility */
     margin-bottom: 30px;
     font-weight: 600;
 }
 
 .description {
     font-size: 1.1rem;
-    color: #cbd5e1;
+    color: #334155; /* Dark gray for readability */
     margin-bottom: 40px;
     line-height: 1.6;
     max-width: 700px;
@@ -157,29 +158,30 @@ nav {
 }
 
 .btn-primary {
-    background: linear-gradient(to right, #3b82f6, #2563eb);
+    background: linear-gradient(to right, #1e40af, #1e3a8a); /* Darker blue */
     color: white;
 }
 
 .btn-primary:hover {
     transform: translateY(-3px);
-    box-shadow: 0 10px 20px rgba(37, 99, 235, 0.3);
+    box-shadow: 0 10px 20px rgba(30, 64, 175, 0.3);
 }
 
 .btn-secondary {
     background-color: transparent;
-    color: white;
-    border: 2px solid #475569;
+    color: #1e40af; /* Dark blue text */
+    border: 2px solid #1e40af; /* Dark blue border */
 }
 
 .btn-secondary:hover {
-    background-color: rgba(255, 255, 255, 0.05);
+    background-color: rgba(30, 64, 175, 0.1);
+    color: #1e3a8a;
 }
 
 .simple-footer {
     padding: 25px 0;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
-    color: #94a3b8;
+    border-top: 1px solid rgba(255, 255, 255, 0.3); /* Lighter border */
+    color: white; /* Changed to white */
     font-size: 0.9rem;
 }
 
@@ -197,16 +199,33 @@ nav {
 }
 
 .footer-links a {
-    color: #94a3b8;
+    color: white; /* Changed to white */
     text-decoration: none;
     transition: color 0.3s;
     padding: 5px 0;
 }
 
 .footer-links a:hover {
-    color: #60a5fa;
+    color: #e0e0e0; /* Lighter white on hover */
 }
 
+/* Mobile menu background - changed to white with dark text */
+@media (max-width: 768px) {
+    .nav-links {
+        background: white; /* Changed to white */
+    }
+    
+    .nav-links a {
+        color: #0f172a; /* Dark text in mobile menu */
+    }
+    
+    .nav-links a:hover {
+        background-color: rgba(30, 64, 175, 0.1); /* Light blue hover */
+        color: #1e40af;
+    }
+}
+
+/* Rest of media queries remain the same */
 @media (max-width: 768px) {
     .mobile-menu-btn {
         display: flex;
@@ -222,7 +241,6 @@ nav {
         width: 70%;
         max-width: 300px;
         height: 100vh;
-        background: #1e293b;
         flex-direction: column;
         padding: 80px 30px 30px;
         gap: 20px;
@@ -246,10 +264,6 @@ nav {
         padding: 12px 15px;
         border-radius: 5px;
         transition: background-color 0.3s;
-    }
-    
-    .nav-links a:hover {
-        background-color: rgba(59, 130, 246, 0.1);
     }
     
     .menu-overlay {
