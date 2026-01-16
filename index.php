@@ -9,10 +9,9 @@
 </head>
 <body>
     <div class="container">
-        <!-- Include Navigation -->
+
         <?php include 'includes/navigation.php'; ?>
 
-        <!-- Main Content - PERFECTLY CENTERED -->
         <div class="main-content">
             <div class="hero-content">
                 <div class="hero">
@@ -33,12 +32,9 @@
                 </div>
             </div>
         </div>
-
-        <!-- Include Footer -->
         <?php include 'includes/footer.php'; ?>
         </div>
         
-        <!-- Mobile Menu Overlay -->
         <div class="menu-overlay" id="menuOverlay"></div>
 
     </div>
