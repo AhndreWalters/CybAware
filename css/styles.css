@@ -209,6 +209,123 @@ nav {
     color: #e0e0e0;
 }
 
+/* Game Page Styles */
+.page-title {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.page-title h1 {
+    color: #0f172a; /* Changed from #2c3e50 to match your theme */
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.page-title p {
+    color: #1e40af; /* Changed from #7f8c8d to match your theme */
+    font-size: 1.2rem;
+    font-weight: 500;
+}
+
+/* Game Sections Layout */
+.game-sections {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 2.5rem;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 1rem;
+    width: 100%;
+}
+
+/* Game Card */
+.game-card {
+    background: white;
+    border-radius: 15px;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border: 1px solid rgba(30, 64, 175, 0.2); /* Changed to match your theme */
+}
+
+.game-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+}
+
+/* Game Icon */
+.game-icon {
+    height: 140px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 4rem;
+    color: white;
+}
+
+.password-icon {
+    background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%); /* Changed to match your theme */
+}
+
+.phishing-icon {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+}
+
+.game-icon i {
+    filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.2));
+}
+
+/* Game Content */
+.game-content {
+    padding: 2.5rem;
+}
+
+.game-content h2 {
+    color: #0f172a; /* Changed from #2c3e50 to match your theme */
+    font-size: 1.8rem;
+    margin-bottom: 1rem;
+    font-weight: 600;
+}
+
+.game-content p {
+    color: #334155; /* Changed from #5d6d7e to match your theme */
+    line-height: 1.6;
+    margin-bottom: 1.8rem;
+    font-size: 1.05rem;
+}
+
+/* Play Button */
+.play-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%); /* Changed to match your theme */
+    color: white;
+    padding: 14px 30px;
+    border-radius: 50px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+    font-size: 1.05rem;
+    box-shadow: 0 4px 15px rgba(30, 64, 175, 0.2);
+}
+
+.play-btn:hover {
+    background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%); /* Changed to match your theme */
+    transform: translateX(8px);
+    box-shadow: 0 8px 25px rgba(30, 64, 175, 0.3);
+}
+
+.play-btn i {
+    transition: transform 0.3s ease;
+}
+
+.play-btn:hover i {
+    transform: translateX(8px);
+}
+
 /* Login Page Styles */
 .login-container {
     width: 100%;
@@ -583,6 +700,7 @@ nav {
     box-shadow: 0 10px 20px rgba(30, 64, 175, 0.3);
 }
 
+/* Responsive Design */
 @media (max-width: 1024px) {
     .hero h1 {
         font-size: 2.8rem;
@@ -610,6 +728,16 @@ nav {
     
     .contact-header h1 {
         font-size: 2.4rem;
+    }
+    
+    /* Game page responsive */
+    .game-sections {
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 2rem;
+    }
+    
+    .page-title h1 {
+        font-size: 2.2rem;
     }
 }
 
@@ -748,6 +876,30 @@ nav {
         flex-direction: column;
         align-items: flex-start;
     }
+    
+    /* Game page responsive */
+    .game-sections {
+        grid-template-columns: 1fr;
+        max-width: 400px;
+        gap: 1.5rem;
+    }
+    
+    .game-icon {
+        height: 120px;
+        font-size: 3.5rem;
+    }
+    
+    .game-content {
+        padding: 2rem;
+    }
+    
+    .page-title h1 {
+        font-size: 2rem;
+    }
+    
+    .page-title p {
+        font-size: 1.1rem;
+    }
 }
 
 @media (max-width: 480px) {
@@ -784,140 +936,8 @@ nav {
     .contact-container {
         padding: 20px 15px;
     }
-}
-
-
-/* Game Page Styles */
-.page-title {
-    text-align: center;
-    margin-bottom: 3rem;
-}
-
-.page-title h1 {
-    color: #2c3e50;
-    font-size: 2.5rem;
-    margin-bottom: 0.5rem;
-}
-
-.page-title p {
-    color: #7f8c8d;
-    font-size: 1.1rem;
-}
-
-/* Game Sections Layout */
-.game-sections {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 2rem;
-    max-width: 900px;
-    margin: 0 auto;
-    padding: 0 1rem;
-}
-
-/* Game Card */
-.game-card {
-    background: white;
-    border-radius: 15px;
-    overflow: hidden;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    border: 1px solid #e1e8ed;
-}
-
-.game-card:hover {
-    transform: translateY(-10px);
-    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.15);
-}
-
-/* Game Icon */
-.game-icon {
-    height: 120px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 3.5rem;
-    color: white;
-}
-
-.password-icon {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-}
-
-.phishing-icon {
-    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-}
-
-.game-icon i {
-    filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1));
-}
-
-/* Game Content */
-.game-content {
-    padding: 2rem;
-}
-
-.game-content h2 {
-    color: #2c3e50;
-    font-size: 1.8rem;
-    margin-bottom: 1rem;
-    font-weight: 600;
-}
-
-.game-content p {
-    color: #5d6d7e;
-    line-height: 1.6;
-    margin-bottom: 1.5rem;
-    font-size: 1rem;
-}
-
-/* Play Button */
-.play-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
-    color: white;
-    padding: 12px 25px;
-    border-radius: 50px;
-    text-decoration: none;
-    font-weight: 600;
-    transition: all 0.3s ease;
-    border: none;
-    cursor: pointer;
-    font-size: 1rem;
-}
-
-.play-btn:hover {
-    background: linear-gradient(135deg, #2980b9 0%, #1f639c 100%);
-    transform: translateX(5px);
-    box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3);
-}
-
-.play-btn i {
-    transition: transform 0.3s ease;
-}
-
-.play-btn:hover i {
-    transform: translateX(5px);
-}
-
-/* Responsive Design */
-@media (max-width: 768px) {
-    .game-sections {
-        grid-template-columns: 1fr;
-        max-width: 400px;
-    }
     
-    .page-title h1 {
-        font-size: 2rem;
-    }
-    
-    .game-content h2 {
-        font-size: 1.5rem;
-    }
-}
-
-@media (max-width: 480px) {
+    /* Game page responsive */
     .game-content {
         padding: 1.5rem;
     }
@@ -927,8 +947,25 @@ nav {
         font-size: 3rem;
     }
     
+    .game-content h2 {
+        font-size: 1.6rem;
+    }
+    
+    .game-content p {
+        font-size: 1rem;
+    }
+    
     .play-btn {
         width: 100%;
         justify-content: center;
+        padding: 12px 20px;
+    }
+    
+    .page-title h1 {
+        font-size: 1.8rem;
+    }
+    
+    .page-title p {
+        font-size: 1rem;
     }
 }
