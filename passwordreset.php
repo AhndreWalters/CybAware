@@ -101,6 +101,6 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                 <a class="btn btn-link ml-2" href="welcome.php">Cancel</a>
             </div>
         </form>
-    </div>    
+    </div>
 </body>
 </html>
