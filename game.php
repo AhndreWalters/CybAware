@@ -13,7 +13,32 @@
         <?php include 'includes/navigation.php'; ?>
 
         <div class="main-content">
-            
+
+            <div class="game-sections">
+                <!-- Password Fortress Section -->
+                <div class="game-card">
+                    <div class="game-icon password-icon">
+                        <i class="fas fa-lock"></i>
+                    </div>
+                    <div class="game-content">
+                        <h2>Password Fortress</h2>
+                        <p>Find out what makes a strong password, plus why websites and users often have poor security.</p>
+                        <a href="password-game.php" class="play-btn">Play Now <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                </div>
+
+                <!-- Phishing Detective Section -->
+                <div class="game-card">
+                    <div class="game-icon phishing-icon">
+                        <i class="fas fa-fish"></i>
+                    </div>
+                    <div class="game-content">
+                        <h2>Phishing Detective</h2>
+                        <p>Discover the tricks of scammers, traits of phishing attacks and how users are easily snared.</p>
+                        <a href="phishing-game.php" class="play-btn">Play Now <i class="fas fa-arrow-right"></i></a>
+                    </div>
+                </div>
+            </div>
         </div>
         <?php include 'includes/footer.php'; ?>
         </div>
