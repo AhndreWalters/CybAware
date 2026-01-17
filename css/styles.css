@@ -328,6 +328,41 @@ nav {
     color: #dc2626;
 }
 
+/* Sign Up Page Specific Styles */
+.form-hint {
+    display: block;
+    color: #64748b;
+    font-size: 0.8rem;
+    margin-top: 5px;
+}
+
+.form-buttons {
+    display: flex;
+    gap: 15px;
+    margin-top: 10px;
+}
+
+.reset-btn {
+    width: 100%;
+    padding: 14px;
+    background-color: transparent;
+    color: #1e40af;
+    border: 2px solid #1e40af;
+    border-radius: 6px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.reset-btn:hover {
+    background-color: rgba(30, 64, 175, 0.1);
+}
+
+.reset-btn:active {
+    transform: translateY(0);
+}
+
 /* About Page Styles */
 .about-container {
     width: 100%;
@@ -425,6 +460,129 @@ nav {
     padding-top: 20px;
 }
 
+/* Contact Page Styles */
+.contact-container {
+    width: 100%;
+    max-width: 800px; /* Reduced from 1200px for vertical layout */
+    padding: 40px 20px;
+}
+
+.contact-header {
+    text-align: center;
+    margin-bottom: 50px;
+}
+
+.contact-header h1 {
+    color: #0f172a;
+    font-size: 2.8rem;
+    margin-bottom: 15px;
+}
+
+.contact-header p {
+    color: #334155;
+    font-size: 1.1rem;
+    max-width: 700px;
+    margin: 0 auto;
+    line-height: 1.6;
+}
+
+.contact-content {
+    display: flex;
+    flex-direction: column; /* Changed from row to column for vertical layout */
+    gap: 40px;
+    margin-bottom: 60px;
+}
+
+.contact-info {
+    width: 100%;
+}
+
+.contact-form {
+    width: 100%;
+}
+
+.contact-card {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 12px;
+    padding: 30px;
+    margin-bottom: 25px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.contact-card h3 {
+    color: #1e40af;
+    margin-bottom: 20px;
+    font-size: 1.4rem;
+}
+
+.contact-item {
+    display: flex;
+    align-items: flex-start;
+    gap: 15px;
+    margin-bottom: 20px;
+}
+
+.contact-icon {
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, #1e40af, #3b82f6);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.2rem;
+}
+
+.contact-details h4 {
+    color: #0f172a;
+    margin-bottom: 5px;
+    font-size: 1.1rem;
+}
+
+.contact-details p {
+    color: #64748b;
+    line-height: 1.5;
+}
+
+.form-textarea {
+    width: 100%;
+    padding: 12px 15px;
+    border: 2px solid #cbd5e1;
+    border-radius: 6px;
+    font-size: 1rem;
+    color: #0f172a;
+    background: white;
+    transition: all 0.3s;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    min-height: 150px;
+    resize: vertical;
+}
+
+.form-textarea:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.contact-btn {
+    padding: 14px 30px;
+    background: linear-gradient(to right, #1e40af, #1e3a8a);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    width: 100%;
+}
+
+.contact-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(30, 64, 175, 0.3);
+}
+
 @media (max-width: 1024px) {
     .hero h1 {
         font-size: 2.8rem;
@@ -448,6 +606,10 @@ nav {
     
     .about-image img {
         max-width: 400px;
+    }
+    
+    .contact-header h1 {
+        font-size: 2.4rem;
     }
 }
 
@@ -572,6 +734,20 @@ nav {
     .about-image img {
         max-width: 300px;
     }
+    
+    /* Contact page responsive */
+    .contact-header h1 {
+        font-size: 2.2rem;
+    }
+    
+    .contact-card {
+        padding: 20px;
+    }
+    
+    .contact-item {
+        flex-direction: column;
+        align-items: flex-start;
+    }
 }
 
 @media (max-width: 480px) {
@@ -599,5 +775,13 @@ nav {
     
     .about-image img {
         max-width: 250px;
+    }
+    
+    .contact-header h1 {
+        font-size: 1.8rem;
+    }
+    
+    .contact-container {
+        padding: 20px 15px;
     }
 }
