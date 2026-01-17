@@ -209,124 +209,6 @@ nav {
     color: #e0e0e0;
 }
 
-/* Game Page Styles */
-.page-title {
-    text-align: center;
-    margin-bottom: 3rem;
-}
-
-.page-title h1 {
-    color: #0f172a; /* Changed from #2c3e50 to match your theme */
-    font-size: 2.5rem;
-    margin-bottom: 0.5rem;
-}
-
-.page-title p {
-    color: #1e40af; /* Changed from #7f8c8d to match your theme */
-    font-size: 1.2rem;
-    font-weight: 500;
-}
-
-/* Game Sections Layout */
-.game-sections {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-    gap: 2.5rem;
-    max-width: 900px;
-    margin: 0 auto;
-    padding: 0 1rem;
-    width: 100%;
-}
-
-/* Game Card */
-.game-card {
-    background: white;
-    border-radius: 15px;
-    overflow: hidden;
-    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-    border: 1px solid rgba(30, 64, 175, 0.2); /* Changed to match your theme */
-}
-
-.game-card:hover {
-    transform: translateY(-10px);
-    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
-}
-
-/* Game Icon */
-.game-icon {
-    height: 140px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 4rem;
-    color: white;
-}
-
-.password-icon {
-    background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%); /* Changed to match your theme */
-}
-
-.phishing-icon {
-    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-}
-
-.game-icon i {
-    filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.2));
-}
-
-/* Game Content */
-.game-content {
-    padding: 2.5rem;
-}
-
-.game-content h2 {
-    color: #0f172a; /* Changed from #2c3e50 to match your theme */
-    font-size: 1.8rem;
-    margin-bottom: 1rem;
-    font-weight: 600;
-}
-
-.game-content p {
-    color: #334155; /* Changed from #5d6d7e to match your theme */
-    line-height: 1.6;
-    margin-bottom: 1.8rem;
-    font-size: 1.05rem;
-}
-
-/* Play Button */
-.play-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%); /* Changed to match your theme */
-    color: white;
-    padding: 14px 30px;
-    border-radius: 50px;
-    text-decoration: none;
-    font-weight: 600;
-    transition: all 0.3s ease;
-    border: none;
-    cursor: pointer;
-    font-size: 1.05rem;
-    box-shadow: 0 4px 15px rgba(30, 64, 175, 0.2);
-}
-
-.play-btn:hover {
-    background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%); /* Changed to match your theme */
-    transform: translateX(8px);
-    box-shadow: 0 8px 25px rgba(30, 64, 175, 0.3);
-}
-
-.play-btn i {
-    transition: transform 0.3s ease;
-}
-
-.play-btn:hover i {
-    transform: translateX(8px);
-}
-
-/* Login Page Styles */
 .login-container {
     width: 100%;
     max-width: 400px;
@@ -445,7 +327,13 @@ nav {
     color: #dc2626;
 }
 
-/* Sign Up Page Specific Styles */
+.login-links {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 15px;
+}
+
 .form-hint {
     display: block;
     color: #64748b;
@@ -480,7 +368,6 @@ nav {
     transform: translateY(0);
 }
 
-/* About Page Styles */
 .about-container {
     width: 100%;
     max-width: 1200px;
@@ -492,19 +379,9 @@ nav {
     align-items: center;
     gap: 60px;
     margin-bottom: 80px;
+    flex-direction: row;
 }
 
-/* ALL sections: Text on left, Image on right */
-.about-section {
-    flex-direction: row; /* Changed from alternating to always text left, image right */
-}
-
-/* Remove the reverse class - we don't need it anymore */
-.about-section.reverse {
-    flex-direction: row; /* Make it the same as regular sections */
-}
-
-/* Message Section Styles - Special styling for last section */
 .message-section {
     background: rgba(255, 255, 255, 0.1);
     border-radius: 12px;
@@ -561,7 +438,6 @@ nav {
     align-items: center;
 }
 
-/* Image styles for transparent background */
 .about-image img {
     width: 100%;
     max-width: 500px;
@@ -571,16 +447,9 @@ nav {
     background-color: transparent;
 }
 
-/* Update main-content for about page */
-.about-page .main-content {
-    justify-content: flex-start;
-    padding-top: 20px;
-}
-
-/* Contact Page Styles */
 .contact-container {
     width: 100%;
-    max-width: 800px; /* Reduced from 1200px for vertical layout */
+    max-width: 800px;
     padding: 40px 20px;
 }
 
@@ -605,7 +474,7 @@ nav {
 
 .contact-content {
     display: flex;
-    flex-direction: column; /* Changed from row to column for vertical layout */
+    flex-direction: column;
     gap: 40px;
     margin-bottom: 60px;
 }
@@ -700,7 +569,83 @@ nav {
     box-shadow: 0 10px 20px rgba(30, 64, 175, 0.3);
 }
 
-/* Responsive Design */
+.game-header {
+    text-align: center;
+    margin-bottom: 50px;
+}
+
+.game-header h1 {
+    color: #0f172a;
+    font-size: 2.5rem;
+    margin-bottom: 15px;
+}
+
+.game-header p {
+    color: #334155;
+    font-size: 1.1rem;
+    max-width: 600px;
+    margin: 0 auto;
+    line-height: 1.6;
+}
+
+.game-sections {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 30px;
+    max-width: 800px;
+    margin: 0 auto;
+    width: 100%;
+    padding: 0 20px;
+}
+
+.game-card {
+    background: white;
+    border-radius: 12px;
+    padding: 40px 30px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e2e8f0;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.game-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+}
+
+.game-content h2 {
+    color: #0f172a;
+    font-size: 1.8rem;
+    margin-bottom: 15px;
+    font-weight: 600;
+}
+
+.game-content p {
+    color: #334155;
+    line-height: 1.6;
+    margin-bottom: 25px;
+    font-size: 1.05rem;
+}
+
+.play-btn {
+    display: inline-block;
+    background: linear-gradient(to right, #1e40af, #1e3a8a);
+    color: white;
+    padding: 12px 30px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    border: none;
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+.play-btn:hover {
+    background: linear-gradient(to right, #1e3a8a, #1e40af);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(30, 64, 175, 0.2);
+}
+
 @media (max-width: 1024px) {
     .hero h1 {
         font-size: 2.8rem;
@@ -730,13 +675,7 @@ nav {
         font-size: 2.4rem;
     }
     
-    /* Game page responsive */
-    .game-sections {
-        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-        gap: 2rem;
-    }
-    
-    .page-title h1 {
+    .game-header h1 {
         font-size: 2.2rem;
     }
 }
@@ -828,7 +767,6 @@ nav {
         text-align: center;
     }
     
-    /* Login page responsive */
     .login-container {
         margin: 0 20px;
         padding: 30px 20px;
@@ -863,7 +801,6 @@ nav {
         max-width: 300px;
     }
     
-    /* Contact page responsive */
     .contact-header h1 {
         font-size: 2.2rem;
     }
@@ -877,28 +814,14 @@ nav {
         align-items: flex-start;
     }
     
-    /* Game page responsive */
     .game-sections {
         grid-template-columns: 1fr;
         max-width: 400px;
-        gap: 1.5rem;
+        gap: 25px;
     }
     
-    .game-icon {
-        height: 120px;
-        font-size: 3.5rem;
-    }
-    
-    .game-content {
-        padding: 2rem;
-    }
-    
-    .page-title h1 {
-        font-size: 2rem;
-    }
-    
-    .page-title p {
-        font-size: 1.1rem;
+    .game-card {
+        padding: 30px 25px;
     }
 }
 
@@ -937,14 +860,12 @@ nav {
         padding: 20px 15px;
     }
     
-    /* Game page responsive */
-    .game-content {
-        padding: 1.5rem;
+    .game-header h1 {
+        font-size: 1.8rem;
     }
     
-    .game-icon {
-        height: 100px;
-        font-size: 3rem;
+    .game-header p {
+        font-size: 1rem;
     }
     
     .game-content h2 {
@@ -957,15 +878,7 @@ nav {
     
     .play-btn {
         width: 100%;
-        justify-content: center;
-        padding: 12px 20px;
-    }
-    
-    .page-title h1 {
-        font-size: 1.8rem;
-    }
-    
-    .page-title p {
-        font-size: 1rem;
+        text-align: center;
+        padding: 14px;
     }
 }
