@@ -95,154 +95,6 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sign In | CybAware</title>
     <link rel="stylesheet" href="css/styles.css">
-    <style>
-        .login-container {
-            width: 100%;
-            max-width: 400px;
-            margin: 0 auto;
-            padding: 40px 30px;
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 12px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-        }
-
-        .login-title {
-            color: #1e40af;
-            text-align: center;
-            margin-bottom: 10px;
-            font-size: 2rem;
-        }
-
-        .login-subtitle {
-            color: #334155;
-            text-align: center;
-            margin-bottom: 30px;
-            font-size: 1rem;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
-        }
-
-        .form-label {
-            display: block;
-            color: #0f172a;
-            margin-bottom: 8px;
-            font-weight: 600;
-        }
-
-        .form-input {
-            width: 100%;
-            padding: 12px 15px;
-            border: 2px solid #cbd5e1;
-            border-radius: 6px;
-            font-size: 1rem;
-            color: #0f172a;
-            background: white;
-            transition: all 0.3s;
-        }
-
-        .form-input:focus {
-            outline: none;
-            border-color: #3b82f6;
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-        }
-
-        .form-input.error {
-            border-color: #ef4444;
-        }
-
-        .error-message {
-            color: #ef4444;
-            font-size: 0.875rem;
-            margin-top: 5px;
-            display: block;
-        }
-
-        .login-btn {
-            width: 100%;
-            padding: 14px;
-            background: linear-gradient(to right, #1e40af, #1e3a8a);
-            color: white;
-            border: none;
-            border-radius: 6px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-            margin-top: 10px;
-        }
-
-        .login-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(30, 64, 175, 0.3);
-        }
-
-        .login-btn:active {
-            transform: translateY(0);
-        }
-
-        .login-footer {
-            text-align: center;
-            margin-top: 25px;
-            color: #64748b;
-            font-size: 0.9rem;
-        }
-
-        .login-footer a {
-            color: #1e40af;
-            text-decoration: none;
-            font-weight: 600;
-            transition: color 0.3s;
-        }
-
-        .login-footer a:hover {
-            color: #1e3a8a;
-            text-decoration: underline;
-        }
-
-        .alert {
-            padding: 12px 15px;
-            border-radius: 6px;
-            margin-bottom: 20px;
-            font-size: 0.9rem;
-        }
-
-        .alert-danger {
-            background-color: #fee2e2;
-            border: 1px solid #fecaca;
-            color: #dc2626;
-        }
-
-        .main-content {
-            justify-content: flex-start;
-            padding-top: 60px;
-            padding-bottom: 60px;
-        }
-
-        @media (max-width: 768px) {
-            .login-container {
-                margin: 0 20px;
-                padding: 30px 20px;
-            }
-            
-            .main-content {
-                padding-top: 40px;
-                padding-bottom: 40px;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .login-container {
-                margin: 0 15px;
-                padding: 25px 15px;
-            }
-            
-            .login-title {
-                font-size: 1.8rem;
-            }
-        }
-    </style>
 </head>
 <body>
     <div class="container">
@@ -280,7 +132,10 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                 </form>
 
                 <div class="login-footer">
-                    <p>Don't have an account? <a href="register.php">Sign up now</a>.</p>
+                    <div class="login-links">
+                        <p>Don't have an account? <a href="register.php">Sign up now</a>.</p>
+                        <p>Forgot your password? <a href="passwordreset.php">Reset it here</a>.</p>
+                    </div>
                 </div>
             </div>
         </div>
