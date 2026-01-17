@@ -50,7 +50,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                 mysqli_stmt_store_result($stmt);
                 
                 // Check if username exists, if yes then verify password
-                if(mysqli_stmt_num_rows($stmt) == 1){                    
+                if(mysqli_stmt_num_rows($stmt) == 1){
                     // Bind result variables
                     mysqli_stmt_bind_result($stmt, $id, $username, $hashed_password);
                     if(mysqli_stmt_fetch($stmt)){
@@ -61,7 +61,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                             // Store data in session variables
                             $_SESSION["loggedin"] = true;
                             $_SESSION["id"] = $id;
-                            $_SESSION["username"] = $username;                            
+                            $_SESSION["username"] = $username;
                             
                             // Redirect user to welcome page
                             header("location: welcome.php");
@@ -104,10 +104,10 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
         <h2>Login</h2>
         <p>Please fill in your credentials to login.</p>
 
-        <?php 
+        <?php
         if(!empty($login_err)){
             echo '<div class="alert alert-danger">' . $login_err . '</div>';
-        }        
+        }
         ?>
 
         <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
@@ -115,7 +115,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                 <label>Username</label>
                 <input type="text" name="username" class="form-control <?php echo (!empty($username_err)) ? 'is-invalid' : ''; ?>" value="<?php echo $username; ?>">
                 <span class="invalid-feedback"><?php echo $username_err; ?></span>
-            </div>    
+            </div>
             <div class="form-group">
                 <label>Password</label>
                 <input type="password" name="password" class="form-control <?php echo (!empty($password_err)) ? 'is-invalid' : ''; ?>">
