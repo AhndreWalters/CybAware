@@ -51,7 +51,7 @@
 
                 <div class="about-section">
                     <div class="about-text">
-                        <h2>A Message from the CybAware Team</h2>
+                        <h2>Message from the CybAware Team</h2>
                         <p>The CybAware development team would like to express our sincere gratitude to everyone who has supported our mission to bridge the cybersecurity skills gap through educational gaming.</p>
                         
                         <p>While this project represents the culmination of our academic journey at T.A. Marryshow Community College, we hope it marks just the beginning of increased cybersecurity awareness in our community. We're incredibly proud of what we've achieved - from initial concept to functional game - and we hope CybAware serves as a valuable resource for students learning about digital safety.</p>
