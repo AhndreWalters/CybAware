@@ -80,7 +80,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
             // Attempt to execute the prepared statement
             if(mysqli_stmt_execute($stmt)){
                 // Redirect to login page
-                header("location: login.php");
+                header("location: signin.php");
             } else{
                 echo "Oops! Something went wrong. Please try again later.";
             }
@@ -99,39 +99,61 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Sign Up</title>
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-    <style>
-        body{ font: 14px sans-serif; }
-        .wrapper{ width: 360px; padding: 20px; }
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up | CybAware</title>
+    <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
-    <div class="wrapper">
-        <h2>Sign Up</h2>
-        <p>Please fill this form to create an account.</p>
-        <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
-            <div class="form-group">
-                <label>Username</label>
-                <input type="text" name="username" class="form-control <?php echo (!empty($username_err)) ? 'is-invalid' : ''; ?>" value="<?php echo $username; ?>">
-                <span class="invalid-feedback"><?php echo $username_err; ?></span>
+    <div class="container">
+        <?php include 'includes/navigation.php'; ?>
+
+        <div class="main-content">
+            <div class="login-container">
+                <h1 class="login-title">Create Account</h1>
+                <p class="login-subtitle">Please fill this form to create an account.</p>
+
+                <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
+                    <div class="form-group">
+                        <label class="form-label">Username</label>
+                        <input type="text" name="username" class="form-input <?php echo (!empty($username_err)) ? 'error' : ''; ?>" value="<?php echo htmlspecialchars($username); ?>">
+                        <?php if(!empty($username_err)): ?>
+                            <span class="error-message"><?php echo $username_err; ?></span>
+                        <?php endif; ?>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Password</label>
+                        <input type="password" name="password" class="form-input <?php echo (!empty($password_err)) ? 'error' : ''; ?>" value="<?php echo htmlspecialchars($password); ?>">
+                        <?php if(!empty($password_err)): ?>
+                            <span class="error-message"><?php echo $password_err; ?></span>
+                        <?php endif; ?>
+                        <small class="form-hint">Password must be at least 6 characters long.</small>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Confirm Password</label>
+                        <input type="password" name="confirm_password" class="form-input <?php echo (!empty($confirm_password_err)) ? 'error' : ''; ?>" value="<?php echo htmlspecialchars($confirm_password); ?>">
+                        <?php if(!empty($confirm_password_err)): ?>
+                            <span class="error-message"><?php echo $confirm_password_err; ?></span>
+                        <?php endif; ?>
+                    </div>
+                    
+                    <div class="form-buttons">
+                        <button type="submit" class="login-btn">Create Account</button>
+                    </div>
+                </form>
+
+                <div class="login-footer">
+                    <p>Already have an account? <a href="signin.php">Sign in here</a>.</p>
+                </div>
             </div>
-            <div class="form-group">
-                <label>Password</label>
-                <input type="password" name="password" class="form-control <?php echo (!empty($password_err)) ? 'is-invalid' : ''; ?>" value="<?php echo $password; ?>">
-                <span class="invalid-feedback"><?php echo $password_err; ?></span>
-            </div>
-            <div class="form-group">
-                <label>Confirm Password</label>
-                <input type="password" name="confirm_password" class="form-control <?php echo (!empty($confirm_password_err)) ? 'is-invalid' : ''; ?>" value="<?php echo $confirm_password; ?>">
-                <span class="invalid-feedback"><?php echo $confirm_password_err; ?></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" class="btn btn-primary" value="Submit">
-                <input type="reset" class="btn btn-secondary ml-2" value="Reset">
-            </div>
-            <p>Already have an account? <a href="login.php">Login here</a>.</p>
-        </form>
+        </div>
+        
+        <?php include 'includes/footer.php'; ?>
+        
+        <div class="menu-overlay" id="menuOverlay"></div>
     </div>
+
+    <script src="js/navigation.js"></script>
 </body>
 </html>
