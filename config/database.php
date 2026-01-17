@@ -1,6 +1,6 @@
 <?php
 define('DB_SERVER', 'cybaware-mysql-db-cybaware.l.aivencloud.com');
-define('DB_NAME', 'cybaware-db');
+define('DB_NAME', 'CybAwareDB');
 define('DB_USERNAME', 'avnadmin');
 define('DB_PASSWORD', 'AVNS_CtY4DwoGW-hpgGDEtqs');
 define('DB_PORT', '27855');
