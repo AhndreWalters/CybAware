@@ -3,27 +3,45 @@
 require_once "config/database.php";
  
 // Define variables and initialize with empty values
-$username = $password = $confirm_password = "";
-$username_err = $password_err = $confirm_password_err = "";
+$first_name = $last_name = $email = $password = $confirm_password = "";
+$first_name_err = $last_name_err = $email_err = $password_err = $confirm_password_err = "";
  
 // Processing form data when form is submitted
 if($_SERVER["REQUEST_METHOD"] == "POST"){
  
-    // Validate username
-    if(empty(trim($_POST["username"]))){
-        $username_err = "Please enter a username.";
-    } elseif(!preg_match('/^[a-zA-Z0-9_]+$/', trim($_POST["username"]))){
-        $username_err = "Username can only contain letters, numbers, and underscores.";
+    // Validate first name
+    if(empty(trim($_POST["first_name"]))){
+        $first_name_err = "Please enter your first name.";
+    } elseif(!preg_match('/^[a-zA-Z\s]+$/', trim($_POST["first_name"]))){
+        $first_name_err = "First name can only contain letters and spaces.";
     } else{
-        // Prepare a select statement
-        $sql = "SELECT id FROM users WHERE username = ?";
+        $first_name = trim($_POST["first_name"]);
+    }
+    
+    // Validate last name
+    if(empty(trim($_POST["last_name"]))){
+        $last_name_err = "Please enter your last name.";
+    } elseif(!preg_match('/^[a-zA-Z\s]+$/', trim($_POST["last_name"]))){
+        $last_name_err = "Last name can only contain letters and spaces.";
+    } else{
+        $last_name = trim($_POST["last_name"]);
+    }
+    
+    // Validate email
+    if(empty(trim($_POST["email"]))){
+        $email_err = "Please enter an email address.";
+    } elseif(!filter_var(trim($_POST["email"]), FILTER_VALIDATE_EMAIL)){
+        $email_err = "Please enter a valid email address.";
+    } else{
+        // Prepare a select statement to check if email exists
+        $sql = "SELECT id FROM users WHERE email = ?";
         
         if($stmt = mysqli_prepare($link, $sql)){
             // Bind variables to the prepared statement as parameters
-            mysqli_stmt_bind_param($stmt, "s", $param_username);
+            mysqli_stmt_bind_param($stmt, "s", $param_email);
             
             // Set parameters
-            $param_username = trim($_POST["username"]);
+            $param_email = trim($_POST["email"]);
             
             // Attempt to execute the prepared statement
             if(mysqli_stmt_execute($stmt)){
@@ -31,9 +49,9 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                 mysqli_stmt_store_result($stmt);
                 
                 if(mysqli_stmt_num_rows($stmt) == 1){
-                    $username_err = "This username is already taken.";
+                    $email_err = "This email is already registered.";
                 } else{
-                    $username = trim($_POST["username"]);
+                    $email = trim($_POST["email"]);
                 }
             } else{
                 echo "Oops! Something went wrong. Please try again later.";
@@ -64,23 +82,29 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     }
     
     // Check input errors before inserting in database
-    if(empty($username_err) && empty($password_err) && empty($confirm_password_err)){
+    if(empty($first_name_err) && empty($last_name_err) && empty($email_err) && empty($password_err) && empty($confirm_password_err)){
+        
+        // Generate a unique username from first name and last name
+        $username = strtolower($first_name . $last_name . rand(100, 999));
         
         // Prepare an insert statement
-        $sql = "INSERT INTO users (username, password) VALUES (?, ?)";
+        $sql = "INSERT INTO users (first_name, last_name, email, username, password) VALUES (?, ?, ?, ?, ?)";
          
         if($stmt = mysqli_prepare($link, $sql)){
             // Bind variables to the prepared statement as parameters
-            mysqli_stmt_bind_param($stmt, "ss", $param_username, $param_password);
+            mysqli_stmt_bind_param($stmt, "sssss", $param_first_name, $param_last_name, $param_email, $param_username, $param_password);
             
             // Set parameters
+            $param_first_name = $first_name;
+            $param_last_name = $last_name;
+            $param_email = $email;
             $param_username = $username;
             $param_password = password_hash($password, PASSWORD_DEFAULT); // Creates a password hash
             
             // Attempt to execute the prepared statement
             if(mysqli_stmt_execute($stmt)){
                 // Redirect to login page
-                header("location: signin.php");
+                header("location: login.php");
             } else{
                 echo "Oops! Something went wrong. Please try again later.";
             }
@@ -113,12 +137,31 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                 <p class="login-subtitle">Please fill this form to create an account.</p>
 
                 <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
+                    <div class="form-row" style="display: flex; gap: 15px; margin-bottom: 20px;">
+                        <div class="form-group" style="flex: 1;">
+                            <label class="form-label">First Name</label>
+                            <input type="text" name="first_name" class="form-input <?php echo (!empty($first_name_err)) ? 'error' : ''; ?>" value="<?php echo htmlspecialchars($first_name); ?>">
+                            <?php if(!empty($first_name_err)): ?>
+                                <span class="error-message"><?php echo $first_name_err; ?></span>
+                            <?php endif; ?>
+                        </div>
+                        
+                        <div class="form-group" style="flex: 1;">
+                            <label class="form-label">Last Name</label>
+                            <input type="text" name="last_name" class="form-input <?php echo (!empty($last_name_err)) ? 'error' : ''; ?>" value="<?php echo htmlspecialchars($last_name); ?>">
+                            <?php if(!empty($last_name_err)): ?>
+                                <span class="error-message"><?php echo $last_name_err; ?></span>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+                    
                     <div class="form-group">
-                        <label class="form-label">Username</label>
-                        <input type="text" name="username" class="form-input <?php echo (!empty($username_err)) ? 'error' : ''; ?>" value="<?php echo htmlspecialchars($username); ?>">
-                        <?php if(!empty($username_err)): ?>
-                            <span class="error-message"><?php echo $username_err; ?></span>
+                        <label class="form-label">Email Address</label>
+                        <input type="email" name="email" class="form-input <?php echo (!empty($email_err)) ? 'error' : ''; ?>" value="<?php echo htmlspecialchars($email); ?>">
+                        <?php if(!empty($email_err)): ?>
+                            <span class="error-message"><?php echo $email_err; ?></span>
                         <?php endif; ?>
+                        <small class="form-hint">We'll never share your email with anyone else.</small>
                     </div>
                     
                     <div class="form-group">
@@ -138,7 +181,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                         <?php endif; ?>
                     </div>
                     
-                        <button type="submit" class="login-btn">Create Account</button>
+                    <button type="submit" class="login-btn">Create Account</button>
                 </form>
 
                 <br>
