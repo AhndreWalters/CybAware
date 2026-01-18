@@ -3,7 +3,7 @@
 
 <nav>
     <div class="logo">
-        <a href="index.php" style="text-decoration: none !important; display: inline-block;">
+        <a href="index.php">
             <div class="logo-text">CybAware</div>
         </a>
     </div>
