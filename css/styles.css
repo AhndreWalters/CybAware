@@ -182,6 +182,13 @@ nav {
     display: inline-block;
 }
 
+.logo-text {
+    color: white;
+    background: none;
+    -webkit-background-clip: initial;
+    background-clip: initial;
+}
+
 .nav-links {
     display: flex;
     gap: 30px;
