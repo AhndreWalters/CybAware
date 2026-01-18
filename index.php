@@ -21,9 +21,9 @@
                     </p>
                     
                     <div class="hero-buttons">
-                        <a href="game.php" class="btn btn-primary">
-                            <i class=""></i> Play Now
-                        </a>
+                        <div style="display: flex; justify-content: center; width: 100%;">
+                            <a href="game.php" class="btn btn-primary">Play Now</a>
+                        </div>
                     </div>
                 </div>
             </div>

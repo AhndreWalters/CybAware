@@ -22,6 +22,145 @@ body {
     flex-direction: column;
 }
 
+.text-primary { color: #0f172a; }
+.text-secondary { color: #334155; }
+.text-muted { color: #64748b; }
+.text-white { color: white; }
+.text-gradient {
+    background: linear-gradient(to right, white, #f0f0f0);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+.btn {
+    padding: 15px 30px;
+    border-radius: 8px;
+    font-weight: 600;
+    text-decoration: none;
+    display: inline-block;
+    transition: all 0.3s;
+    min-width: 180px;
+    text-align: center;
+    border: none;
+    cursor: pointer;
+    font-size: 1rem;
+}
+
+.btn-primary {
+    background: linear-gradient(to right, #1e40af, #1e3a8a);
+    color: white;
+}
+
+.btn-primary:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px rgba(30, 64, 175, 0.3);
+}
+
+.btn-secondary {
+    background-color: transparent;
+    color: #1e40af;
+    border: 2px solid #1e40af;
+}
+
+.btn-secondary:hover {
+    background-color: rgba(30, 64, 175, 0.1);
+}
+
+.btn-block {
+    width: 100%;
+    max-width: 300px;
+}
+
+.btn-small {
+    padding: 12px 25px;
+    min-width: 150px;
+}
+
+/* Reassign existing button classes to use .btn */
+.play-btn,
+.login-btn,
+.contact-btn {
+    padding: 14px 30px;
+    background: linear-gradient(to right, #1e40af, #1e3a8a);
+    color: white;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s;
+    border: none;
+    font-size: 1rem;
+    cursor: pointer;
+    display: inline-block;
+}
+
+.play-btn:hover,
+.login-btn:hover,
+.contact-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(30, 64, 175, 0.3);
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-label {
+    display: block;
+    color: #0f172a;
+    margin-bottom: 8px;
+    font-weight: 600;
+}
+
+.form-input,
+.form-textarea {
+    width: 100%;
+    padding: 12px 15px;
+    border: 2px solid #cbd5e1;
+    border-radius: 6px;
+    font-size: 1rem;
+    color: #0f172a;
+    background: white;
+    transition: all 0.3s;
+}
+
+.form-textarea {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    min-height: 150px;
+    resize: vertical;
+}
+
+.form-input:focus,
+.form-textarea:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.form-input.error {
+    border-color: #ef4444;
+}
+
+.error-message {
+    color: #ef4444;
+    font-size: 0.875rem;
+    margin-top: 5px;
+    display: block;
+}
+
+.form-hint {
+    display: block;
+    color: #64748b;
+    font-size: 0.8rem;
+    margin-top: 5px;
+}
+
+.form-buttons {
+    display: flex;
+    gap: 15px;
+    margin-top: 10px;
+}
+
 nav {
     display: flex;
     justify-content: space-between;
@@ -38,16 +177,9 @@ nav {
     font-weight: 700;
 }
 
-.logo-icon {
-    color: white;
-    font-size: 2rem;
-}
-
-.logo-text {
-    background: linear-gradient(to right, white, #f0f0f0);
-    -webkit-background-clip: text;
-    background-clip: text;
-    color: transparent;
+.logo a {
+    text-decoration: none !important;
+    display: inline-block;
 }
 
 .nav-links {
@@ -147,37 +279,6 @@ nav {
     justify-content: center;
 }
 
-.btn {
-    padding: 15px 30px;
-    border-radius: 8px;
-    font-weight: 600;
-    text-decoration: none;
-    display: inline-block;
-    transition: all 0.3s;
-    min-width: 180px;
-}
-
-.btn-primary {
-    background: linear-gradient(to right, #1e40af, #1e3a8a);
-    color: white;
-}
-
-.btn-primary:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 10px 20px rgba(30, 64, 175, 0.3);
-}
-
-.btn-secondary {
-    background-color: transparent;
-    color: #1e40af;
-    border: 2px solid #1e40af;
-}
-
-.btn-secondary:hover {
-    background-color: rgba(30, 64, 175, 0.1);
-    color: #1e3a8a;
-}
-
 .simple-footer {
     padding: 25px 0;
     border-top: 1px solid rgba(255, 255, 255, 0.3);
@@ -209,7 +310,22 @@ nav {
     color: #e0e0e0;
 }
 
-.login-container {
+.card {
+    background: white;
+    border-radius: 12px;
+    padding: 40px 30px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    border: 1px solid #e2e8f0;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+}
+
+.login-container,
+.contact-form {
     width: 100%;
     max-width: 400px;
     margin: 0 auto;
@@ -219,99 +335,20 @@ nav {
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
 }
 
-.login-title {
+.login-title,
+.contact-header h1 {
     color: #1e40af;
     text-align: center;
     margin-bottom: 10px;
     font-size: 2rem;
 }
 
-.login-subtitle {
+.login-subtitle,
+.contact-header p {
     color: #334155;
     text-align: center;
     margin-bottom: 30px;
     font-size: 1rem;
-}
-
-.form-group {
-    margin-bottom: 20px;
-}
-
-.form-label {
-    display: block;
-    color: #0f172a;
-    margin-bottom: 8px;
-    font-weight: 600;
-}
-
-.form-input {
-    width: 100%;
-    padding: 12px 15px;
-    border: 2px solid #cbd5e1;
-    border-radius: 6px;
-    font-size: 1rem;
-    color: #0f172a;
-    background: white;
-    transition: all 0.3s;
-}
-
-.form-input:focus {
-    outline: none;
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-}
-
-.form-input.error {
-    border-color: #ef4444;
-}
-
-.error-message {
-    color: #ef4444;
-    font-size: 0.875rem;
-    margin-top: 5px;
-    display: block;
-}
-
-.login-btn {
-    width: 100%;
-    padding: 14px;
-    background: linear-gradient(to right, #1e40af, #1e3a8a);
-    color: white;
-    border: none;
-    border-radius: 6px;
-    font-size: 1rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s;
-    margin-top: 10px;
-}
-
-.login-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 10px 20px rgba(30, 64, 175, 0.3);
-}
-
-.login-btn:active {
-    transform: translateY(0);
-}
-
-.login-footer {
-    text-align: center;
-    margin-top: 25px;
-    color: #64748b;
-    font-size: 0.9rem;
-}
-
-.login-footer a {
-    color: #1e40af;
-    text-decoration: none;
-    font-weight: 600;
-    transition: color 0.3s;
-}
-
-.login-footer a:hover {
-    color: #1e3a8a;
-    text-decoration: underline;
 }
 
 .alert {
@@ -325,47 +362,6 @@ nav {
     background-color: #fee2e2;
     border: 1px solid #fecaca;
     color: #dc2626;
-}
-
-.login-links {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    margin-top: 15px;
-}
-
-.form-hint {
-    display: block;
-    color: #64748b;
-    font-size: 0.8rem;
-    margin-top: 5px;
-}
-
-.form-buttons {
-    display: flex;
-    gap: 15px;
-    margin-top: 10px;
-}
-
-.reset-btn {
-    width: 100%;
-    padding: 14px;
-    background-color: transparent;
-    color: #1e40af;
-    border: 2px solid #1e40af;
-    border-radius: 6px;
-    font-size: 1rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s;
-}
-
-.reset-btn:hover {
-    background-color: rgba(30, 64, 175, 0.1);
-}
-
-.reset-btn:active {
-    transform: translateY(0);
 }
 
 .about-container {
@@ -382,46 +378,22 @@ nav {
     flex-direction: row;
 }
 
-.message-section {
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 12px;
-    padding: 40px;
-    margin-top: 40px;
-}
-
-.message-section .about-text {
-    text-align: center;
-}
-
-.message-section .signature {
-    margin-top: 30px;
-    font-style: italic;
-    font-size: 1.1rem;
-    color: #1e40af;
-    text-align: center;
-}
-
-.message-section .signature strong {
-    color: #0f172a;
-}
-
 .about-text {
     flex: 1;
     text-align: left;
 }
 
-.about-text h1 {
-    font-size: 2.5rem;
+.about-text h1,
+.about-text h2 {
     color: #0f172a;
     margin-bottom: 25px;
     line-height: 1.3;
 }
 
-.about-text h2 {
+.about-text h1 { font-size: 2.5rem; }
+.about-text h2 { 
     font-size: 2rem;
     color: #1e40af;
-    margin-bottom: 20px;
-    line-height: 1.3;
 }
 
 .about-text p {
@@ -447,15 +419,33 @@ nav {
     background-color: transparent;
 }
 
+.message-section {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 40px;
+    margin-top: 40px;
+}
+
+.message-section .about-text {
+    text-align: center;
+}
+
+.message-section .signature {
+    margin-top: 30px;
+    font-style: italic;
+    font-size: 1.1rem;
+    color: #1e40af;
+    text-align: center;
+}
+
+.message-section .signature strong {
+    color: #0f172a;
+}
+
 .contact-container {
     width: 100%;
     max-width: 800px;
     padding: 40px 20px;
-}
-
-.contact-header {
-    text-align: center;
-    margin-bottom: 50px;
 }
 
 .contact-header h1 {
@@ -464,27 +454,11 @@ nav {
     margin-bottom: 15px;
 }
 
-.contact-header p {
-    color: #334155;
-    font-size: 1.1rem;
-    max-width: 700px;
-    margin: 0 auto;
-    line-height: 1.6;
-}
-
 .contact-content {
     display: flex;
     flex-direction: column;
     gap: 40px;
     margin-bottom: 60px;
-}
-
-.contact-info {
-    width: 100%;
-}
-
-.contact-form {
-    width: 100%;
 }
 
 .contact-card {
@@ -526,49 +500,6 @@ nav {
     font-size: 1.1rem;
 }
 
-.contact-details p {
-    color: #64748b;
-    line-height: 1.5;
-}
-
-.form-textarea {
-    width: 100%;
-    padding: 12px 15px;
-    border: 2px solid #cbd5e1;
-    border-radius: 6px;
-    font-size: 1rem;
-    color: #0f172a;
-    background: white;
-    transition: all 0.3s;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    min-height: 150px;
-    resize: vertical;
-}
-
-.form-textarea:focus {
-    outline: none;
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-}
-
-.contact-btn {
-    padding: 14px 30px;
-    background: linear-gradient(to right, #1e40af, #1e3a8a);
-    color: white;
-    border: none;
-    border-radius: 6px;
-    font-size: 1rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s;
-    width: 100%;
-}
-
-.contact-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 10px 20px rgba(30, 64, 175, 0.3);
-}
-
 .game-header {
     text-align: center;
     margin-bottom: 50px;
@@ -578,14 +509,6 @@ nav {
     color: #0f172a;
     font-size: 2.5rem;
     margin-bottom: 15px;
-}
-
-.game-header p {
-    color: #334155;
-    font-size: 1.1rem;
-    max-width: 600px;
-    margin: 0 auto;
-    line-height: 1.6;
 }
 
 .game-sections {
@@ -626,66 +549,34 @@ nav {
     font-size: 1.05rem;
 }
 
-.play-btn {
-    display: inline-block;
-    background: linear-gradient(to right, #1e40af, #1e3a8a);
-    color: white;
-    padding: 12px 30px;
-    border-radius: 6px;
-    text-decoration: none;
-    font-weight: 600;
-    transition: all 0.3s ease;
-    border: none;
-    font-size: 1rem;
-    cursor: pointer;
+.menu-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 999;
 }
 
-.play-btn:hover {
-    background: linear-gradient(to right, #1e3a8a, #1e40af);
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(30, 64, 175, 0.2);
+.menu-overlay.active {
+    display: block;
 }
 
 @media (max-width: 1024px) {
-    .hero h1 {
-        font-size: 2.8rem;
-    }
-    
-    .tagline {
-        font-size: 1.6rem;
-    }
-    
-    .about-section {
-        gap: 40px;
-    }
-    
-    .about-text h1 {
-        font-size: 2.2rem;
-    }
-    
-    .about-text h2 {
-        font-size: 1.8rem;
-    }
-    
-    .about-image img {
-        max-width: 400px;
-    }
-    
-    .contact-header h1 {
-        font-size: 2.4rem;
-    }
-    
-    .game-header h1 {
-        font-size: 2.2rem;
-    }
+    .hero h1 { font-size: 2.8rem; }
+    .tagline { font-size: 1.6rem; }
+    .about-section { gap: 40px; }
+    .about-text h1 { font-size: 2.2rem; }
+    .about-text h2 { font-size: 1.8rem; }
+    .about-image img { max-width: 400px; }
+    .contact-header h1,
+    .game-header h1 { font-size: 2.4rem; }
 }
 
 @media (max-width: 768px) {
-    .mobile-menu-btn {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-    }
+    .mobile-menu-btn { display: flex; }
     
     .nav-links {
         display: none;
@@ -710,16 +601,11 @@ nav {
         transform: translateX(0);
     }
     
-    .nav-links li {
-        width: 100%;
-    }
-    
     .nav-links a {
-        display: block;
+        color: #0f172a;
         padding: 12px 15px;
         border-radius: 5px;
         transition: background-color 0.3s;
-        color: #0f172a;
     }
     
     .nav-links a:hover {
@@ -727,39 +613,10 @@ nav {
         color: #1e40af;
     }
     
-    .menu-overlay {
-        display: none;
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.5);
-        z-index: 999;
-    }
-    
-    .menu-overlay.active {
-        display: block;
-    }
-    
-    .hero h1 {
-        font-size: 2.2rem;
-    }
-    
-    .tagline {
-        font-size: 1.5rem;
-    }
-    
-    .hero-buttons {
-        flex-direction: column;
-        align-items: center;
-    }
-    
-    .btn {
-        width: 100%;
-        max-width: 300px;
-        text-align: center;
-    }
+    .hero h1 { font-size: 2.2rem; }
+    .tagline { font-size: 1.5rem; }
+    .hero-buttons { flex-direction: column; }
+    .btn { max-width: 300px; }
     
     .footer-content {
         flex-direction: column;
@@ -767,15 +624,8 @@ nav {
         text-align: center;
     }
     
-    .login-container {
-        margin: 0 20px;
-        padding: 30px 20px;
-    }
-    
-    .main-content {
-        padding-top: 40px;
-        padding-bottom: 40px;
-    }
+    .login-container,
+    .contact-form { margin: 0 20px; padding: 30px 20px; }
     
     .about-section {
         flex-direction: column;
@@ -783,102 +633,32 @@ nav {
         margin-bottom: 60px;
     }
     
-    .about-text h1 {
-        font-size: 2rem;
-        text-align: center;
-    }
+    .about-text h1,
+    .about-text h2,
+    .about-text p { text-align: center; }
     
-    .about-text h2 {
-        font-size: 1.6rem;
-        text-align: center;
-    }
-    
-    .about-text p {
-        text-align: center;
-    }
-    
-    .about-image img {
-        max-width: 300px;
-    }
-    
-    .contact-header h1 {
-        font-size: 2.2rem;
-    }
-    
-    .contact-card {
-        padding: 20px;
-    }
-    
-    .contact-item {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-    
-    .game-sections {
-        grid-template-columns: 1fr;
-        max-width: 400px;
-        gap: 25px;
-    }
-    
-    .game-card {
-        padding: 30px 25px;
-    }
+    .about-image img { max-width: 300px; }
+    .contact-card { padding: 20px; }
+    .contact-item { flex-direction: column; }
+    .game-sections { grid-template-columns: 1fr; max-width: 400px; gap: 25px; }
+    .game-card { padding: 30px 25px; }
 }
 
 @media (max-width: 480px) {
-    .footer-links {
-        flex-direction: column;
-        gap: 10px;
-    }
+    .footer-links { flex-direction: column; gap: 10px; }
+    .login-container,
+    .contact-form { margin: 0 15px; padding: 25px 15px; }
     
-    .login-container {
-        margin: 0 15px;
-        padding: 25px 15px;
-    }
+    .login-title,
+    .contact-header h1 { font-size: 1.8rem; }
     
-    .login-title {
-        font-size: 1.8rem;
-    }
+    .about-text h1 { font-size: 1.8rem; }
+    .about-text h2 { font-size: 1.4rem; }
+    .about-image img { max-width: 250px; }
     
-    .about-text h1 {
-        font-size: 1.8rem;
-    }
-    
-    .about-text h2 {
-        font-size: 1.4rem;
-    }
-    
-    .about-image img {
-        max-width: 250px;
-    }
-    
-    .contact-header h1 {
-        font-size: 1.8rem;
-    }
-    
-    .contact-container {
-        padding: 20px 15px;
-    }
-    
-    .game-header h1 {
-        font-size: 1.8rem;
-    }
-    
-    .game-header p {
-        font-size: 1rem;
-    }
-    
-    .game-content h2 {
-        font-size: 1.6rem;
-    }
-    
-    .game-content p {
-        font-size: 1rem;
-    }
-    
-    .play-btn {
-        width: 100%;
-        text-align: center;
-        padding: 14px;
-    }
+    .game-header h1 { font-size: 1.8rem; }
+    .game-header p { font-size: 1rem; }
+    .game-content h2 { font-size: 1.6rem; }
+    .game-content p { font-size: 1rem; }
+    .play-btn { width: 100%; padding: 14px; }
 }

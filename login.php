@@ -131,10 +131,12 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                     <button type="submit" class="login-btn">Sign In</button>
                 </form>
 
+                <br>
+
                 <div class="login-footer">
                     <div class="login-links">
-                        <p>Don't have an account? <a href="register.php">Sign up now</a>.</p>
-                        <p>Forgot your password? <a href="passwordreset.php">Reset it here</a>.</p>
+                        <p>Don't have an account? <a href="register.php" style="color: #1e40af; font-weight: 600; text-decoration: none;">Sign up now</a>.</p>
+                        <p>Forgot your password? <a href="passwordreset.php" style="color: #1e40af; font-weight: 600; text-decoration: none;">Reset it here</a>.</p>
                     </div>
                 </div>
             </div>

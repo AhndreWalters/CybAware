@@ -138,13 +138,13 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                         <?php endif; ?>
                     </div>
                     
-                    <div class="form-buttons">
                         <button type="submit" class="login-btn">Create Account</button>
-                    </div>
                 </form>
 
+                <br>
+
                 <div class="login-footer">
-                    <p>Already have an account? <a href="login.php">Sign in here</a>.</p>
+                    <p>Already have an account? <a href="login.php" style="color: #1e40af; font-weight: 600; text-decoration: none;">Sign in here</a>.</p>
                 </div>
             </div>
         </div>
