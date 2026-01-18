@@ -567,53 +567,70 @@ nav {
     display: block;
 }
 
-@media (max-width: 1024px) {
-    .hero h1 { font-size: 2.8rem; }
-    .tagline { font-size: 1.6rem; }
-    .about-section { gap: 40px; }
-    .about-text h1 { font-size: 2.2rem; }
-    .about-text h2 { font-size: 1.8rem; }
-    .about-image img { max-width: 400px; }
-    .contact-header h1,
-    .game-header h1 { font-size: 2.4rem; }
-}
-
 @media (max-width: 768px) {
-    .mobile-menu-btn { display: flex; }
+    .mobile-menu-btn { 
+        display: flex; 
+        align-items: center;
+        justify-content: center;
+    }
     
     .nav-links {
         display: none;
         position: fixed;
-        top: 0;
-        right: 0;
-        width: 70%;
-        max-width: 300px;
+        top: 100%;
+        left: 0;
+        width: 100%;
         height: 100vh;
-        background: white;
+        background: rgba(30, 64, 175, 0.98);
         flex-direction: column;
-        padding: 80px 30px 30px;
+        padding: 100px 30px 30px;
         gap: 20px;
         z-index: 1000;
-        transition: transform 0.3s ease;
-        transform: translateX(100%);
+        transform: translateY(-100%);
+        transition: transform 0.3s ease-in-out;
     }
     
     .nav-links.active {
         display: flex;
-        transform: translateX(0);
+        transform: translateY(0);
     }
     
+    .nav-links li {
+        width: 100%;
+        text-align: center;
+        opacity: 0;
+        transform: translateY(-20px);
+        transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+    
+    .nav-links.active li {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    
+    .nav-links.active li:nth-child(1) { transition-delay: 0.1s; }
+    .nav-links.active li:nth-child(2) { transition-delay: 0.2s; }
+    .nav-links.active li:nth-child(3) { transition-delay: 0.3s; }
+    .nav-links.active li:nth-child(4) { transition-delay: 0.4s; }
+    
     .nav-links a {
-        color: #0f172a;
-        padding: 12px 15px;
+        color: white;
+        padding: 20px 15px;
         border-radius: 5px;
-        transition: background-color 0.3s;
+        transition: all 0.3s;
+        font-size: 1.2rem;
+        display: block;
+        border: 2px solid rgba(255, 255, 255, 0.1);
+        background: rgba(255, 255, 255, 0.1);
     }
     
     .nav-links a:hover {
-        background-color: rgba(30, 64, 175, 0.1);
-        color: #1e40af;
+        background: rgba(255, 255, 255, 0.2);
+        color: white;
+        border-color: rgba(255, 255, 255, 0.3);
+        transform: translateX(10px);
     }
+    
     
     .hero h1 { font-size: 2.2rem; }
     .tagline { font-size: 1.5rem; }
@@ -644,23 +661,4 @@ nav {
     .contact-item { flex-direction: column; }
     .game-sections { grid-template-columns: 1fr; max-width: 400px; gap: 25px; }
     .game-card { padding: 30px 25px; }
-}
-
-@media (max-width: 480px) {
-    .footer-links { flex-direction: column; gap: 10px; }
-    .login-container,
-    .contact-form { margin: 0 15px; padding: 25px 15px; }
-    
-    .login-title,
-    .contact-header h1 { font-size: 1.8rem; }
-    
-    .about-text h1 { font-size: 1.8rem; }
-    .about-text h2 { font-size: 1.4rem; }
-    .about-image img { max-width: 250px; }
-    
-    .game-header h1 { font-size: 1.8rem; }
-    .game-header p { font-size: 1rem; }
-    .game-content h2 { font-size: 1.6rem; }
-    .game-content p { font-size: 1rem; }
-    .play-btn { width: 100%; padding: 14px; }
 }
