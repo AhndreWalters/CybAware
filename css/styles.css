@@ -507,6 +507,12 @@ nav {
     font-size: 1.1rem;
 }
 
+.game-container {
+    width: 100%;
+    max-width: 800px;
+    padding: 40px 20px;
+}
+
 .game-header {
     text-align: center;
     margin-bottom: 50px;

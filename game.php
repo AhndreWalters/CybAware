@@ -11,7 +11,7 @@
         <?php include 'includes/navigation.php'; ?>
 
         <div class="main-content">
-            <div class="contact-container">
+            <div class="game-container">
                 <div class="game-header">
                     <h1>Cybersecurity Missions</h1>
                     <p>Choose an interactive mission to learn cybersecurity skills through gameplay. Each mission teaches essential online safety concepts in a fun, engaging way.</p>

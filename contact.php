@@ -15,7 +15,8 @@
             <div class="contact-container">
                 <div class="contact-header">
                     <h1>Get In Touch</h1>
-<p>Have questions about CybAware? Need support with the game? Want to collaborate? We're here to help! Reach out to us through our email: <a href="mailto:cybaware@proton.me" style="color: #1e40af; font-weight: 600; text-decoration: none;">cybaware@proton.me</a></p>                </div>
+                    
+                    <p>Have questions about CybAware? Need support with the game? Want to collaborate? We're here to help! Reach out to us through our email: <a href="mailto:cybaware@proton.me" style="color: #1e40af; font-weight: 600; text-decoration: none;">cybaware@proton.me</a></p>                </div>
 
                         <div class="contact-card">
                             <h3>Send Us a Message</h3>
