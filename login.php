@@ -1,89 +1,87 @@
 <?php
-// Initialize the session
+require_once "config/database.php";
+ 
 session_start();
  
-// Check if the user is already logged in, if yes then redirect him to welcome page
 if(isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true){
-    header("location: welcome.php");
+    header("location: index.php");
     exit;
 }
  
-// Include config file
-require_once "config/database.php";
+$login_input = $password = "";
+$login_err = $password_err = "";
  
-// Define variables and initialize with empty values
-$username = $password = "";
-$username_err = $password_err = $login_err = "";
- 
-// Processing form data when form is submitted
 if($_SERVER["REQUEST_METHOD"] == "POST"){
  
-    // Check if username is empty
-    if(empty(trim($_POST["username"]))){
-        $username_err = "Please enter username.";
+    if(empty(trim($_POST["login_input"]))){
+        $login_err = "Please enter your email or name.";
     } else{
-        $username = trim($_POST["username"]);
+        $login_input = trim($_POST["login_input"]);
     }
     
-    // Check if password is empty
     if(empty(trim($_POST["password"]))){
         $password_err = "Please enter your password.";
     } else{
         $password = trim($_POST["password"]);
     }
     
-    // Validate credentials
-    if(empty($username_err) && empty($password_err)){
-        // Prepare a select statement
-        $sql = "SELECT id, username, password FROM users WHERE username = ?";
+    if(empty($login_err) && empty($password_err)){
+        if(filter_var($login_input, FILTER_VALIDATE_EMAIL)){
+            $sql = "SELECT id, first_name, last_name, email, password FROM users WHERE email = ?";
+        } else {
+            $name_parts = explode(' ', $login_input, 2);
+            
+            if(count($name_parts) == 2){
+                $first_name = $name_parts[0];
+                $last_name = $name_parts[1];
+                $sql = "SELECT id, first_name, last_name, email, password FROM users WHERE first_name = ? AND last_name = ?";
+            } else {
+                $sql = "SELECT id, first_name, last_name, email, password FROM users WHERE first_name = ? OR last_name = ?";
+            }
+        }
         
         if($stmt = mysqli_prepare($link, $sql)){
-            // Bind variables to the prepared statement as parameters
-            mysqli_stmt_bind_param($stmt, "s", $param_username);
+            if(filter_var($login_input, FILTER_VALIDATE_EMAIL)){
+                mysqli_stmt_bind_param($stmt, "s", $param_login);
+                $param_login = $login_input;
+            } elseif(count($name_parts) == 2){
+                mysqli_stmt_bind_param($stmt, "ss", $first_name, $last_name);
+            } else {
+                mysqli_stmt_bind_param($stmt, "ss", $login_input, $login_input);
+            }
             
-            // Set parameters
-            $param_username = $username;
-            
-            // Attempt to execute the prepared statement
             if(mysqli_stmt_execute($stmt)){
-                // Store result
                 mysqli_stmt_store_result($stmt);
                 
-                // Check if username exists, if yes then verify password
-                if(mysqli_stmt_num_rows($stmt) == 1){
-                    // Bind result variables
-                    mysqli_stmt_bind_result($stmt, $id, $username, $hashed_password);
+                if(mysqli_stmt_num_rows($stmt) == 1){                    
+                    mysqli_stmt_bind_result($stmt, $id, $first_name, $last_name, $email, $hashed_password);
                     if(mysqli_stmt_fetch($stmt)){
                         if(password_verify($password, $hashed_password)){
-                            // Password is correct, so start a new session
                             session_start();
                             
-                            // Store data in session variables
                             $_SESSION["loggedin"] = true;
                             $_SESSION["id"] = $id;
-                            $_SESSION["username"] = $username;
+                            $_SESSION["email"] = $email;
+                            $_SESSION["first_name"] = $first_name;
+                            $_SESSION["last_name"] = $last_name;
+                            $_SESSION["full_name"] = $first_name . " " . $last_name;
                             
-                            // Redirect user to welcome page
-                            header("location: welcome.php");
+                            header("location: index.php");
                         } else{
-                            // Password is not valid, display a generic error message
-                            $login_err = "Invalid username or password.";
+                            $password_err = "The password you entered was not valid.";
                         }
                     }
                 } else{
-                    // Username doesn't exist, display a generic error message
-                    $login_err = "Invalid username or password.";
+                    $login_err = "No account found with those credentials.";
                 }
             } else{
                 echo "Oops! Something went wrong. Please try again later.";
             }
 
-            // Close statement
             mysqli_stmt_close($stmt);
         }
     }
     
-    // Close connection
     mysqli_close($link);
 }
 ?>
@@ -103,41 +101,36 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
         <div class="main-content">
             <div class="login-container">
                 <h1 class="login-title">Sign In</h1>
-                <p class="login-subtitle">Please fill in your credentials to login.</p>
-
-                <?php
-                if(!empty($login_err)){
-                    echo '<div class="alert alert-danger">' . $login_err . '</div>';
-                }
-                ?>
+                <p class="login-subtitle">Enter your email or name and password to login.</p>
 
                 <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
                     <div class="form-group">
-                        <label class="form-label">Username</label>
-                        <input type="text" name="username" class="form-input <?php echo (!empty($username_err)) ? 'error' : ''; ?>" value="<?php echo htmlspecialchars($username); ?>">
-                        <?php if(!empty($username_err)): ?>
-                            <span class="error-message"><?php echo $username_err; ?></span>
+                        <label class="form-label">Email or Name</label>
+                        <input type="text" name="login_input" class="form-input <?php echo (!empty($login_err)) ? 'error' : ''; ?>" value="<?php echo htmlspecialchars($login_input); ?>" placeholder="Email or First Name & Last Name">
+                        <?php if(!empty($login_err)): ?>
+                            <span class="error-message"><?php echo $login_err; ?></span>
                         <?php endif; ?>
                     </div>
                     
                     <div class="form-group">
                         <label class="form-label">Password</label>
-                        <input type="password" name="password" class="form-input <?php echo (!empty($password_err)) ? 'error' : ''; ?>">
+                        <input type="password" name="password" class="form-input <?php echo (!empty($password_err)) ? 'error' : ''; ?>" placeholder="Password">
                         <?php if(!empty($password_err)): ?>
                             <span class="error-message"><?php echo $password_err; ?></span>
                         <?php endif; ?>
                     </div>
                     
                     <button type="submit" class="login-btn">Sign In</button>
+                    
+                    <div style="text-align: center; margin-top: 15px;">
+                        <a href="passwordreset.php" style="color: #1e40af; font-weight: 600; text-decoration: none;">Forgot password?</a>
+                    </div>
                 </form>
 
                 <br>
 
                 <div class="login-footer">
-                    <div class="login-links">
-                        <p>Don't have an account? <a href="register.php" style="color: #1e40af; font-weight: 600; text-decoration: none;">Sign up now</a>.</p>
-                        <p>Forgot your password? <a href="passwordreset.php" style="color: #1e40af; font-weight: 600; text-decoration: none;">Reset it here</a>.</p>
-                    </div>
+                    <p>Don't have an account? <a href="register.php" style="color: #1e40af; font-weight: 600; text-decoration: none;">Sign up here</a>.</p>
                 </div>
             </div>
         </div>
