@@ -68,17 +68,14 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     
     if(empty($first_name_err) && empty($last_name_err) && empty($email_err) && empty($password_err) && empty($confirm_password_err)){
         
-        $username = strtolower($first_name . $last_name . rand(100, 999));
+        $sql = "INSERT INTO users (first_name, last_name, email, password) VALUES (?, ?, ?, ?)";
         
-        $sql = "INSERT INTO users (first_name, last_name, email, username, password) VALUES (?, ?, ?, ?, ?)";
-         
         if($stmt = mysqli_prepare($link, $sql)){
-            mysqli_stmt_bind_param($stmt, "sssss", $param_first_name, $param_last_name, $param_email, $param_username, $param_password);
+            mysqli_stmt_bind_param($stmt, "ssss", $param_first_name, $param_last_name, $param_email, $param_password);
             
             $param_first_name = $first_name;
             $param_last_name = $last_name;
             $param_email = $email;
-            $param_username = $username;
             $param_password = password_hash($password, PASSWORD_DEFAULT);
             
             if(mysqli_stmt_execute($stmt)){
