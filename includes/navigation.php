@@ -1,4 +1,5 @@
 <?php
+session_start();
 ?>
 
 <nav>
@@ -38,6 +39,24 @@ document.addEventListener('DOMContentLoaded', function() {
             mobileMenuBtn.textContent = navLinks.classList.contains('active') ? '✕' : '☰';
         });
         
+        navLinks.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', function() {
+                if (window.innerWidth <= 768) {
+                    navLinks.classList.remove('active');
+                    mobileMenuBtn.textContent = '☰';
+                }
+            });
+        });
+        
+        document.addEventListener('click', function(e) {
+            if (navLinks.classList.contains('active') && 
+                !navLinks.contains(e.target) && 
+                !mobileMenuBtn.contains(e.target) &&
+                window.innerWidth <= 768) {
+                navLinks.classList.remove('active');
+                mobileMenuBtn.textContent = '☰';
+            }
+        });
     }
 });
 </script>
