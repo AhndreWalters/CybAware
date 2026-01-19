@@ -442,6 +442,11 @@ nav {
     border-radius: 12px;
     padding: 30px;
     margin-bottom: 25px;
+    transition: transform 0.3s ease;
+}
+
+.contact-card:hover {
+    transform: translateY(-5px);
 }
 
 .contact-card h3 {
@@ -503,11 +508,13 @@ nav {
 }
 
 .game-card {
-    background: white;
+    background: rgba(255, 255, 255, 0.95);
     border-radius: 12px;
-    padding: 40px 30px;
+    padding: 30px;
+    margin-bottom: 0;
     border: 1px solid #e2e8f0;
     transition: transform 0.3s ease;
+    width: 100%;
 }
 
 .game-card:hover {
@@ -515,10 +522,9 @@ nav {
 }
 
 .game-content h2 {
-    color: #0f172a;
-    font-size: 1.8rem;
-    margin-bottom: 15px;
-    font-weight: 600;
+    color: #1e40af;
+    margin-bottom: 20px;
+    font-size: 1.4rem;
 }
 
 .game-content p {
@@ -619,5 +625,5 @@ nav {
     .contact-card { padding: 20px; }
     .contact-item { flex-direction: column; }
     .game-sections { grid-template-columns: 1fr; max-width: 400px; gap: 25px; }
-    .game-card { padding: 30px 25px; }
+    .game-card { padding: 20px; }
 }
