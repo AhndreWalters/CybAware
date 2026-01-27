@@ -23,7 +23,7 @@
                             <img src="images/ui-icon-password-security.png" alt="" style="width: 80px; height: 80px; object-fit: contain; margin-bottom: 20px; display: block; margin-left: auto; margin-right: auto;">
                             <h2>Password Fortress</h2>
                             <p>Learn what makes a strong password and why websites and users often have poor security practices.</p>
-                            <a href="password-game.php" class="play-btn">Play Now</a>
+                            <a href="game/password-game.php" class="play-btn">Play Now</a>
                         </div>
                     </div>
 
@@ -32,7 +32,7 @@
                             <img src="images/ui-icon-social-engineering.png" alt="" style="width: 80px; height: 80px; object-fit: contain; margin-bottom: 20px; display: block; margin-left: auto; margin-right: auto;">
                             <h2>Phishing Detective</h2>
                             <p>Discover the tricks of scammers, traits of phishing attacks, and how users are easily deceived.</p>
-                            <a href="phishing-game.php" class="play-btn">Play Now</a>
+                            <a href="game/phishing-game.php" class="play-btn">Play Now</a>
                         </div>
                     </div>
                 </div>
