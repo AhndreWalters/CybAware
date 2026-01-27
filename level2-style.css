@@ -1,0 +1,474 @@
+/* ===== BASE STYLES ===== */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #1a2980 0%, #26d0ce 100%);
+    color: #333;
+    min-height: 100vh;
+}
+
+/* ===== NAVIGATION HEADER ===== */
+.game-header {
+    background: linear-gradient(135deg, #1a2980, #26d0ce);
+    color: white;
+    padding: 15px 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-radius: 0 0 15px 15px;
+    margin-bottom: 30px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.back-to-hub {
+    color: white;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 15px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 6px;
+    transition: all 0.3s;
+}
+
+.back-to-hub:hover {
+    background: rgba(255, 255, 255, 0.2);
+    transform: translateX(-3px);
+}
+
+.level-info {
+    text-align: center;
+}
+
+.level-tag {
+    display: block;
+    font-size: 0.9rem;
+    opacity: 0.9;
+    margin-bottom: 3px;
+}
+
+.level-title {
+    font-size: 1.3rem;
+    font-weight: 600;
+}
+
+.header-score {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 15px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    font-weight: 600;
+}
+
+.header-score i {
+    color: #ffd32a;
+}
+
+/* ===== GAME CONTAINER ===== */
+.game-container {
+    max-width: 1000px;
+    margin: 0 auto 40px;
+    background: white;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+}
+
+.game-title {
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+.game-title h1 {
+    color: #1a2980;
+    margin-bottom: 10px;
+    font-size: 2.2rem;
+}
+
+.game-title p {
+    color: #666;
+    font-size: 1.1rem;
+}
+
+/* ===== SCORE DISPLAY ===== */
+.score-display {
+    display: flex;
+    justify-content: space-around;
+    background: linear-gradient(135deg, #1a2980, #26d0ce);
+    color: white;
+    padding: 18px;
+    border-radius: 12px;
+    margin: 25px 0;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+}
+
+.score-item {
+    text-align: center;
+    padding: 0 15px;
+}
+
+.score-item i {
+    font-size: 1.8rem;
+    margin-bottom: 8px;
+    display: block;
+}
+
+.score-item span {
+    font-size: 1.2rem;
+    font-weight: 600;
+}
+
+#score {
+    color: #ffd32a;
+    font-weight: bold;
+    font-size: 1.3rem;
+}
+
+#max-score {
+    color: #ffd32a;
+    opacity: 0.8;
+}
+
+#found-count {
+    color: #4cd137;
+    font-weight: bold;
+    font-size: 1.3rem;
+}
+
+#total-clues {
+    color: #4cd137;
+    opacity: 0.8;
+}
+
+#progress-percent {
+    color: #ff6b6b;
+    font-weight: bold;
+    font-size: 1.3rem;
+}
+
+/* ===== EMAIL BOX ===== */
+.email-box {
+    border: 2px solid #ccc;
+    border-radius: 12px;
+    padding: 30px;
+    background: #f9f9f9;
+    font-family: 'Georgia', serif;
+    line-height: 1.7;
+    margin-bottom: 25px;
+    position: relative;
+    font-size: 1.05rem;
+}
+
+.email-box h2 {
+    color: #1a2980;
+    margin-bottom: 20px;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+.email-box h3 {
+    color: #1a2980;
+    margin: 20px 0 15px;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+.email-box hr {
+    border: none;
+    border-top: 1px solid #ddd;
+    margin: 25px 0;
+}
+
+.email-box ul {
+    margin-left: 25px;
+    margin-bottom: 20px;
+}
+
+.email-box li {
+    margin-bottom: 10px;
+}
+
+/* ===== CLUE STYLES - HIDDEN UNTIL HOVER ===== */
+.clue {
+    cursor: pointer;
+    transition: all 0.3s;
+    border-radius: 3px;
+    padding: 2px 4px;
+    position: relative;
+    /* REMOVE the yellow background and border initially */
+    background: transparent !important;
+    border-bottom: none !important;
+    /* Make them look like normal text */
+    color: inherit;
+    text-decoration: none;
+}
+
+/* Only show clue indicators on hover */
+.clue:hover {
+    background: #ffeb3b !important;
+    border-bottom: 2px dashed #ffc107 !important;
+    transform: scale(1.03);
+    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+}
+
+/* Found clues get red styling */
+.clue.clicked {
+    background: #ff6b6b !important;
+    color: white !important;
+    border-bottom: 2px solid #e53935 !important;
+    text-decoration: line-through;
+}
+
+.clue.clicked::after {
+    content: '🚩';
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    font-size: 14px;
+    background: white;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+/* Optional: Slightly different styling for clicked clues when hovered */
+.clue.clicked:hover {
+    background: #e53935 !important;
+}
+
+/* ===== FEEDBACK AREA ===== */
+.feedback {
+    margin: 25px 0;
+    padding: 22px;
+    border-radius: 12px;
+    background: #e3f2fd;
+    border-left: 6px solid #2196f3;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.08);
+}
+
+.feedback h3 {
+    color: #0d47a1;
+    margin-bottom: 15px;
+    font-size: 1.3rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+#feedback-text {
+    font-size: 1.1rem;
+    line-height: 1.6;
+    color: #333;
+    min-height: 60px;
+    padding: 10px;
+    background: white;
+    border-radius: 8px;
+    border: 1px solid #bbdefb;
+}
+
+/* ===== CLUE CHECKLIST ===== */
+.clue-list {
+    background: #fffde7;
+    padding: 25px;
+    border-radius: 12px;
+    margin: 30px 0;
+    border: 1px dashed #ffd54f;
+}
+
+.clue-list h3 {
+    margin-top: 0;
+    color: #5d4037;
+    font-size: 1.4rem;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+#clue-checklist {
+    columns: 2;
+    padding-left: 25px;
+    list-style-type: none;
+}
+
+#clue-checklist li {
+    margin-bottom: 12px;
+    padding: 12px;
+    transition: all 0.3s;
+    background: white;
+    border-radius: 6px;
+    border-left: 4px solid #4a69bd;
+    break-inside: avoid;
+    position: relative;
+}
+
+#clue-checklist li strong {
+    color: #1a2980;
+    display: block;
+    margin-bottom: 5px;
+}
+
+#clue-checklist li.found {
+    background: #e8f5e9;
+    border-left-color: #4cd137;
+    text-decoration: line-through;
+    color: #666;
+}
+
+#clue-checklist li.found strong {
+    color: #2e7d32;
+}
+
+.clue-points {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    background: #4cd137;
+    color: white;
+    padding: 3px 10px;
+    border-radius: 12px;
+    font-size: 0.85rem;
+    font-weight: bold;
+}
+
+/* ===== CONTROLS ===== */
+.controls {
+    text-align: center;
+    margin-top: 35px;
+    padding-top: 25px;
+    border-top: 1px solid #eee;
+}
+
+button {
+    background: #1a2980;
+    color: white;
+    border: none;
+    padding: 15px 35px;
+    font-size: 1.2rem;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.3s;
+    margin: 8px;
+    font-weight: bold;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+button:hover:not(:disabled) {
+    transform: translateY(-3px);
+    box-shadow: 0 7px 20px rgba(0, 0, 0, 0.2);
+}
+
+.btn-reset {
+    background: #e74c3c;
+}
+
+.btn-reset:hover {
+    background: #c0392b;
+}
+
+.btn-hint {
+    background: #f39c12;
+}
+
+.btn-hint:hover {
+    background: #d35400;
+}
+
+.btn-next {
+    background: linear-gradient(135deg, #4a69bd, #1e3799);
+    animation: pulse 1.5s infinite;
+}
+
+.btn-next:hover {
+    background: linear-gradient(135deg, #1e3799, #0c2461);
+}
+
+button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none !important;
+}
+
+/* ===== ANIMATIONS ===== */
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.05); }
+    100% { transform: scale(1); }
+}
+
+/* ===== RESPONSIVE DESIGN ===== */
+@media (max-width: 900px) {
+    #clue-checklist {
+        columns: 1;
+    }
+}
+
+@media (max-width: 768px) {
+    .game-container {
+        padding: 20px;
+    }
+    
+    .score-display {
+        flex-direction: column;
+        gap: 20px;
+        text-align: center;
+    }
+    
+    .score-item {
+        padding: 10px 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .score-item:last-child {
+        border-bottom: none;
+    }
+    
+    .game-header {
+        flex-direction: column;
+        gap: 15px;
+        text-align: center;
+        padding: 15px;
+    }
+    
+    .email-box {
+        padding: 20px;
+    }
+    
+    button {
+        width: 100%;
+        margin: 8px 0;
+    }
+    
+    .controls {
+        display: flex;
+        flex-direction: column;
+    }
+}
+
+@media (max-width: 480px) {
+    .game-title h1 {
+        font-size: 1.8rem;
+    }
+    
+    .email-box {
+        font-size: 0.95rem;
+        padding: 15px;
+    }
+    
+    .feedback {
+        padding: 15px;
+    }
+}

@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phishing Detective - Level 2: Advanced Email Inspection</title>
+    <link rel="stylesheet" href="level2-style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <!-- Navigation Header -->
+    <div class="game-header">
+        <a href="../game-hub.html" class="back-to-hub">
+            <i class="fas fa-arrow-left"></i> Game Hub
+        </a>
+        <div class="level-info">
+            <span class="level-tag">Level 2</span>
+            <span class="level-title">Advanced Email Inspection</span>
+        </div>
+        <div class="header-score">
+            <i class="fas fa-star"></i>
+            <span id="current-score">0</span>
+        </div>
+    </div>
+
+    <!-- GAME CONTAINER -->
+    <div class="game-container">
+        <header class="game-title">
+            <h1>🔍 Phishing Detective - Level 2</h1>
+            <p><strong>Mission:</strong> Hover over the email to find suspicious elements, then click to flag them as phishing clues.</p>
+        </header>
+
+        <!-- Score Display -->
+        <div class="score-display">
+            <div class="score-item">
+                <i class="fas fa-star"></i>
+                <span>Points: <span id="score">0</span>/<span id="max-score">140</span></span>
+            </div>
+            <div class="score-item">
+                <i class="fas fa-search"></i>
+                <span>Clues: <span id="found-count">0</span>/<span id="total-clues">14</span></span>
+            </div>
+            <div class="score-item">
+                <i class="fas fa-chart-line"></i>
+                <span>Progress: <span id="progress-percent">0</span>%</span>
+            </div>
+        </div>
+
+        <!-- Email Content -->
+        <div class="email-box" id="email-content">
+            <h2>Subject: <span class="clue" data-id="1" data-info="Spelling error: 'Congradulations' should be 'Congratulations'">Congradulations</span>! You've Won with <span class="clue" data-id="2" data-info="Character substitution: 'Digice1' uses number 1 instead of letter l">Digice1</span></h2>
+            <p><span class="clue" data-id="3" data-info="Grammar error: 'Madman' instead of 'Madam'">Dear Sir/Madman</span></p>
+            <p>We have some exciting news!</p>
+            <p>You have been selected as a winner in our recent <span class="clue" data-id="4" data-info="Spelling error: 'promotianal' should be 'promotional'">promotianal</span> giveaway. We are <span class="clue" data-id="5" data-info="Grammar error: 'delight to rewarding' should be 'delighted to reward'">delight to rewarding</span> you for being a part of the <span class="clue" data-id="6" data-info="Social engineering: 'Digicel family' emotional manipulation">Digicel family</span> and participating in our latest event.</p>
+            <hr>
+            <h3>Your Prize Details</h3>
+            <p>You have won: <span class="clue" data-id="7" data-info="Fake product: 'Apple lphone 18' doesn't exist">Apple lphone 18</span></p>
+            <p>To ensure you receive your prize <span class="clue" data-id="8" data-info="Urgency tactic: 'as quickly as possible' pressures victim">as quickly as possible</span>, please take note of the following information:</p>
+            <ul>
+                <li><strong>Verification:</strong> You may be asked to provide a valid photo <span class="clue" data-id="9" data-info="Character substitution: 'lD' uses lowercase L instead of I">lD</span> and proof of your Digicel mobile number.</li>
+                <li><strong>Next Steps:</strong> Simply reply to this email or visit your nearest Digicel flagship store. <span class="clue" data-id="10" data-info="Vague instructions: no official contact or process">[no official link or address]</span></li>
+            </ul>
+            <hr>
+            <h3>Stay Safe <span class="clue" data-id="11" data-info="Character substitution: '0nline' uses zero instead of O">0nline</span></h3>
+            <p>Please remember that <span class="clue" data-id="12" data-info="Contradictory security: implies Digicel WILL ask for sensitive info">Digicel will ask you for your bank account details, PINs, or to send us mobile credit</span> in order to claim a prize. Your security is our priority.</p>
+            <hr>
+            <p>Congratulations once again on your win! We look forward to hearing from you soon.</p>
+            <p>Warm regards,</p>
+            <p>The <span class="clue" data-id="13" data-info="Character substitution: 'DigiceI' uses capital I instead of lowercase l">DigiceI</span> Team</p>
+            <p class="clue" data-id="14" data-info="Missing corporate info: no address, phone, links, or footer">[No corporate address, phone, or links provided]</p>
+        </div>
+
+        <!-- Feedback Area -->
+        <div class="feedback" id="feedback">
+            <h3>📝 Clue Explanation:</h3>
+            <p id="feedback-text">Hover over suspicious text in the email to reveal clues, then click to flag them.</p>
+        </div>
+
+        <!-- Clue Checklist -->
+        <div class="clue-list">
+            <h3>🕵️ Phishing Clues to Find (14 total):</h3>
+            <ul id="clue-checklist">
+                <!-- Will be filled by JavaScript -->
+            </ul>
+        </div>
+
+        <!-- Controls -->
+        <div class="controls">
+            <button id="reset-btn" class="btn-reset">
+                <i class="fas fa-redo"></i> Reset Level
+            </button>
+            <button id="hint-btn" class="btn-hint">
+                <i class="fas fa-lightbulb"></i> Get Hint
+            </button>
+            <button id="next-level" class="btn-next" style="display:none;">
+                <i class="fas fa-arrow-right"></i> Next Level
+            </button>
+        </div>
+    </div>
+
+    <script src="level2-script.js"></script>
+</body>
+</html>
