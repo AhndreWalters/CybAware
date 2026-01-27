@@ -15,23 +15,23 @@
             <div class="game-container">
                 <div class="game-header">
                     <h1>Cybersecurity Missions</h1>
-                    <p>Choose an interactive mission to learn cybersecurity skills through gameplay. Each mission teaches essential online safety concepts in a fun, engaging way.</p>
+                    <p>Choose an interactive mission to learn cybersecurity skills. Each mission teaches essential online safety concepts.</p>
                 </div>
                 <div class="game-sections">
                     <div class="game-card">
                         <div class="game-content">
-                            <img src="images/ui-icon-password-security.png" alt="" style="width: 80px; height: 80px; object-fit: contain; margin-bottom: 20px; display: block; margin-left: auto; margin-right: auto;">
+                            <img src="images/ui-icon-password-security.png" alt="Password Security Icon" style="width: 80px; height: 80px; margin-bottom: 20px;">
                             <h2>Password Fortress</h2>
-                            <p>Learn what makes a strong password and why websites and users often have poor security practices.</p>
+                            <p>Learn what makes a strong password and avoid common security mistakes.</p>
                             <a href="password-game.php" class="play-btn">Play Now</a>
                         </div>
                     </div>
 
                     <div class="game-card">
                         <div class="game-content">
-                            <img src="images/ui-icon-social-engineering.png" alt="" style="width: 80px; height: 80px; object-fit: contain; margin-bottom: 20px; display: block; margin-left: auto; margin-right: auto;">
+                            <img src="images/ui-icon-social-engineering.png" alt="Phishing Detection Icon" style="width: 80px; height: 80px; margin-bottom: 20px;">
                             <h2>Phishing Detective</h2>
-                            <p>Discover the tricks of scammers, traits of phishing attacks, and how users are easily deceived.</p>
+                            <p>Learn to spot fake emails and protect yourself from online scams.</p>
                             <a href="phishing-game.php" class="play-btn">Play Now</a>
                         </div>
                     </div>
@@ -40,10 +40,6 @@
         </div>
         
         <?php include 'includes/footer.php'; ?>
-        
-        <div class="menu-overlay" id="menuOverlay"></div>
     </div>
-
-    <script src="js/navigation.js"></script>
 </body>
 </html>
