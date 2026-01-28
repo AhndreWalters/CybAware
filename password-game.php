@@ -20,19 +20,10 @@ $game_completed = false;
 if($_SERVER["REQUEST_METHOD"] == "POST") {
     if(isset($_POST['answer'])) {
         $user_answer = $_POST['answer'];
-        $question_id = $_POST['question_id'];
+        $question_id = (int)$_POST['question_id'];
         
         // Correct answers
         $correct_answers = [
-            1 => "StrongPass2024!",
-            2 => "Phishing",
-            3 => "Every 3-6 months",
-            4 => "All", // For checkbox question
-            5 => "Strong" // For password test
-        ];
-        
-        // Check answer (simplified logic)
-        $current_email = [
             1 => "StrongPass2024!",
             2 => "Phishing",
             3 => "Every 3-6 months",
@@ -40,12 +31,20 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
             5 => "Strong"
         ];
         
-        if($user_answer === $current_email[$question_id] || ($question_id == 4 && $user_answer == "All")) {
+        // Special handling for question 4 (checkboxes)
+        if($question_id == 4) {
+            // For question 4, any selection is considered correct
+            if(isset($_POST['answer']) && $_POST['answer'] != "") {
+                $user_answer = "All";
+            }
+        }
+        
+        if($user_answer === $correct_answers[$question_id]) {
             $score++;
             $_SESSION['password_score'] = $score;
-            $feedback = "✅ Correct!";
+            $feedback = "<span style='color: #10b981;'>✓ Correct</span>";
         } else {
-            $feedback = "❌ Try again!";
+            $feedback = "<span style='color: #dc2626;'>✗ Incorrect</span>";
         }
         
         $current_question = $question_id + 1;
@@ -91,141 +90,392 @@ if(isset($_GET['reset'])) {
     <title>Password Fortress | CybAware</title>
     <link rel="stylesheet" href="css/styles.css">
     <style>
+        /* Professional CompTIA-style design */
         .game-interface {
-            max-width: 800px;
+            max-width: 900px;
             margin: 0 auto;
-            padding: 20px;
+            padding: 30px;
             background: white;
-            border-radius: 10px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            border: 1px solid #e5e7eb;
+        }
+        
+        .game-header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 1px solid #e5e7eb;
+            padding-bottom: 20px;
+        }
+        
+        .game-header h1 {
+            color: #1e40af;
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        
+        .game-header p {
+            color: #6b7280;
+            font-size: 16px;
+        }
+        
+        .progress-container {
+            margin-bottom: 25px;
+        }
+        
+        .progress-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 14px;
+            color: #6b7280;
         }
         
         .progress-bar {
-            height: 10px;
-            background: #e2e8f0;
-            border-radius: 5px;
-            margin-bottom: 20px;
+            height: 6px;
+            background: #e5e7eb;
+            border-radius: 3px;
             overflow: hidden;
         }
         
         .progress-fill {
             height: 100%;
-            background: #3b82f6;
+            background: #1e40af;
             width: <?php echo (($current_question-1)/$total_questions)*100; ?>%;
+            transition: width 0.3s ease;
         }
         
         .score-display {
-            text-align: center;
-            font-size: 1.2rem;
-            color: #1e40af;
-            margin-bottom: 20px;
-            font-weight: 600;
-        }
-        
-        .question-box {
             background: #f8fafc;
-            padding: 25px;
-            border-radius: 8px;
-            margin: 20px 0;
-            border: 2px solid #e2e8f0;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            padding: 15px;
+            margin-bottom: 25px;
+            text-align: center;
+            font-size: 16px;
+            color: #374151;
+            font-weight: 500;
         }
         
-        .options {
+        .question-container {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            padding: 30px;
+            margin-bottom: 25px;
+        }
+        
+        .question-number {
+            color: #6b7280;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .question-text {
+            color: #111827;
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 25px;
+            line-height: 1.5;
+        }
+        
+        .options-container {
             display: flex;
             flex-direction: column;
             gap: 12px;
-            margin: 20px 0;
         }
         
         .option {
-            padding: 15px;
-            border: 2px solid #cbd5e1;
-            border-radius: 8px;
+            position: relative;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            padding: 16px 20px;
             cursor: pointer;
+            transition: all 0.2s ease;
             background: white;
+            display: flex;
+            align-items: center;
         }
         
         .option:hover {
             border-color: #3b82f6;
-            background: #eff6ff;
+            background: #f8fafc;
         }
         
-        .option input {
-            margin-right: 10px;
+        .option.selected {
+            border-color: #1e40af;
+            background: #eff6ff;
+            border-width: 2px;
+        }
+        
+        .option-label {
+            display: flex;
+            align-items: center;
+            width: 100%;
+        }
+        
+        .option-letter {
+            background: #f3f4f6;
+            border-radius: 4px;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            font-weight: 600;
+            color: #374151;
+            font-size: 14px;
+        }
+        
+        .option.selected .option-letter {
+            background: #1e40af;
+            color: white;
+        }
+        
+        .option-text {
+            color: #374151;
+            font-size: 16px;
+            flex: 1;
+        }
+        
+        input[type="radio"],
+        input[type="checkbox"] {
+            margin-right: 15px;
+            transform: scale(1.2);
         }
         
         .feedback {
-            padding: 15px;
-            border-radius: 8px;
-            margin: 15px 0;
-            font-weight: 600;
-            text-align: center;
-        }
-        
-        .correct-feedback {
-            background: #d1fae5;
-            color: #065f46;
-            border: 1px solid #10b981;
-        }
-        
-        .incorrect-feedback {
-            background: #fee2e2;
-            color: #991b1b;
-            border: 1px solid #ef4444;
-        }
-        
-        .completion-screen {
-            text-align: center;
-            padding: 40px;
-        }
-        
-        .password-test {
+            padding: 16px;
+            border-radius: 6px;
             margin: 20px 0;
+            font-size: 15px;
+            font-weight: 500;
+            text-align: center;
+            border: 1px solid transparent;
+        }
+        
+        .feedback.correct {
+            background: #f0fdf4;
+            color: #065f46;
+            border-color: #10b981;
+        }
+        
+        .feedback.incorrect {
+            background: #fef2f2;
+            color: #991b1b;
+            border-color: #ef4444;
+        }
+        
+        .password-test-container {
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            padding: 20px;
+            margin-top: 20px;
         }
         
         .password-input {
             width: 100%;
-            padding: 12px;
-            border: 2px solid #cbd5e1;
+            padding: 14px;
+            border: 1px solid #d1d5db;
             border-radius: 6px;
-            font-size: 1.1rem;
-            margin: 10px 0;
+            font-size: 16px;
+            margin-bottom: 15px;
+            font-family: monospace;
+        }
+        
+        .password-input:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        
+        .strength-indicator {
+            margin-top: 20px;
+        }
+        
+        .strength-label {
+            font-size: 14px;
+            color: #6b7280;
+            margin-bottom: 8px;
+            display: block;
         }
         
         .strength-meter {
             height: 8px;
-            background: #e2e8f0;
+            background: #e5e7eb;
             border-radius: 4px;
-            margin: 10px 0;
+            margin-bottom: 8px;
             overflow: hidden;
         }
         
         .strength-bar {
             height: 100%;
             width: 0%;
-            background: #ef4444;
             border-radius: 4px;
+            transition: width 0.3s ease, background-color 0.3s ease;
         }
         
         .strength-text {
-            font-size: 0.9rem;
-            color: #64748b;
+            font-size: 14px;
+            font-weight: 500;
         }
         
-        .btn-game {
-            padding: 12px 30px;
+        .strength-weak {
+            color: #dc2626;
+        }
+        
+        .strength-fair {
+            color: #d97706;
+        }
+        
+        .strength-good {
+            color: #059669;
+        }
+        
+        .strength-strong {
+            color: #1e40af;
+        }
+        
+        .hint-box {
+            background: #fef3c7;
+            border: 1px solid #f59e0b;
+            border-radius: 6px;
+            padding: 14px;
+            margin-top: 15px;
+            font-size: 14px;
+            color: #92400e;
+        }
+        
+        .controls {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 25px;
+            border-top: 1px solid #e5e7eb;
+        }
+        
+        .btn-next {
             background: #1e40af;
             color: white;
             border: none;
             border-radius: 6px;
-            font-size: 1rem;
+            padding: 14px 36px;
+            font-size: 16px;
             font-weight: 600;
             cursor: pointer;
-            margin: 10px;
+            transition: all 0.2s ease;
         }
         
-        .btn-game:hover {
+        .btn-next:hover:not(:disabled) {
             background: #1e3a8a;
+            transform: translateY(-1px);
+        }
+        
+        .btn-next:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+        }
+        
+        .completion-screen {
+            text-align: center;
+            padding: 40px 30px;
+        }
+        
+        .completion-screen h2 {
+            color: #1e40af;
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+        
+        .score-result {
+            font-size: 18px;
+            color: #374151;
+            margin-bottom: 25px;
+        }
+        
+        .performance-rating {
+            background: #f8fafc;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            padding: 20px;
+            max-width: 500px;
+            margin: 0 auto 30px;
+            text-align: left;
+        }
+        
+        .performance-rating h4 {
+            color: #1e40af;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+        
+        .completion-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .btn-action {
+            padding: 14px 28px;
+            border-radius: 6px;
+            font-size: 15px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            display: inline-block;
+        }
+        
+        .btn-certificate {
+            background: #1e40af;
+            color: white;
+            border: 1px solid #1e40af;
+        }
+        
+        .btn-certificate:hover {
+            background: #1e3a8a;
+        }
+        
+        .btn-secondary {
+            background: white;
+            color: #374151;
+            border: 1px solid #d1d5db;
+        }
+        
+        .btn-secondary:hover {
+            background: #f9fafb;
+            border-color: #9ca3af;
+        }
+        
+        @media (max-width: 768px) {
+            .game-interface {
+                padding: 20px;
+            }
+            
+            .question-container {
+                padding: 20px;
+            }
+            
+            .option {
+                padding: 14px 16px;
+            }
+            
+            .completion-actions {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .btn-action {
+                width: 100%;
+                max-width: 250px;
+                text-align: center;
+            }
         }
     </style>
 </head>
@@ -235,120 +485,225 @@ if(isset($_GET['reset'])) {
 
         <div class="main-content">
             <div class="game-interface">
-                <h1 style="text-align: center; color: #1e40af; margin-bottom: 10px;">🔐 Password Fortress</h1>
-                <p style="text-align: center; color: #64748b; margin-bottom: 20px;">Learn about password security</p>
-                
-                <div class="progress-bar">
-                    <div class="progress-fill"></div>
+                <div class="game-header">
+                    <h1>Password Fortress</h1>
+                    <p>Test your knowledge of password security best practices</p>
                 </div>
                 
-                <div class="score-display">
-                    Score: <?php echo $score; ?>/<?php echo $total_questions; ?> 
-                    | Question: <?php echo $current_question; ?>/<?php echo $total_questions; ?>
+                <div class="progress-container">
+                    <div class="progress-info">
+                        <span>Question <?php echo $current_question; ?> of <?php echo $total_questions; ?></span>
+                        <span>Score: <?php echo $score; ?>/<?php echo $total_questions; ?></span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill"></div>
+                    </div>
                 </div>
                 
                 <?php if($feedback): ?>
-                    <div class="feedback <?php echo strpos($feedback, '✅') !== false ? 'correct-feedback' : 'incorrect-feedback'; ?>">
+                    <div class="feedback <?php echo strpos($feedback, 'Correct') !== false ? 'correct' : 'incorrect'; ?>">
                         <?php echo $feedback; ?>
                     </div>
                 <?php endif; ?>
                 
                 <?php if($game_completed): ?>
                     <div class="completion-screen">
-                        <h2 style="color: #10b981;">🎉 Mission Complete!</h2>
-                        <p>You scored <?php echo $score; ?> out of <?php echo $total_questions; ?>!</p>
-                        <a href="certificate.php?game=password&score=<?php echo $score; ?>" class="btn-game">
-                            🏆 Get Certificate
-                        </a>
-                        <div style="margin-top: 20px;">
-                            <a href="game.php" class="btn-game" style="background: #64748b;">Back to Games</a>
-                            <a href="password-game.php?reset=1" class="btn-game">Play Again</a>
+                        <h2>Assessment Complete</h2>
+                        <p class="score-result">You scored <?php echo $score; ?> out of <?php echo $total_questions; ?> correctly.</p>
+                        
+                        <div class="performance-rating">
+                            <h4>Performance Analysis</h4>
+                            <?php 
+                            if($score == $total_questions) {
+                                echo "<p>Excellent performance. You demonstrate strong understanding of password security principles.</p>";
+                            } elseif($score >= 3) {
+                                echo "<p>Good performance. You understand basic password security concepts but should review some areas.</p>";
+                            } else {
+                                echo "<p>Needs improvement. Review password security fundamentals to enhance your knowledge.</p>";
+                            }
+                            ?>
+                        </div>
+                        
+                        <div class="completion-actions">
+                            <a href="certificate.php?game=password&score=<?php echo $score; ?>" class="btn-action btn-certificate">
+                                View Certificate
+                            </a>
+                            <a href="game.php" class="btn-action btn-secondary">
+                                Return to Games
+                            </a>
+                            <a href="password-game.php?reset=1" class="btn-action btn-secondary">
+                                Retake Assessment
+                            </a>
                         </div>
                     </div>
                 <?php else: ?>
-                    <form method="POST" action="password-game.php">
+                    <form method="POST" action="password-game.php" id="gameForm">
                         <input type="hidden" name="question_id" value="<?php echo $current_question; ?>">
                         
-                        <div class="question-box">
+                        <div class="question-container">
+                            <div class="question-number">Question <?php echo $current_question; ?></div>
+                            
                             <?php if($current_question == 1): ?>
-                                <h3>1. Which password is strongest?</h3>
-                                <div class="options">
+                                <div class="question-text">Which of the following passwords would be considered the most secure?</div>
+                                
+                                <div class="options-container">
                                     <label class="option">
-                                        <input type="radio" name="answer" value="password123" required> password123
+                                        <input type="radio" name="answer" value="password123" required>
+                                        <div class="option-label">
+                                            <div class="option-letter">A</div>
+                                            <div class="option-text">password123</div>
+                                        </div>
                                     </label>
+                                    
                                     <label class="option">
-                                        <input type="radio" name="answer" value="StrongPass2024!" required> StrongPass2024!
+                                        <input type="radio" name="answer" value="StrongPass2024!" required>
+                                        <div class="option-label">
+                                            <div class="option-letter">B</div>
+                                            <div class="option-text">StrongPass2024!</div>
+                                        </div>
                                     </label>
+                                    
                                     <label class="option">
-                                        <input type="radio" name="answer" value="123456" required> 123456
+                                        <input type="radio" name="answer" value="123456" required>
+                                        <div class="option-label">
+                                            <div class="option-letter">C</div>
+                                            <div class="option-text">123456</div>
+                                        </div>
                                     </label>
+                                    
                                     <label class="option">
-                                        <input type="radio" name="answer" value="qwerty" required> qwerty
+                                        <input type="radio" name="answer" value="qwerty" required>
+                                        <div class="option-label">
+                                            <div class="option-letter">D</div>
+                                            <div class="option-text">qwerty</div>
+                                        </div>
                                     </label>
                                 </div>
-                                <p style="color: #64748b; font-size: 0.9rem; margin-top: 10px;">
-                                    Hint: Strong passwords have uppercase, lowercase, numbers, and symbols.
-                                </p>
+                                
+                                <div class="hint-box">
+                                    <strong>Hint:</strong> Secure passwords should include a combination of uppercase letters, lowercase letters, numbers, and special characters.
+                                </div>
                                 
                             <?php elseif($current_question == 2): ?>
-                                <h3>2. What trick do hackers use to get passwords?</h3>
-                                <div class="options">
+                                <div class="question-text">What is the term for the technique where attackers trick users into revealing their passwords through deceptive emails or websites?</div>
+                                
+                                <div class="options-container">
                                     <label class="option">
-                                        <input type="radio" name="answer" value="Encryption" required> Encryption
+                                        <input type="radio" name="answer" value="Encryption" required>
+                                        <div class="option-label">
+                                            <div class="option-letter">A</div>
+                                            <div class="option-text">Encryption</div>
+                                        </div>
                                     </label>
+                                    
                                     <label class="option">
-                                        <input type="radio" name="answer" value="Phishing" required> Phishing
+                                        <input type="radio" name="answer" value="Phishing" required>
+                                        <div class="option-label">
+                                            <div class="option-letter">B</div>
+                                            <div class="option-text">Phishing</div>
+                                        </div>
                                     </label>
+                                    
                                     <label class="option">
-                                        <input type="radio" name="answer" value="Firewall" required> Firewall
+                                        <input type="radio" name="answer" value="Firewall" required>
+                                        <div class="option-label">
+                                            <div class="option-letter">C</div>
+                                            <div class="option-text">Firewall</div>
+                                        </div>
                                     </label>
+                                    
                                     <label class="option">
-                                        <input type="radio" name="answer" value="VPN" required> VPN
+                                        <input type="radio" name="answer" value="VPN" required>
+                                        <div class="option-label">
+                                            <div class="option-letter">D</div>
+                                            <div class="option-text">VPN</div>
+                                        </div>
                                     </label>
                                 </div>
                                 
                             <?php elseif($current_question == 3): ?>
-                                <h3>3. How often should you change passwords?</h3>
-                                <div class="options">
+                                <div class="question-text">What is the recommended frequency for changing passwords according to cybersecurity best practices?</div>
+                                
+                                <div class="options-container">
                                     <label class="option">
-                                        <input type="radio" name="answer" value="Every day" required> Every day
+                                        <input type="radio" name="answer" value="Every day" required>
+                                        <div class="option-label">
+                                            <div class="option-letter">A</div>
+                                            <div class="option-text">Every day</div>
+                                        </div>
                                     </label>
+                                    
                                     <label class="option">
-                                        <input type="radio" name="answer" value="Every 3-6 months" required> Every 3-6 months
+                                        <input type="radio" name="answer" value="Every 3-6 months" required>
+                                        <div class="option-label">
+                                            <div class="option-letter">B</div>
+                                            <div class="option-text">Every 3-6 months</div>
+                                        </div>
                                     </label>
+                                    
                                     <label class="option">
-                                        <input type="radio" name="answer" value="Never" required> Never
+                                        <input type="radio" name="answer" value="Never" required>
+                                        <div class="option-label">
+                                            <div class="option-letter">C</div>
+                                            <div class="option-text">Never</div>
+                                        </div>
                                     </label>
+                                    
                                     <label class="option">
-                                        <input type="radio" name="answer" value="Only when hacked" required> Only when hacked
+                                        <input type="radio" name="answer" value="Only when hacked" required>
+                                        <div class="option-label">
+                                            <div class="option-letter">D</div>
+                                            <div class="option-text">Only when there's evidence of compromise</div>
+                                        </div>
                                     </label>
                                 </div>
                                 
                             <?php elseif($current_question == 4): ?>
-                                <h3>4. What makes a password strong? (Choose all)</h3>
-                                <div class="options">
+                                <div class="question-text">Select all characteristics that contribute to creating a strong password:</div>
+                                
+                                <div class="options-container">
                                     <label class="option">
-                                        <input type="checkbox" name="answer[]" value="Length"> At least 12 characters
+                                        <input type="checkbox" name="answer4[]" value="Length">
+                                        <div class="option-label">
+                                            <div class="option-letter">A</div>
+                                            <div class="option-text">Minimum of 12 characters in length</div>
+                                        </div>
                                     </label>
+                                    
                                     <label class="option">
-                                        <input type="checkbox" name="answer[]" value="Mix"> Mix of letters, numbers, symbols
+                                        <input type="checkbox" name="answer4[]" value="Mix">
+                                        <div class="option-label">
+                                            <div class="option-letter">B</div>
+                                            <div class="option-text">Combination of uppercase letters, lowercase letters, numbers, and symbols</div>
+                                        </div>
                                     </label>
+                                    
                                     <label class="option">
-                                        <input type="checkbox" name="answer[]" value="Unique"> Not used on other sites
+                                        <input type="checkbox" name="answer4[]" value="Unique">
+                                        <div class="option-label">
+                                            <div class="option-letter">C</div>
+                                            <div class="option-text">Not reused across multiple websites or services</div>
+                                        </div>
                                     </label>
                                 </div>
-                                <input type="hidden" name="answer" value="All">
+                                <input type="hidden" name="answer" id="question4Answer" value="">
                                 
                             <?php elseif($current_question == 5): ?>
-                                <h3>5. Test a password strength:</h3>
-                                <div class="password-test">
-                                    <input type="text" class="password-input" id="passwordTest" placeholder="Type a password">
-                                    <div class="strength-meter">
-                                        <div class="strength-bar" id="strengthBar"></div>
+                                <div class="question-text">Evaluate the strength of a password by entering one below:</div>
+                                
+                                <div class="password-test-container">
+                                    <input type="text" class="password-input" id="passwordTest" placeholder="Enter a password to test its strength">
+                                    
+                                    <div class="strength-indicator">
+                                        <span class="strength-label">Password Strength:</span>
+                                        <div class="strength-meter">
+                                            <div class="strength-bar" id="strengthBar"></div>
+                                        </div>
+                                        <div class="strength-text" id="strengthText">Enter a password to see strength analysis</div>
                                     </div>
-                                    <div class="strength-text" id="strengthText">Type to see strength</div>
                                 </div>
                                 <input type="hidden" name="answer" id="passwordAnswer" value="Weak">
+                                
                                 <script>
                                     const passwordInput = document.getElementById('passwordTest');
                                     const strengthBar = document.getElementById('strengthBar');
@@ -359,8 +714,11 @@ if(isset($_GET['reset'])) {
                                         const password = this.value;
                                         let strength = 0;
                                         
+                                        // Length checks
                                         if(password.length >= 8) strength++;
                                         if(password.length >= 12) strength++;
+                                        
+                                        // Complexity checks
                                         if(/[a-z]/.test(password)) strength++;
                                         if(/[A-Z]/.test(password)) strength++;
                                         if(/[0-9]/.test(password)) strength++;
@@ -370,19 +728,19 @@ if(isset($_GET['reset'])) {
                                         strengthBar.style.width = width + '%';
                                         
                                         if(strength <= 2) {
-                                            strengthBar.style.background = '#ef4444';
-                                            strengthText.textContent = 'Weak password';
-                                            strengthText.style.color = '#ef4444';
+                                            strengthBar.style.backgroundColor = '#dc2626';
+                                            strengthText.textContent = 'Weak - Easily compromised';
+                                            strengthText.className = 'strength-text strength-weak';
                                             passwordAnswer.value = 'Weak';
                                         } else if(strength <= 4) {
-                                            strengthBar.style.background = '#f59e0b';
-                                            strengthText.textContent = 'Fair password';
-                                            strengthText.style.color = '#f59e0b';
+                                            strengthBar.style.backgroundColor = '#d97706';
+                                            strengthText.textContent = 'Fair - Could be stronger';
+                                            strengthText.className = 'strength-text strength-fair';
                                             passwordAnswer.value = 'Fair';
                                         } else {
-                                            strengthBar.style.background = '#10b981';
-                                            strengthText.textContent = 'Strong password!';
-                                            strengthText.style.color = '#10b981';
+                                            strengthBar.style.backgroundColor = '#059669';
+                                            strengthText.textContent = 'Strong - Meets security standards';
+                                            strengthText.className = 'strength-text strength-good';
                                             passwordAnswer.value = 'Strong';
                                         }
                                     });
@@ -391,9 +749,9 @@ if(isset($_GET['reset'])) {
                             <?php endif; ?>
                         </div>
                         
-                        <div style="text-align: center; margin-top: 20px;">
-                            <button type="submit" class="btn-game">
-                                <?php echo $current_question == $total_questions ? 'Finish' : 'Next'; ?>
+                        <div class="controls">
+                            <button type="submit" class="btn-next" id="submitBtn">
+                                <?php echo $current_question == $total_questions ? 'Complete Assessment' : 'Next Question'; ?>
                             </button>
                         </div>
                     </form>
@@ -403,5 +761,170 @@ if(isset($_GET['reset'])) {
         
         <?php include 'includes/footer.php'; ?>
     </div>
+    
+    <script>
+        // Simple JavaScript for option selection
+        document.addEventListener('DOMContentLoaded', function() {
+            const options = document.querySelectorAll('.option');
+            const submitBtn = document.getElementById('submitBtn');
+            const currentQuestion = <?php echo $current_question; ?>;
+            
+            // For questions 1-3 and 5 (single choice)
+            if(currentQuestion !== 4) {
+                options.forEach(option => {
+                    const input = option.querySelector('input');
+                    
+                    option.addEventListener('click', function() {
+                        // Remove selected class from all options
+                        options.forEach(opt => opt.classList.remove('selected'));
+                        
+                        // Add selected class to clicked option
+                        this.classList.add('selected');
+                        
+                        // Check the radio button
+                        if(input) {
+                            input.checked = true;
+                        }
+                        
+                        // Enable submit button
+                        if(submitBtn) {
+                            submitBtn.disabled = false;
+                        }
+                    });
+                    
+                    // Update visual state when input changes
+                    input.addEventListener('change', function() {
+                        if(this.checked) {
+                            options.forEach(opt => opt.classList.remove('selected'));
+                            option.classList.add('selected');
+                            
+                            if(submitBtn) {
+                                submitBtn.disabled = false;
+                            }
+                        }
+                    });
+                });
+                
+                // Check if any option is already selected on page load
+                const selectedInput = document.querySelector('input[type="radio"]:checked');
+                if(selectedInput) {
+                    const selectedOption = selectedInput.closest('.option');
+                    if(selectedOption) {
+                        selectedOption.classList.add('selected');
+                        if(submitBtn) submitBtn.disabled = false;
+                    }
+                }
+            }
+            
+            // For question 4 (multiple choice)
+            if(currentQuestion === 4) {
+                const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+                const question4Answer = document.getElementById('question4Answer');
+                
+                checkboxes.forEach(checkbox => {
+                    const option = checkbox.closest('.option');
+                    
+                    option.addEventListener('click', function() {
+                        // Toggle checkbox
+                        checkbox.checked = !checkbox.checked;
+                        
+                        // Toggle selected class
+                        this.classList.toggle('selected');
+                        
+                        // Update the hidden answer field
+                        let selectedValues = [];
+                        checkboxes.forEach(cb => {
+                            if(cb.checked) selectedValues.push(cb.value);
+                        });
+                        
+                        if(selectedValues.length > 0) {
+                            question4Answer.value = 'All';
+                            if(submitBtn) submitBtn.disabled = false;
+                        } else {
+                            question4Answer.value = '';
+                            if(submitBtn) submitBtn.disabled = true;
+                        }
+                    });
+                });
+                
+                // Enable submit button if any checkbox is checked on page load
+                const anyChecked = Array.from(checkboxes).some(cb => cb.checked);
+                if(anyChecked && submitBtn) {
+                    submitBtn.disabled = false;
+                    question4Answer.value = 'All';
+                }
+            }
+            
+            // For question 5 (password test), enable submit button if password is entered
+            if(currentQuestion === 5) {
+                const passwordInput = document.getElementById('passwordTest');
+                const passwordAnswer = document.getElementById('passwordAnswer');
+                
+                if(passwordInput && submitBtn) {
+                    passwordInput.addEventListener('input', function() {
+                        if(this.value.trim() !== '') {
+                            submitBtn.disabled = false;
+                        } else {
+                            submitBtn.disabled = true;
+                        }
+                    });
+                    
+                    // Check on page load
+                    if(passwordInput.value.trim() !== '') {
+                        submitBtn.disabled = false;
+                    }
+                }
+            }
+            
+            // Disable submit button initially for questions 1-4
+            if(currentQuestion <= 4 && submitBtn) {
+                submitBtn.disabled = true;
+            }
+            
+            // Simple form validation
+            const form = document.getElementById('gameForm');
+            if(form) {
+                form.addEventListener('submit', function(e) {
+                    // For question 4, ensure at least one checkbox is checked
+                    if(currentQuestion === 4) {
+                        const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+                        let anyChecked = false;
+                        
+                        checkboxes.forEach(cb => {
+                            if(cb.checked) anyChecked = true;
+                        });
+                        
+                        if(!anyChecked) {
+                            e.preventDefault();
+                            alert('Please select at least one characteristic that contributes to password strength.');
+                            return false;
+                        }
+                    }
+                    
+                    // For other questions, ensure a radio button is selected
+                    if(currentQuestion !== 4 && currentQuestion !== 5) {
+                        const selectedRadio = document.querySelector('input[type="radio"]:checked');
+                        if(!selectedRadio) {
+                            e.preventDefault();
+                            alert('Please select an answer before continuing.');
+                            return false;
+                        }
+                    }
+                    
+                    // For question 5, ensure password is entered
+                    if(currentQuestion === 5) {
+                        const passwordInput = document.getElementById('passwordTest');
+                        if(!passwordInput || passwordInput.value.trim() === '') {
+                            e.preventDefault();
+                            alert('Please enter a password to test its strength.');
+                            return false;
+                        }
+                    }
+                    
+                    return true;
+                });
+            }
+        });
+    </script>
 </body>
 </html>
