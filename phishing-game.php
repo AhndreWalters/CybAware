@@ -52,40 +52,43 @@ $emails = [
 
 // Process form submission
 if($_SERVER["REQUEST_METHOD"] == "POST") {
-    if(isset($_POST['answer'])) {
+    if(isset($_POST['answer']) && isset($_POST['question_id'])) {
         $user_answer = $_POST['answer'];
-        $question_id = $_POST['question_id'];
+        $question_id = (int)$_POST['question_id'];
         
-        $correct_answer = $emails[$question_id]['answer'];
-        
-        if($user_answer === $correct_answer) {
-            $score++;
-            $_SESSION['phishing_score'] = $score;
-            $feedback = "✅ Correct!";
-        } else {
-            $feedback = "❌ This was actually " . ucfirst($correct_answer);
-        }
-        
-        $current_question = $question_id + 1;
-        $_SESSION['phishing_question'] = $current_question;
-        
-        if($current_question > $total_questions) {
-            $game_completed = true;
+        if(isset($emails[$question_id])) {
+            $correct_answer = $emails[$question_id]['answer'];
             
-            // Save score to database
-            $user_id = $_SESSION['id'];
-            $sql = "INSERT INTO game_scores (user_id, game_type, score, total_questions, completed_at) 
-                    VALUES (?, 'phishing_detective', ?, ?, NOW())";
-            
-            if($stmt = mysqli_prepare($link, $sql)) {
-                mysqli_stmt_bind_param($stmt, "iii", $user_id, $score, $total_questions);
-                mysqli_stmt_execute($stmt);
-                mysqli_stmt_close($stmt);
+            if($user_answer === $correct_answer) {
+                $score++;
+                $_SESSION['phishing_score'] = $score;
+                $feedback = "✅ Correct!";
+            } else {
+                $feedback = "❌ This was actually " . ucfirst($correct_answer);
             }
             
-            // Clear session data
-            unset($_SESSION['phishing_score']);
-            unset($_SESSION['phishing_question']);
+            $current_question = $question_id + 1;
+            $_SESSION['phishing_question'] = $current_question;
+            
+            // Check if game is completed
+            if($current_question > $total_questions) {
+                $game_completed = true;
+                
+                // Save score to database
+                $user_id = $_SESSION['id'];
+                $sql = "INSERT INTO game_scores (user_id, game_type, score, total_questions, completed_at) 
+                        VALUES (?, 'phishing_detective', ?, ?, NOW())";
+                
+                if($stmt = mysqli_prepare($link, $sql)) {
+                    mysqli_stmt_bind_param($stmt, "iii", $user_id, $score, $total_questions);
+                    mysqli_stmt_execute($stmt);
+                    mysqli_stmt_close($stmt);
+                }
+                
+                // Clear session data
+                unset($_SESSION['phishing_score']);
+                unset($_SESSION['phishing_question']);
+            }
         }
     }
 }
@@ -100,8 +103,19 @@ if(isset($_GET['reset'])) {
     exit;
 }
 
-// Get current email
-$current_email = isset($emails[$current_question]) ? $emails[$current_question] : null;
+// Get current question display number (never exceeds total)
+$display_question = min($current_question, $total_questions);
+
+// Get current email only if game is not completed and question exists
+$current_email = null;
+if(!$game_completed && isset($emails[$current_question])) {
+    $current_email = $emails[$current_question];
+}
+
+// If current question exceeds total but game not marked completed, fix it
+if($current_question > $total_questions && !$game_completed) {
+    $game_completed = true;
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -132,7 +146,13 @@ $current_email = isset($emails[$current_question]) ? $emails[$current_question] 
         .progress-fill {
             height: 100%;
             background: #3b82f6;
-            width: <?php echo (($current_question-1)/$total_questions)*100; ?>%;
+            width: <?php 
+                if($game_completed) {
+                    echo '100';
+                } else {
+                    echo (($display_question-1)/$total_questions)*100; 
+                }
+            ?>%;
         }
         
         .score-display {
@@ -141,6 +161,9 @@ $current_email = isset($emails[$current_question]) ? $emails[$current_question] 
             color: #1e40af;
             margin-bottom: 20px;
             font-weight: 600;
+            background: #eff6ff;
+            padding: 15px;
+            border-radius: 8px;
         }
         
         .email-box {
@@ -159,12 +182,15 @@ $current_email = isset($emails[$current_question]) ? $emails[$current_question] 
         }
         
         .email-field {
-            margin-bottom: 8px;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: flex-start;
         }
         
         .email-label {
             font-weight: 600;
             color: #64748b;
+            min-width: 60px;
         }
         
         .email-body {
@@ -174,25 +200,37 @@ $current_email = isset($emails[$current_question]) ? $emails[$current_question] 
             padding: 20px;
             border-radius: 6px;
             border: 1px solid #e2e8f0;
+            margin-top: 15px;
         }
         
-        .options {
+        .options-container {
             display: flex;
-            gap: 15px;
-            margin: 25px 0;
+            gap: 20px;
+            margin: 30px 0;
             justify-content: center;
+            flex-wrap: wrap;
         }
         
         .option-btn {
-            padding: 15px 30px;
+            padding: 18px 40px;
             border: 2px solid #cbd5e1;
             border-radius: 8px;
             background: white;
             font-size: 1.1rem;
             font-weight: 600;
             cursor: pointer;
-            min-width: 150px;
+            min-width: 180px;
             text-align: center;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .option-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         }
         
         .phishing-btn {
@@ -218,7 +256,7 @@ $current_email = isset($emails[$current_question]) ? $emails[$current_question] 
         .feedback {
             padding: 15px;
             border-radius: 8px;
-            margin: 15px 0;
+            margin: 20px 0;
             font-weight: 600;
             text-align: center;
         }
@@ -241,23 +279,88 @@ $current_email = isset($emails[$current_question]) ? $emails[$current_question] 
         }
         
         .btn-game {
-            padding: 12px 30px;
+            padding: 15px 35px;
             background: #1e40af;
             color: white;
             border: none;
-            border-radius: 6px;
+            border-radius: 8px;
             font-size: 1rem;
             font-weight: 600;
             cursor: pointer;
             margin: 10px;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s ease;
         }
         
         .btn-game:hover {
             background: #1e3a8a;
+            transform: translateY(-2px);
         }
         
-        input[type="radio"] {
-            display: none;
+        .tip-box {
+            background: #e0f2fe;
+            border-left: 4px solid #0ea5e9;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 6px;
+            font-size: 0.95rem;
+        }
+        
+        .game-controls {
+            text-align: center;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #e2e8f0;
+        }
+        
+        .game-controls button {
+            padding: 15px 40px;
+            font-size: 1.1rem;
+            min-width: 200px;
+        }
+        
+        .game-controls button:disabled {
+            background: #94a3b8;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .game-controls button:disabled:hover {
+            background: #94a3b8;
+            transform: none;
+        }
+        
+        @media (max-width: 768px) {
+            .options-container {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .option-btn {
+                width: 100%;
+                max-width: 300px;
+            }
+            
+            .email-box {
+                padding: 20px;
+            }
+            
+            .btn-game {
+                padding: 12px 25px;
+                margin: 8px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .game-interface {
+                padding: 15px;
+            }
+            
+            .option-btn {
+                padding: 15px 25px;
+                font-size: 1rem;
+            }
         }
     </style>
 </head>
@@ -276,7 +379,7 @@ $current_email = isset($emails[$current_question]) ? $emails[$current_question] 
                 
                 <div class="score-display">
                     Score: <?php echo $score; ?>/<?php echo $total_questions; ?> 
-                    | Email: <?php echo $current_question; ?>/<?php echo $total_questions; ?>
+                    | Question: <?php echo $display_question; ?>/<?php echo $total_questions; ?>
                 </div>
                 
                 <?php if($feedback): ?>
@@ -287,51 +390,79 @@ $current_email = isset($emails[$current_question]) ? $emails[$current_question] 
                 
                 <?php if($game_completed): ?>
                     <div class="completion-screen">
-                        <h2 style="color: #10b981;">🎉 Mission Complete!</h2>
-                        <p>You scored <?php echo $score; ?> out of <?php echo $total_questions; ?>!</p>
-                        <a href="certificate.php?game=phishing&score=<?php echo $score; ?>" class="btn-game">
-                            🏆 Get Certificate
-                        </a>
-                        <div style="margin-top: 20px;">
+                        <h2 style="color: #10b981; margin-bottom: 20px;">🎉 Mission Complete!</h2>
+                        <p style="font-size: 1.2rem; margin-bottom: 15px;">You scored <?php echo $score; ?> out of <?php echo $total_questions; ?>!</p>
+                        <p style="color: #64748b; margin-bottom: 30px; max-width: 600px; margin-left: auto; margin-right: auto;">
+                            <?php 
+                            if($score == $total_questions) {
+                                echo "Perfect score! You're a phishing detection expert!";
+                            } elseif($score >= 3) {
+                                echo "Good job! You can spot most phishing attempts.";
+                            } else {
+                                echo "Keep practicing! Review what makes an email suspicious.";
+                            }
+                            ?>
+                        </p>
+                        <div style="margin-bottom: 30px;">
+                            <a href="certificate.php?game=phishing&score=<?php echo $score; ?>" class="btn-game">
+                                🏆 Get Certificate
+                            </a>
+                        </div>
+                        <div>
                             <a href="game.php" class="btn-game" style="background: #64748b;">Back to Games</a>
                             <a href="phishing-game.php?reset=1" class="btn-game">Play Again</a>
                         </div>
                     </div>
                 <?php else: ?>
-                    <form method="POST" action="phishing-game.php" id="gameForm">
-                        <input type="hidden" name="question_id" value="<?php echo $current_question; ?>">
-                        <input type="hidden" name="answer" id="selectedAnswer" value="">
-                        
-                        <div class="email-box">
-                            <div class="email-header">
-                                <div class="email-field">
-                                    <span class="email-label">From:</span> <strong><?php echo htmlspecialchars($current_email['sender']); ?></strong>
+                    <?php if($current_email): ?>
+                        <form method="POST" action="phishing-game.php" id="gameForm">
+                            <input type="hidden" name="question_id" value="<?php echo $current_question; ?>">
+                            <input type="hidden" name="answer" id="selectedAnswer" value="">
+                            
+                            <div class="tip-box">
+                                💡 <strong>Tip:</strong> Check the sender's email address carefully. Legitimate companies use their official domains.
+                            </div>
+                            
+                            <div class="email-box">
+                                <div class="email-header">
+                                    <div class="email-field">
+                                        <span class="email-label">From:</span> 
+                                        <span style="margin-left: 10px;"><strong><?php echo htmlspecialchars($current_email['sender']); ?></strong></span>
+                                    </div>
+                                    <div class="email-field">
+                                        <span class="email-label">Subject:</span> 
+                                        <span style="margin-left: 10px;"><?php echo htmlspecialchars($current_email['subject']); ?></span>
+                                    </div>
                                 </div>
-                                <div class="email-field">
-                                    <span class="email-label">Subject:</span> <?php echo htmlspecialchars($current_email['subject']); ?>
+                                
+                                <div class="email-body">
+                                    <?php echo nl2br(htmlspecialchars($current_email['body'])); ?>
+                                </div>
+                                
+                                <div class="options-container">
+                                    <div class="option-btn phishing-btn" onclick="selectAnswer('phishing')">
+                                        <span style="font-size: 1.3rem; margin-bottom: 5px;">🚨</span>
+                                        <span>Phishing</span>
+                                    </div>
+                                    <div class="option-btn legit-btn" onclick="selectAnswer('legitimate')">
+                                        <span style="font-size: 1.3rem; margin-bottom: 5px;">✅</span>
+                                        <span>Legitimate</span>
+                                    </div>
                                 </div>
                             </div>
                             
-                            <div class="email-body">
-                                <?php echo nl2br(htmlspecialchars($current_email['body'])); ?>
+                            <div class="game-controls">
+                                <button type="submit" class="btn-game" id="submitBtn" disabled style="min-width: 200px;">
+                                    <?php echo $current_question == $total_questions ? 'Finish Mission' : 'Next Question'; ?>
+                                </button>
                             </div>
-                            
-                            <div class="options">
-                                <div class="option-btn phishing-btn" onclick="selectAnswer('phishing')">
-                                    🚨 Phishing
-                                </div>
-                                <div class="option-btn legit-btn" onclick="selectAnswer('legitimate')">
-                                    ✅ Legitimate
-                                </div>
-                            </div>
+                        </form>
+                    <?php else: ?>
+                        <div class="completion-screen">
+                            <p>Loading game data...</p>
+                            <a href="phishing-game.php?reset=1" class="btn-game">Restart Game</a>
                         </div>
-                        
-                        <div style="text-align: center; margin-top: 20px;">
-                            <button type="submit" class="btn-game" id="submitBtn" disabled>
-                                <?php echo $current_question == $total_questions ? 'Finish' : 'Next'; ?>
-                            </button>
-                        </div>
-                    </form>
+                    <?php endif; ?>
                 <?php endif; ?>
             </div>
         </div>
@@ -343,7 +474,7 @@ $current_email = isset($emails[$current_question]) ? $emails[$current_question] 
         let selectedOption = null;
         
         function selectAnswer(answer) {
-            // Remove selected class from both buttons
+            // Remove selected class from all buttons
             document.querySelectorAll('.option-btn').forEach(btn => {
                 btn.classList.remove('selected');
             });
@@ -364,19 +495,32 @@ $current_email = isset($emails[$current_question]) ? $emails[$current_question] 
             selectedOption = answer;
         }
         
-        // Quick tips
-        const tips = [
-            "Check the sender's email address",
-            "Look for urgent or threatening language",
-            "Hover over links before clicking",
-            "Check for spelling mistakes",
-            "Legitimate companies use their official domains"
-        ];
+        // Prevent form submission without selection
+        document.getElementById('gameForm')?.addEventListener('submit', function(e) {
+            if(!selectedOption) {
+                e.preventDefault();
+                alert('Please select an answer before continuing.');
+            }
+        });
         
-        // Show a random tip
+        // Show random tip
         document.addEventListener('DOMContentLoaded', function() {
-            const randomTip = tips[Math.floor(Math.random() * tips.length)];
-            console.log("💡 Tip: " + randomTip);
+            const tips = [
+                "Check the sender's email address carefully",
+                "Look for urgent or threatening language",
+                "Hover over links to see where they really go",
+                "Check for spelling and grammar mistakes",
+                "Legitimate companies use their official domains",
+                "Never click links in suspicious emails",
+                "Verify with the company directly if unsure"
+            ];
+            
+            // Update the tip box with a random tip
+            const tipBox = document.querySelector('.tip-box');
+            if(tipBox) {
+                const randomTip = tips[Math.floor(Math.random() * tips.length)];
+                tipBox.innerHTML = '💡 <strong>Tip:</strong> ' + randomTip;
+            }
         });
     </script>
 </body>
