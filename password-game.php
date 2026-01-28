@@ -27,24 +27,23 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
             1 => "StrongPass2024!",
             2 => "Phishing",
             3 => "Every 3-6 months",
-            4 => "All",
+            4 => "Minimum of 12 characters in length",  // Changed to single correct answer
             5 => "Strong"
         ];
-        
-        // Special handling for question 4 (checkboxes)
-        if($question_id == 4) {
-            // For question 4, any selection is considered correct
-            if(isset($_POST['answer']) && $_POST['answer'] != "") {
-                $user_answer = "All";
-            }
-        }
         
         if($user_answer === $correct_answers[$question_id]) {
             $score++;
             $_SESSION['password_score'] = $score;
-            $feedback = "<span style='color: #10b981;'>✓ Correct</span>";
+            $feedback = "<div class='feedback correct'><span style='color: #10b981;'>✓ Correct</span></div>";
         } else {
-            $feedback = "<span style='color: #dc2626;'>✗ Incorrect</span>";
+            // Show what the correct answer should have been
+            $correct_hint = "";
+            if($question_id == 4) {
+                $correct_hint = " (Minimum password length is the most important factor for security)";
+            } elseif($question_id == 5) {
+                $correct_hint = " (Create a password with uppercase, lowercase, numbers, and symbols, at least 12 characters long)";
+            }
+            $feedback = "<div class='feedback incorrect'><span style='color: #dc2626;'>✗ Incorrect</span>$correct_hint</div>";
         }
         
         $current_question = $question_id + 1;
@@ -56,9 +55,25 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
             
             // Save score to database
             $user_id = $_SESSION['id'];
+            
+            // First check if table exists, if not create it
+            $table_check = mysqli_query($link, "SHOW TABLES LIKE 'game_scores'");
+            if(mysqli_num_rows($table_check) == 0) {
+                // Create the table if it doesn't exist
+                $create_table_sql = "CREATE TABLE IF NOT EXISTS game_scores (
+                    id INT AUTO_INCREMENT PRIMARY KEY,
+                    user_id INT NOT NULL,
+                    game_type VARCHAR(50) NOT NULL,
+                    score INT NOT NULL,
+                    total_questions INT NOT NULL,
+                    completed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                )";
+                mysqli_query($link, $create_table_sql);
+            }
+            
             $sql = "INSERT INTO game_scores (user_id, game_type, score, total_questions, completed_at) 
                     VALUES (?, 'password_fortress', ?, ?, NOW())
-                    ON DUPLICATE KEY UPDATE score = VALUES(score), completed_at = VALUES(completed_at)";
+                    ON DUPLICATE KEY UPDATE score = VALUES(score), completed_at = NOW()";
             
             if($stmt = mysqli_prepare($link, $sql)) {
                 mysqli_stmt_bind_param($stmt, "iii", $user_id, $score, $total_questions);
@@ -70,6 +85,31 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
             unset($_SESSION['password_score']);
             unset($_SESSION['password_question']);
         }
+    }
+}
+
+// Function to calculate password strength
+function calculatePasswordStrength($password) {
+    if(empty($password)) return "Weak";
+    
+    $strength = 0;
+    
+    // Length checks
+    if(strlen($password) >= 8) $strength++;
+    if(strlen($password) >= 12) $strength++;
+    
+    // Complexity checks
+    if(preg_match('/[a-z]/', $password)) $strength++;
+    if(preg_match('/[A-Z]/', $password)) $strength++;
+    if(preg_match('/[0-9]/', $password)) $strength++;
+    if(preg_match('/[^A-Za-z0-9]/', $password)) $strength++;
+    
+    if($strength <= 2) {
+        return "Weak";
+    } elseif($strength <= 4) {
+        return "Fair";
+    } else {
+        return "Strong";
     }
 }
 
@@ -86,7 +126,6 @@ if(isset($_GET['reset'])) {
 // If somehow current_question is 6 but game not marked completed, fix it
 if($current_question > $total_questions && !$game_completed) {
     $game_completed = true;
-    // Clear session data if stuck
     unset($_SESSION['password_score']);
     unset($_SESSION['password_question']);
 }
@@ -100,7 +139,7 @@ if($current_question > $total_questions && !$game_completed) {
     <title>Password Fortress | CybAware</title>
     <link rel="stylesheet" href="css/styles.css">
     <style>
-        /* Professional CompTIA-style design */
+        /* Professional CompTIA-style design - KEEPING YOUR CSS */
         .game-interface {
             max-width: 900px;
             margin: 0 auto;
@@ -259,8 +298,7 @@ if($current_question > $total_questions && !$game_completed) {
             flex: 1;
         }
         
-        input[type="radio"],
-        input[type="checkbox"] {
+        input[type="radio"] {
             margin-right: 15px;
             transform: scale(1.2);
         }
@@ -513,6 +551,15 @@ if($current_question > $total_questions && !$game_completed) {
             font-size: 14px;
             text-align: center;
         }
+        
+        .instruction-note {
+            background: #e0f2fe;
+            border-left: 4px solid #0ea5e9;
+            padding: 12px;
+            margin-bottom: 20px;
+            border-radius: 6px;
+            font-size: 0.95rem;
+        }
     </style>
 </head>
 <body>
@@ -536,11 +583,7 @@ if($current_question > $total_questions && !$game_completed) {
                     </div>
                 </div>
                 
-                <?php if($feedback): ?>
-                    <div class="feedback <?php echo strpos($feedback, 'Correct') !== false ? 'correct' : 'incorrect'; ?>">
-                        <?php echo $feedback; ?>
-                    </div>
-                <?php endif; ?>
+                <?php echo $feedback; ?>
                 
                 <?php if($game_completed): ?>
                     <div class="completion-screen">
@@ -576,6 +619,7 @@ if($current_question > $total_questions && !$game_completed) {
                 <?php else: ?>
                     <form method="POST" action="password-game.php" id="gameForm">
                         <input type="hidden" name="question_id" value="<?php echo $current_question; ?>">
+                        <input type="hidden" name="answer" id="selectedAnswer" value="">
                         
                         <div class="question-container">
                             <div class="question-number">Question <?php echo $current_question; ?></div>
@@ -696,11 +740,11 @@ if($current_question > $total_questions && !$game_completed) {
                                 </div>
                                 
                             <?php elseif($current_question == 4): ?>
-                                <div class="question-text">Select all characteristics that contribute to creating a strong password:</div>
+                                <div class="question-text">Which of the following is the MOST important factor for password security?</div>
                                 
                                 <div class="options-container">
                                     <label class="option">
-                                        <input type="checkbox" name="answer4[]" value="Length">
+                                        <input type="radio" name="answer" value="Minimum of 12 characters in length" required>
                                         <div class="option-label">
                                             <div class="option-letter">A</div>
                                             <div class="option-text">Minimum of 12 characters in length</div>
@@ -708,7 +752,7 @@ if($current_question > $total_questions && !$game_completed) {
                                     </label>
                                     
                                     <label class="option">
-                                        <input type="checkbox" name="answer4[]" value="Mix">
+                                        <input type="radio" name="answer" value="Combination of uppercase letters, lowercase letters, numbers, and symbols" required>
                                         <div class="option-label">
                                             <div class="option-letter">B</div>
                                             <div class="option-text">Combination of uppercase letters, lowercase letters, numbers, and symbols</div>
@@ -716,20 +760,36 @@ if($current_question > $total_questions && !$game_completed) {
                                     </label>
                                     
                                     <label class="option">
-                                        <input type="checkbox" name="answer4[]" value="Unique">
+                                        <input type="radio" name="answer" value="Not reused across multiple websites or services" required>
                                         <div class="option-label">
                                             <div class="option-letter">C</div>
                                             <div class="option-text">Not reused across multiple websites or services</div>
                                         </div>
                                     </label>
+                                    
+                                    <label class="option">
+                                        <input type="radio" name="answer" value="Contains personal information like birth dates" required>
+                                        <div class="option-label">
+                                            <div class="option-letter">D</div>
+                                            <div class="option-text">Contains personal information like birth dates (INCORRECT)</div>
+                                        </div>
+                                    </label>
                                 </div>
-                                <input type="hidden" name="answer" id="question4Answer" value="">
+                                
+                                <div class="hint-box">
+                                    <strong>Hint:</strong> While all options (except D) contribute to security, password length is the most critical factor against brute force attacks.
+                                </div>
                                 
                             <?php elseif($current_question == 5): ?>
                                 <div class="question-text">Evaluate the strength of a password by entering one below:</div>
                                 
+                                <div class="instruction-note">
+                                    <strong>Goal:</strong> Create a password that scores "Strong" in the strength meter. You need a password with uppercase letters, lowercase letters, numbers, and symbols, at least 12 characters long.
+                                </div>
+                                
                                 <div class="password-test-container">
-                                    <input type="text" class="password-input" id="passwordTest" placeholder="Enter a password to test its strength">
+                                    <input type="text" class="password-input" id="passwordTest" name="password_test" placeholder="Enter a password to test its strength" required>
+                                    <input type="hidden" id="passwordStrength" name="answer" value="">
                                     
                                     <div class="strength-indicator">
                                         <span class="strength-label">Password Strength:</span>
@@ -739,49 +799,6 @@ if($current_question > $total_questions && !$game_completed) {
                                         <div class="strength-text" id="strengthText">Enter a password to see strength analysis</div>
                                     </div>
                                 </div>
-                                <input type="hidden" name="answer" id="passwordAnswer" value="Weak">
-                                
-                                <script>
-                                    const passwordInput = document.getElementById('passwordTest');
-                                    const strengthBar = document.getElementById('strengthBar');
-                                    const strengthText = document.getElementById('strengthText');
-                                    const passwordAnswer = document.getElementById('passwordAnswer');
-                                    
-                                    passwordInput.addEventListener('input', function() {
-                                        const password = this.value;
-                                        let strength = 0;
-                                        
-                                        // Length checks
-                                        if(password.length >= 8) strength++;
-                                        if(password.length >= 12) strength++;
-                                        
-                                        // Complexity checks
-                                        if(/[a-z]/.test(password)) strength++;
-                                        if(/[A-Z]/.test(password)) strength++;
-                                        if(/[0-9]/.test(password)) strength++;
-                                        if(/[^A-Za-z0-9]/.test(password)) strength++;
-                                        
-                                        const width = (strength / 6) * 100;
-                                        strengthBar.style.width = width + '%';
-                                        
-                                        if(strength <= 2) {
-                                            strengthBar.style.backgroundColor = '#dc2626';
-                                            strengthText.textContent = 'Weak - Easily compromised';
-                                            strengthText.className = 'strength-text strength-weak';
-                                            passwordAnswer.value = 'Weak';
-                                        } else if(strength <= 4) {
-                                            strengthBar.style.backgroundColor = '#d97706';
-                                            strengthText.textContent = 'Fair - Could be stronger';
-                                            strengthText.className = 'strength-text strength-fair';
-                                            passwordAnswer.value = 'Fair';
-                                        } else {
-                                            strengthBar.style.backgroundColor = '#059669';
-                                            strengthText.textContent = 'Strong - Meets security standards';
-                                            strengthText.className = 'strength-text strength-good';
-                                            passwordAnswer.value = 'Strong';
-                                        }
-                                    });
-                                </script>
                                 
                             <?php endif; ?>
                         </div>
@@ -800,7 +817,6 @@ if($current_question > $total_questions && !$game_completed) {
     </div>
     
     <script>
-        // Simple JavaScript for option selection
         document.addEventListener('DOMContentLoaded', function() {
             const options = document.querySelectorAll('.option');
             const submitBtn = document.getElementById('submitBtn');
@@ -808,103 +824,133 @@ if($current_question > $total_questions && !$game_completed) {
             
             // Only run this code if game is not completed
             if(currentQuestion <= <?php echo $total_questions; ?>) {
-                // For questions 1-3 and 5 (single choice)
-                if(currentQuestion !== 4) {
-                    options.forEach(option => {
-                        const input = option.querySelector('input');
+                // For all questions 1-5 (all are single choice now)
+                options.forEach(option => {
+                    const input = option.querySelector('input');
+                    
+                    option.addEventListener('click', function() {
+                        // Remove selected class from all options
+                        options.forEach(opt => opt.classList.remove('selected'));
                         
-                        option.addEventListener('click', function() {
-                            // Remove selected class from all options
+                        // Add selected class to clicked option
+                        this.classList.add('selected');
+                        
+                        // Check the radio button
+                        if(input) {
+                            input.checked = true;
+                        }
+                        
+                        // Enable submit button
+                        if(submitBtn) {
+                            submitBtn.disabled = false;
+                        }
+                    });
+                    
+                    // Update visual state when input changes
+                    input?.addEventListener('change', function() {
+                        if(this.checked) {
                             options.forEach(opt => opt.classList.remove('selected'));
+                            option.classList.add('selected');
                             
-                            // Add selected class to clicked option
-                            this.classList.add('selected');
-                            
-                            // Check the radio button
-                            if(input) {
-                                input.checked = true;
-                            }
-                            
-                            // Enable submit button
                             if(submitBtn) {
                                 submitBtn.disabled = false;
                             }
-                        });
-                        
-                        // Update visual state when input changes
-                        input.addEventListener('change', function() {
-                            if(this.checked) {
-                                options.forEach(opt => opt.classList.remove('selected'));
-                                option.classList.add('selected');
-                                
-                                if(submitBtn) {
-                                    submitBtn.disabled = false;
-                                }
-                            }
-                        });
-                    });
-                    
-                    // Check if any option is already selected on page load
-                    const selectedInput = document.querySelector('input[type="radio"]:checked');
-                    if(selectedInput) {
-                        const selectedOption = selectedInput.closest('.option');
-                        if(selectedOption) {
-                            selectedOption.classList.add('selected');
-                            if(submitBtn) submitBtn.disabled = false;
                         }
-                    }
-                }
-                
-                // For question 4 (multiple choice)
-                if(currentQuestion === 4) {
-                    const checkboxes = document.querySelectorAll('input[type="checkbox"]');
-                    const question4Answer = document.getElementById('question4Answer');
-                    
-                    checkboxes.forEach(checkbox => {
-                        const option = checkbox.closest('.option');
-                        
-                        option.addEventListener('click', function() {
-                            // Toggle checkbox
-                            checkbox.checked = !checkbox.checked;
-                            
-                            // Toggle selected class
-                            this.classList.toggle('selected');
-                            
-                            // Update the hidden answer field
-                            let selectedValues = [];
-                            checkboxes.forEach(cb => {
-                                if(cb.checked) selectedValues.push(cb.value);
-                            });
-                            
-                            if(selectedValues.length > 0) {
-                                question4Answer.value = 'All';
-                                if(submitBtn) submitBtn.disabled = false;
-                            } else {
-                                question4Answer.value = '';
-                                if(submitBtn) submitBtn.disabled = true;
-                            }
-                        });
                     });
-                    
-                    // Enable submit button if any checkbox is checked on page load
-                    const anyChecked = Array.from(checkboxes).some(cb => cb.checked);
-                    if(anyChecked && submitBtn) {
-                        submitBtn.disabled = false;
-                        question4Answer.value = 'All';
+                });
+                
+                // Check if any option is already selected on page load (for questions 1-4)
+                const selectedInput = document.querySelector('input[type="radio"]:checked');
+                if(selectedInput) {
+                    const selectedOption = selectedInput.closest('.option');
+                    if(selectedOption) {
+                        selectedOption.classList.add('selected');
+                        if(submitBtn) submitBtn.disabled = false;
                     }
                 }
                 
                 // For question 5 (password test), enable submit button if password is entered
                 if(currentQuestion === 5) {
                     const passwordInput = document.getElementById('passwordTest');
-                    const passwordAnswer = document.getElementById('passwordAnswer');
+                    const passwordStrengthInput = document.getElementById('passwordStrength');
                     
-                    if(passwordInput && submitBtn) {
+                    // Password strength calculation
+                    function calculateStrength(password) {
+                        if(!password) return {strength: 0, text: 'Enter a password to see strength analysis', class: ''};
+                        
+                        let strength = 0;
+                        
+                        // Length checks
+                        if(password.length >= 8) strength++;
+                        if(password.length >= 12) strength++;
+                        
+                        // Complexity checks
+                        if(/[a-z]/.test(password)) strength++;
+                        if(/[A-Z]/.test(password)) strength++;
+                        if(/[0-9]/.test(password)) strength++;
+                        if(/[^A-Za-z0-9]/.test(password)) strength++;
+                        
+                        const width = (strength / 6) * 100;
+                        let text = '';
+                        let className = '';
+                        let answerValue = '';
+                        
+                        if(strength <= 2) {
+                            text = 'Weak - Easily compromised';
+                            className = 'strength-weak';
+                            answerValue = 'Weak';
+                        } else if(strength <= 4) {
+                            text = 'Fair - Could be stronger';
+                            className = 'strength-fair';
+                            answerValue = 'Fair';
+                        } else {
+                            text = 'Strong - Meets security standards';
+                            className = 'strength-good';
+                            answerValue = 'Strong';
+                        }
+                        
+                        return {
+                            strength: strength,
+                            width: width,
+                            text: text,
+                            className: className,
+                            answerValue: answerValue
+                        };
+                    }
+                    
+                    // Update strength meter as user types
+                    if(passwordInput) {
                         passwordInput.addEventListener('input', function() {
-                            if(this.value.trim() !== '') {
-                                submitBtn.disabled = false;
-                            } else {
-                                submitBtn.disabled = true;
+                            const result = calculateStrength(this.value);
+                            
+                            // Update strength bar
+                            const strengthBar = document.getElementById('strengthBar');
+                            if(strengthBar) {
+                                strengthBar.style.width = result.width + '%';
+                                if(result.strength <= 2) {
+                                    strengthBar.style.backgroundColor = '#dc2626';
+                                } else if(result.strength <= 4) {
+                                    strengthBar.style.backgroundColor = '#d97706';
+                                } else {
+                                    strengthBar.style.backgroundColor = '#059669';
+                                }
+                            }
+                            
+                            // Update strength text
+                            const strengthText = document.getElementById('strengthText');
+                            if(strengthText) {
+                                strengthText.textContent = result.text;
+                                strengthText.className = 'strength-text ' + result.className;
+                            }
+                            
+                            // Update hidden input value
+                            if(passwordStrengthInput) {
+                                passwordStrengthInput.value = result.answerValue;
+                            }
+                            
+                            // Enable/disable submit button
+                            if(submitBtn) {
+                                submitBtn.disabled = this.value.trim() === '';
                             }
                         });
                         
@@ -915,8 +961,8 @@ if($current_question > $total_questions && !$game_completed) {
                     }
                 }
                 
-                // Disable submit button initially for questions 1-4
-                if(currentQuestion <= 4 && submitBtn) {
+                // Disable submit button initially for all questions
+                if(submitBtn) {
                     submitBtn.disabled = true;
                 }
                 
@@ -924,24 +970,8 @@ if($current_question > $total_questions && !$game_completed) {
                 const form = document.getElementById('gameForm');
                 if(form) {
                     form.addEventListener('submit', function(e) {
-                        // For question 4, ensure at least one checkbox is checked
-                        if(currentQuestion === 4) {
-                            const checkboxes = document.querySelectorAll('input[type="checkbox"]');
-                            let anyChecked = false;
-                            
-                            checkboxes.forEach(cb => {
-                                if(cb.checked) anyChecked = true;
-                            });
-                            
-                            if(!anyChecked) {
-                                e.preventDefault();
-                                alert('Please select at least one characteristic that contributes to password strength.');
-                                return false;
-                            }
-                        }
-                        
-                        // For other questions, ensure a radio button is selected
-                        if(currentQuestion !== 4 && currentQuestion !== 5) {
+                        // For questions 1-4, ensure a radio button is selected
+                        if(currentQuestion <= 4) {
                             const selectedRadio = document.querySelector('input[type="radio"]:checked');
                             if(!selectedRadio) {
                                 e.preventDefault();
