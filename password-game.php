@@ -56,7 +56,8 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
             // Save score to database
             $user_id = $_SESSION['id'];
             $sql = "INSERT INTO game_scores (user_id, game_type, score, total_questions, completed_at) 
-                    VALUES (?, 'password_fortress', ?, ?, NOW())";
+                    VALUES (?, 'password_fortress', ?, ?, NOW())
+                    ON DUPLICATE KEY UPDATE score = VALUES(score), completed_at = VALUES(completed_at)";
             
             if($stmt = mysqli_prepare($link, $sql)) {
                 mysqli_stmt_bind_param($stmt, "iii", $user_id, $score, $total_questions);
@@ -424,22 +425,21 @@ if(isset($_GET['reset'])) {
         
         .btn-action {
             padding: 14px 28px;
+            background: #1e40af;
+            color: white;
+            border: none;
             border-radius: 6px;
             font-size: 15px;
             font-weight: 600;
+            cursor: pointer;
             text-decoration: none;
-            transition: all 0.2s ease;
             display: inline-block;
+            transition: all 0.2s ease;
         }
         
-        .btn-certificate {
-            background: #1e40af;
-            color: white;
-            border: 1px solid #1e40af;
-        }
-        
-        .btn-certificate:hover {
+        .btn-action:hover {
             background: #1e3a8a;
+            transform: translateY(-1px);
         }
         
         .btn-secondary {
@@ -525,16 +525,19 @@ if(isset($_GET['reset'])) {
                         </div>
                         
                         <div class="completion-actions">
-                            <a href="certificate.php?game=password&score=<?php echo $score; ?>" class="btn-action btn-certificate">
-                                View Certificate
-                            </a>
-                            <a href="game.php" class="btn-action btn-secondary">
+                            <!-- REMOVED: Certificate link from here -->
+                            <!-- Certificate is now only available on game.php after completing both games -->
+                            <a href="game.php" class="btn-action">
                                 Return to Games
                             </a>
-                            <a href="password-game.php?reset=1" class="btn-action btn-secondary">
+                            <button onclick="window.location.href='password-game.php?reset=1'" class="btn-action" style="background: #64748b;">
                                 Retake Assessment
-                            </a>
+                            </button>
                         </div>
+                        
+                        <p style="margin-top: 30px; color: #64748b; font-size: 14px;">
+                            <strong>Note:</strong> Complete both Password Fortress and Phishing Detective to unlock your certificate.
+                        </p>
                     </div>
                 <?php else: ?>
                     <form method="POST" action="password-game.php" id="gameForm">
