@@ -50,6 +50,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
         $current_question = $question_id + 1;
         $_SESSION['password_question'] = $current_question;
         
+        // Check if game is completed (after answering question 5)
         if($current_question > $total_questions) {
             $game_completed = true;
             
@@ -80,6 +81,14 @@ if(isset($_GET['reset'])) {
     $current_question = 1;
     header("location: password-game.php");
     exit;
+}
+
+// If somehow current_question is 6 but game not marked completed, fix it
+if($current_question > $total_questions && !$game_completed) {
+    $game_completed = true;
+    // Clear session data if stuck
+    unset($_SESSION['password_score']);
+    unset($_SESSION['password_question']);
 }
 ?>
 <!DOCTYPE html>
@@ -143,7 +152,13 @@ if(isset($_GET['reset'])) {
         .progress-fill {
             height: 100%;
             background: #1e40af;
-            width: <?php echo (($current_question-1)/$total_questions)*100; ?>%;
+            width: <?php 
+                if($game_completed) {
+                    echo '100';
+                } else {
+                    echo (($current_question-1)/$total_questions)*100; 
+                }
+            ?>%;
             transition: width 0.3s ease;
         }
         
@@ -451,6 +466,16 @@ if(isset($_GET['reset'])) {
         .btn-secondary:hover {
             background: #f9fafb;
             border-color: #9ca3af;
+            transform: translateY(-1px);
+        }
+        
+        .btn-gray {
+            background: #64748b;
+            color: white;
+        }
+        
+        .btn-gray:hover {
+            background: #475569;
         }
         
         @media (max-width: 768px) {
@@ -477,6 +502,17 @@ if(isset($_GET['reset'])) {
                 text-align: center;
             }
         }
+        
+        .certificate-note {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f0f9ff;
+            border: 1px solid #0ea5e9;
+            border-radius: 6px;
+            color: #0369a1;
+            font-size: 14px;
+            text-align: center;
+        }
     </style>
 </head>
 <body>
@@ -492,7 +528,7 @@ if(isset($_GET['reset'])) {
                 
                 <div class="progress-container">
                     <div class="progress-info">
-                        <span>Question <?php echo $current_question; ?> of <?php echo $total_questions; ?></span>
+                        <span>Question <?php echo min($current_question, $total_questions); ?> of <?php echo $total_questions; ?></span>
                         <span>Score: <?php echo $score; ?>/<?php echo $total_questions; ?></span>
                     </div>
                     <div class="progress-bar">
@@ -508,7 +544,7 @@ if(isset($_GET['reset'])) {
                 
                 <?php if($game_completed): ?>
                     <div class="completion-screen">
-                        <h2>Assessment Complete</h2>
+                        <h2>🎉 Assessment Complete</h2>
                         <p class="score-result">You scored <?php echo $score; ?> out of <?php echo $total_questions; ?> correctly.</p>
                         
                         <div class="performance-rating">
@@ -525,19 +561,17 @@ if(isset($_GET['reset'])) {
                         </div>
                         
                         <div class="completion-actions">
-                            <!-- REMOVED: Certificate link from here -->
-                            <!-- Certificate is now only available on game.php after completing both games -->
                             <a href="game.php" class="btn-action">
-                                Return to Games
+                                Return to Game Dashboard
                             </a>
-                            <button onclick="window.location.href='password-game.php?reset=1'" class="btn-action" style="background: #64748b;">
-                                Retake Assessment
-                            </button>
+                            <a href="password-game.php?reset=1" class="btn-action btn-gray">
+                                Play Again
+                            </a>
                         </div>
                         
-                        <p style="margin-top: 30px; color: #64748b; font-size: 14px;">
-                            <strong>Note:</strong> Complete both Password Fortress and Phishing Detective to unlock your certificate.
-                        </p>
+                        <div class="certificate-note">
+                            <strong>Certificate Status:</strong> Complete both Password Fortress and Phishing Detective missions to unlock your cybersecurity awareness certificate.
+                        </div>
                     </div>
                 <?php else: ?>
                     <form method="POST" action="password-game.php" id="gameForm">
@@ -772,160 +806,163 @@ if(isset($_GET['reset'])) {
             const submitBtn = document.getElementById('submitBtn');
             const currentQuestion = <?php echo $current_question; ?>;
             
-            // For questions 1-3 and 5 (single choice)
-            if(currentQuestion !== 4) {
-                options.forEach(option => {
-                    const input = option.querySelector('input');
-                    
-                    option.addEventListener('click', function() {
-                        // Remove selected class from all options
-                        options.forEach(opt => opt.classList.remove('selected'));
+            // Only run this code if game is not completed
+            if(currentQuestion <= <?php echo $total_questions; ?>) {
+                // For questions 1-3 and 5 (single choice)
+                if(currentQuestion !== 4) {
+                    options.forEach(option => {
+                        const input = option.querySelector('input');
                         
-                        // Add selected class to clicked option
-                        this.classList.add('selected');
-                        
-                        // Check the radio button
-                        if(input) {
-                            input.checked = true;
-                        }
-                        
-                        // Enable submit button
-                        if(submitBtn) {
-                            submitBtn.disabled = false;
-                        }
-                    });
-                    
-                    // Update visual state when input changes
-                    input.addEventListener('change', function() {
-                        if(this.checked) {
+                        option.addEventListener('click', function() {
+                            // Remove selected class from all options
                             options.forEach(opt => opt.classList.remove('selected'));
-                            option.classList.add('selected');
                             
+                            // Add selected class to clicked option
+                            this.classList.add('selected');
+                            
+                            // Check the radio button
+                            if(input) {
+                                input.checked = true;
+                            }
+                            
+                            // Enable submit button
                             if(submitBtn) {
                                 submitBtn.disabled = false;
                             }
-                        }
-                    });
-                });
-                
-                // Check if any option is already selected on page load
-                const selectedInput = document.querySelector('input[type="radio"]:checked');
-                if(selectedInput) {
-                    const selectedOption = selectedInput.closest('.option');
-                    if(selectedOption) {
-                        selectedOption.classList.add('selected');
-                        if(submitBtn) submitBtn.disabled = false;
-                    }
-                }
-            }
-            
-            // For question 4 (multiple choice)
-            if(currentQuestion === 4) {
-                const checkboxes = document.querySelectorAll('input[type="checkbox"]');
-                const question4Answer = document.getElementById('question4Answer');
-                
-                checkboxes.forEach(checkbox => {
-                    const option = checkbox.closest('.option');
-                    
-                    option.addEventListener('click', function() {
-                        // Toggle checkbox
-                        checkbox.checked = !checkbox.checked;
-                        
-                        // Toggle selected class
-                        this.classList.toggle('selected');
-                        
-                        // Update the hidden answer field
-                        let selectedValues = [];
-                        checkboxes.forEach(cb => {
-                            if(cb.checked) selectedValues.push(cb.value);
                         });
                         
-                        if(selectedValues.length > 0) {
-                            question4Answer.value = 'All';
+                        // Update visual state when input changes
+                        input.addEventListener('change', function() {
+                            if(this.checked) {
+                                options.forEach(opt => opt.classList.remove('selected'));
+                                option.classList.add('selected');
+                                
+                                if(submitBtn) {
+                                    submitBtn.disabled = false;
+                                }
+                            }
+                        });
+                    });
+                    
+                    // Check if any option is already selected on page load
+                    const selectedInput = document.querySelector('input[type="radio"]:checked');
+                    if(selectedInput) {
+                        const selectedOption = selectedInput.closest('.option');
+                        if(selectedOption) {
+                            selectedOption.classList.add('selected');
                             if(submitBtn) submitBtn.disabled = false;
-                        } else {
-                            question4Answer.value = '';
-                            if(submitBtn) submitBtn.disabled = true;
                         }
-                    });
-                });
-                
-                // Enable submit button if any checkbox is checked on page load
-                const anyChecked = Array.from(checkboxes).some(cb => cb.checked);
-                if(anyChecked && submitBtn) {
-                    submitBtn.disabled = false;
-                    question4Answer.value = 'All';
-                }
-            }
-            
-            // For question 5 (password test), enable submit button if password is entered
-            if(currentQuestion === 5) {
-                const passwordInput = document.getElementById('passwordTest');
-                const passwordAnswer = document.getElementById('passwordAnswer');
-                
-                if(passwordInput && submitBtn) {
-                    passwordInput.addEventListener('input', function() {
-                        if(this.value.trim() !== '') {
-                            submitBtn.disabled = false;
-                        } else {
-                            submitBtn.disabled = true;
-                        }
-                    });
-                    
-                    // Check on page load
-                    if(passwordInput.value.trim() !== '') {
-                        submitBtn.disabled = false;
                     }
                 }
-            }
-            
-            // Disable submit button initially for questions 1-4
-            if(currentQuestion <= 4 && submitBtn) {
-                submitBtn.disabled = true;
-            }
-            
-            // Simple form validation
-            const form = document.getElementById('gameForm');
-            if(form) {
-                form.addEventListener('submit', function(e) {
-                    // For question 4, ensure at least one checkbox is checked
-                    if(currentQuestion === 4) {
-                        const checkboxes = document.querySelectorAll('input[type="checkbox"]');
-                        let anyChecked = false;
+                
+                // For question 4 (multiple choice)
+                if(currentQuestion === 4) {
+                    const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+                    const question4Answer = document.getElementById('question4Answer');
+                    
+                    checkboxes.forEach(checkbox => {
+                        const option = checkbox.closest('.option');
                         
-                        checkboxes.forEach(cb => {
-                            if(cb.checked) anyChecked = true;
+                        option.addEventListener('click', function() {
+                            // Toggle checkbox
+                            checkbox.checked = !checkbox.checked;
+                            
+                            // Toggle selected class
+                            this.classList.toggle('selected');
+                            
+                            // Update the hidden answer field
+                            let selectedValues = [];
+                            checkboxes.forEach(cb => {
+                                if(cb.checked) selectedValues.push(cb.value);
+                            });
+                            
+                            if(selectedValues.length > 0) {
+                                question4Answer.value = 'All';
+                                if(submitBtn) submitBtn.disabled = false;
+                            } else {
+                                question4Answer.value = '';
+                                if(submitBtn) submitBtn.disabled = true;
+                            }
+                        });
+                    });
+                    
+                    // Enable submit button if any checkbox is checked on page load
+                    const anyChecked = Array.from(checkboxes).some(cb => cb.checked);
+                    if(anyChecked && submitBtn) {
+                        submitBtn.disabled = false;
+                        question4Answer.value = 'All';
+                    }
+                }
+                
+                // For question 5 (password test), enable submit button if password is entered
+                if(currentQuestion === 5) {
+                    const passwordInput = document.getElementById('passwordTest');
+                    const passwordAnswer = document.getElementById('passwordAnswer');
+                    
+                    if(passwordInput && submitBtn) {
+                        passwordInput.addEventListener('input', function() {
+                            if(this.value.trim() !== '') {
+                                submitBtn.disabled = false;
+                            } else {
+                                submitBtn.disabled = true;
+                            }
                         });
                         
-                        if(!anyChecked) {
-                            e.preventDefault();
-                            alert('Please select at least one characteristic that contributes to password strength.');
-                            return false;
+                        // Check on page load
+                        if(passwordInput.value.trim() !== '') {
+                            submitBtn.disabled = false;
                         }
                     }
-                    
-                    // For other questions, ensure a radio button is selected
-                    if(currentQuestion !== 4 && currentQuestion !== 5) {
-                        const selectedRadio = document.querySelector('input[type="radio"]:checked');
-                        if(!selectedRadio) {
-                            e.preventDefault();
-                            alert('Please select an answer before continuing.');
-                            return false;
+                }
+                
+                // Disable submit button initially for questions 1-4
+                if(currentQuestion <= 4 && submitBtn) {
+                    submitBtn.disabled = true;
+                }
+                
+                // Simple form validation
+                const form = document.getElementById('gameForm');
+                if(form) {
+                    form.addEventListener('submit', function(e) {
+                        // For question 4, ensure at least one checkbox is checked
+                        if(currentQuestion === 4) {
+                            const checkboxes = document.querySelectorAll('input[type="checkbox"]');
+                            let anyChecked = false;
+                            
+                            checkboxes.forEach(cb => {
+                                if(cb.checked) anyChecked = true;
+                            });
+                            
+                            if(!anyChecked) {
+                                e.preventDefault();
+                                alert('Please select at least one characteristic that contributes to password strength.');
+                                return false;
+                            }
                         }
-                    }
-                    
-                    // For question 5, ensure password is entered
-                    if(currentQuestion === 5) {
-                        const passwordInput = document.getElementById('passwordTest');
-                        if(!passwordInput || passwordInput.value.trim() === '') {
-                            e.preventDefault();
-                            alert('Please enter a password to test its strength.');
-                            return false;
+                        
+                        // For other questions, ensure a radio button is selected
+                        if(currentQuestion !== 4 && currentQuestion !== 5) {
+                            const selectedRadio = document.querySelector('input[type="radio"]:checked');
+                            if(!selectedRadio) {
+                                e.preventDefault();
+                                alert('Please select an answer before continuing.');
+                                return false;
+                            }
                         }
-                    }
-                    
-                    return true;
-                });
+                        
+                        // For question 5, ensure password is entered
+                        if(currentQuestion === 5) {
+                            const passwordInput = document.getElementById('passwordTest');
+                            if(!passwordInput || passwordInput.value.trim() === '') {
+                                e.preventDefault();
+                                alert('Please enter a password to test its strength.');
+                                return false;
+                            }
+                        }
+                        
+                        return true;
+                    });
+                }
             }
         });
     </script>
