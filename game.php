@@ -389,7 +389,7 @@ if($stmt = mysqli_prepare($link, $sql)) {
                                     </div>
                                 <?php endif; ?>
                                 
-                                <a href="phishing-game.php" class="play-btn">
+                                <a href="" class="play-btn">
                                     <?php echo $phishing_score > 0 ? 'Play Again' : 'Start Mission'; ?>
                                 </a>
                             </div>

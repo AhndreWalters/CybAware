@@ -34,7 +34,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
         if($user_answer === $correct_answers[$question_id]) {
             $score++;
             $_SESSION['password_score'] = $score;
-            $feedback = "<div class='feedback correct'><span style='color: #10b981;'>✓ Correct</span></div>";
+            $feedback = "<div class='feedback correct'><span style='color: #10b981;'>2Correct</span></div>";
         } else {
             // Show what the correct answer should have been
             $correct_hint = "";
@@ -43,7 +43,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
             } elseif($question_id == 5) {
                 $correct_hint = " (Create a password with uppercase, lowercase, numbers, and symbols, at least 12 characters long)";
             }
-            $feedback = "<div class='feedback incorrect'><span style='color: #dc2626;'>✗ Incorrect</span>$correct_hint</div>";
+            $feedback = "<div class='feedback incorrect'><span style='color: #dc2626;'>Incorrect</span>$correct_hint</div>";
         }
         
         $current_question = $question_id + 1;
