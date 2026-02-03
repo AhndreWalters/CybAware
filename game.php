@@ -328,18 +328,7 @@ if($stmt = mysqli_prepare($link, $sql)) {
                     <h1>Cybersecurity Missions</h1>
                     <p>Complete both missions to earn your cybersecurity awareness certificate.</p>
                     
-                    <div class="games-completed">
-                        <strong>Progress:</strong> <?php echo $games_completed; ?> of <?php echo $total_games; ?> games completed
-                        <div class="completion-status">
-                            <span class="status-icon <?php echo $password_score > 0 ? 'status-complete' : 'status-incomplete'; ?>">
-                                <?php echo $password_score > 0 ? '✓' : '✗'; ?>
-                            </span>
-                            <span>Password Fortress</span>
-                            <span class="status-icon <?php echo $phishing_score > 0 ? 'status-complete' : 'status-incomplete'; ?>">
-                                <?php echo $phishing_score > 0 ? '✓' : '✗'; ?>
-                            </span>
-                            <span>Phishing Detective</span>
-                        </div>
+                    <div>
                     </div>
                 </div>
                 
@@ -425,7 +414,7 @@ if($stmt = mysqli_prepare($link, $sql)) {
                         
                         <?php if($can_download_certificate): ?>
                             <div class="certificate-section">
-                                <h3>🎉 Certificate Ready!</h3>
+                                <h3>Certificate Ready!</h3>
                                 <p>Congratulations! You've completed both cybersecurity missions with a score of <?php echo $overall_score; ?>/10 (<?php echo round($percentage); ?>%).</p>
                                 <p>Download your certificate to showcase your cybersecurity awareness skills.</p>
                                 <a href="certificate.php" class="certificate-btn">
