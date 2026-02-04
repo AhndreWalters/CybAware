@@ -651,386 +651,434 @@ if($current_question > $total_questions && !$game_completed) {
     <title>Phishing Detective | CybAware</title>
     <link rel="stylesheet" href="css/styles.css">
     <style>
+    .game-interface {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+    
+    .game-header {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+    
+    .game-header h1 {
+        color: #1e40af;
+        font-size: 2rem;
+        margin-bottom: 10px;
+    }
+    
+    .game-header p {
+        color: #64748b;
+        font-size: 1.1rem;
+    }
+    
+    .progress-container {
+        background: white;
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        width: 100%;
+        box-sizing: border-box;
+    }
+    
+    .progress-info {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 10px;
+        font-size: 0.9rem;
+        color: #64748b;
+    }
+    
+    .progress-bar {
+        height: 8px;
+        background: #e2e8f0;
+        border-radius: 4px;
+        overflow: hidden;
+        width: 100%;
+    }
+    
+    .progress-fill {
+        height: 100%;
+        background: #3b82f6;
+        width: <?php echo $game_completed ? '100' : (($display_question-1)/$total_questions)*100; ?>%;
+        transition: width 0.3s ease;
+    }
+    
+    .score-display {
+        text-align: center;
+        font-size: 1.1rem;
+        color: #1e40af;
+        font-weight: 600;
+        background: #eff6ff;
+        padding: 12px;
+        border-radius: 6px;
+        margin-bottom: 20px;
+        width: 100%;
+        box-sizing: border-box;
+    }
+    
+    .email-container {
+        background: white;
+        border-radius: 8px;
+        padding: 0;
+        margin-bottom: 30px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        border: 1px solid #e2e8f0;
+        overflow: hidden;
+        width: 100%;
+        box-sizing: border-box;
+    }
+    
+    .email-header {
+        background: #f8fafc;
+        padding: 20px;
+        border-bottom: 1px solid #e2e8f0;
+        width: 100%;
+        box-sizing: border-box;
+    }
+    
+    .email-subject {
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: #1e293b;
+        margin-bottom: 15px;
+        width: 100%;
+    }
+    
+    .email-from {
+        display: flex;
+        align-items: center;
+        margin-bottom: 10px;
+        width: 100%;
+    }
+    
+    .from-label {
+        color: #64748b;
+        min-width: 60px;
+        font-size: 0.9rem;
+    }
+    
+    .from-details {
+        flex: 1;
+        width: calc(100% - 60px);
+    }
+    
+    .sender-name {
+        font-weight: 600;
+        color: #1e293b;
+        width: 100%;
+    }
+    
+    .sender-email {
+        color: #64748b;
+        font-size: 0.9rem;
+        width: 100%;
+    }
+    
+    .email-body {
+        padding: 30px;
+        min-height: 300px;
+        background: white;
+        text-align: left;
+        font-family: Arial, Helvetica, sans-serif;
+        width: 100%;
+        box-sizing: border-box;
+        overflow-wrap: break-word;
+        word-wrap: break-word;
+    }
+    
+    .decision-section {
+        background: #f8fafc;
+        padding: 25px;
+        border-radius: 8px;
+        margin-top: 20px;
+        border: 1px solid #e2e8f0;
+        width: 100%;
+        box-sizing: border-box;
+    }
+    
+    .decision-title {
+        font-size: 1.1rem;
+        color: #1e293b;
+        margin-bottom: 20px;
+        text-align: center;
+        font-weight: 600;
+        width: 100%;
+    }
+    
+    .options-container {
+        display: flex;
+        gap: 20px;
+        justify-content: center;
+        flex-wrap: wrap;
+        width: 100%;
+    }
+    
+    .option-btn {
+        flex: 1;
+        min-width: 150px;
+        max-width: 250px;
+        padding: 16px;
+        border: 2px solid #e2e8f0;
+        border-radius: 6px;
+        background: white;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        text-align: center;
+        transition: all 0.2s ease;
+        box-sizing: border-box;
+        width: calc(50% - 10px); /* Makes two buttons equal width */
+    }
+    
+    .option-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    
+    .phishing-btn {
+        color: #dc2626;
+        border-color: #fecaca;
+    }
+    
+    .phishing-btn:hover {
+        background: #fee2e2;
+        border-color: #dc2626;
+    }
+    
+    .phishing-btn.selected {
+        background: #dc2626;
+        color: white;
+        border-color: #dc2626;
+    }
+    
+    .legit-btn {
+        color: #059669;
+        border-color: #a7f3d0;
+    }
+    
+    .legit-btn:hover {
+        background: #d1fae5;
+        border-color: #059669;
+    }
+    
+    .legit-btn.selected {
+        background: #059669;
+        color: white;
+        border-color: #059669;
+    }
+    
+    .feedback {
+        padding: 16px;
+        border-radius: 6px;
+        margin: 20px 0;
+        font-weight: 500;
+        text-align: center;
+        animation: fadeIn 0.3s ease;
+        width: 100%;
+        box-sizing: border-box;
+    }
+    
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(-10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .feedback.correct {
+        background: #d1fae5;
+        color: #065f46;
+        border: 1px solid #10b981;
+    }
+    
+    .feedback.incorrect {
+        background: #fee2e2;
+        color: #991b1b;
+        border: 1px solid #ef4444;
+    }
+    
+    .game-controls {
+        text-align: center;
+        margin-top: 30px;
+        width: 100%;
+    }
+    
+    .submit-btn {
+        padding: 14px 40px;
+        background: #1e40af;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        min-width: 200px;
+        width: auto;
+        display: inline-block;
+    }
+    
+    .submit-btn:hover:not(:disabled) {
+        background: #1e3a8a;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 6px rgba(30, 64, 175, 0.2);
+    }
+    
+    .submit-btn:disabled {
+        background: #94a3b8;
+        cursor: not-allowed;
+        transform: none;
+    }
+    
+    .completion-screen {
+        text-align: center;
+        padding: 40px 30px;
+        background: white;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        width: 100%;
+        box-sizing: border-box;
+    }
+    
+    .completion-screen h2 {
+        color: #1e40af;
+        font-size: 1.8rem;
+        margin-bottom: 15px;
+    }
+    
+    .score-result {
+        font-size: 1.2rem;
+        color: #334155;
+        margin-bottom: 25px;
+        width: 100%;
+    }
+    
+    .completion-actions {
+        display: flex;
+        gap: 15px;
+        justify-content: center;
+        margin-top: 30px;
+        flex-wrap: wrap;
+        width: 100%;
+    }
+    
+    .action-btn {
+        padding: 12px 30px;
+        background: #1e40af;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        font-size: 0.95rem;
+        font-weight: 600;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-block;
+        transition: all 0.2s ease;
+        box-sizing: border-box;
+        min-width: 150px;
+    }
+    
+    .action-btn:hover {
+        background: #1e3a8a;
+        transform: translateY(-2px);
+    }
+    
+    .action-btn.secondary {
+        background: white;
+        color: #64748b;
+        border: 2px solid #e2e8f0;
+    }
+    
+    .action-btn.secondary:hover {
+        background: #f8fafc;
+        border-color: #cbd5e1;
+    }
+    
+    .tip-box {
+        background: #e0f2fe;
+        padding: 15px;
+        border-radius: 6px;
+        margin: 20px 0;
+        font-size: 0.95rem;
+        color: #0369a1;
+        border-left: 4px solid #0ea5e9;
+        width: 100%;
+        box-sizing: border-box;
+    }
+    
+    /* Container alignment fix */
+    .game-interface > * {
+        width: 100%;
+        box-sizing: border-box;
+        display: block;
+    }
+    
+    @media (max-width: 768px) {
         .game-interface {
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        
-        .game-header {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-        
-        .game-header h1 {
-            color: #1e40af;
-            font-size: 2rem;
-            margin-bottom: 10px;
-        }
-        
-        .game-header p {
-            color: #64748b;
-            font-size: 1.1rem;
-        }
-        
-        .progress-container {
-            background: white;
-            border-radius: 8px;
-            padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        
-        .progress-info {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 10px;
-            font-size: 0.9rem;
-            color: #64748b;
-        }
-        
-        .progress-bar {
-            height: 8px;
-            background: #e2e8f0;
-            border-radius: 4px;
-            overflow: hidden;
-        }
-        
-        .progress-fill {
-            height: 100%;
-            background: #3b82f6;
-            width: <?php echo $game_completed ? '100' : (($display_question-1)/$total_questions)*100; ?>%;
-            transition: width 0.3s ease;
-        }
-        
-        .score-display {
-            text-align: center;
-            font-size: 1.1rem;
-            color: #1e40af;
-            font-weight: 600;
-            background: #eff6ff;
-            padding: 12px;
-            border-radius: 6px;
-            margin-bottom: 20px;
-        }
-        
-        .email-container {
-            background: white;
-            border-radius: 8px;
-            padding: 0;
-            margin-bottom: 30px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            border: 1px solid #e2e8f0;
-            overflow: hidden;
-            max-width: 700px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-        
-        .email-header {
-            background: #f8fafc;
-            padding: 20px;
-            border-bottom: 1px solid #e2e8f0;
-        }
-        
-        .email-subject {
-            font-size: 1.2rem;
-            font-weight: 600;
-            color: #1e293b;
-            margin-bottom: 15px;
-        }
-        
-        .email-from {
-            display: flex;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-        
-        .from-label {
-            color: #64748b;
-            min-width: 60px;
-            font-size: 0.9rem;
-        }
-        
-        .from-details {
-            flex: 1;
-        }
-        
-        .sender-name {
-            font-weight: 600;
-            color: #1e293b;
-        }
-        
-        .sender-email {
-            color: #64748b;
-            font-size: 0.9rem;
-        }
-        
-        .email-body {
-            padding: 30px;
-            min-height: 300px;
-            background: white;
-            text-align: left;
-            font-family: Arial, Helvetica, sans-serif;
-        }
-        
-        .decision-section {
-            background: #f8fafc;
-            padding: 25px;
-            border-radius: 8px;
-            margin-top: 20px;
-            border: 1px solid #e2e8f0;
-        }
-        
-        .decision-title {
-            font-size: 1.1rem;
-            color: #1e293b;
-            margin-bottom: 20px;
-            text-align: center;
-            font-weight: 600;
+            padding: 15px;
         }
         
         .options-container {
-            display: flex;
-            gap: 20px;
-            justify-content: center;
-            flex-wrap: wrap;
+            flex-direction: column;
+            align-items: stretch;
         }
         
         .option-btn {
-            flex: 1;
-            min-width: 150px;
-            max-width: 200px;
-            padding: 16px;
-            border: 2px solid #e2e8f0;
-            border-radius: 6px;
-            background: white;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            text-align: center;
-            transition: all 0.2s ease;
+            width: 100%;
+            max-width: 100%;
+            margin-bottom: 10px;
         }
         
-        .option-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        }
-        
-        .phishing-btn {
-            color: #dc2626;
-            border-color: #fecaca;
-        }
-        
-        .phishing-btn:hover {
-            background: #fee2e2;
-            border-color: #dc2626;
-        }
-        
-        .phishing-btn.selected {
-            background: #dc2626;
-            color: white;
-            border-color: #dc2626;
-        }
-        
-        .legit-btn {
-            color: #059669;
-            border-color: #a7f3d0;
-        }
-        
-        .legit-btn:hover {
-            background: #d1fae5;
-            border-color: #059669;
-        }
-        
-        .legit-btn.selected {
-            background: #059669;
-            color: white;
-            border-color: #059669;
-        }
-        
-        .feedback {
-            padding: 16px;
-            border-radius: 6px;
-            margin: 20px 0;
-            font-weight: 500;
-            text-align: center;
-            animation: fadeIn 0.3s ease;
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        .feedback.correct {
-            background: #d1fae5;
-            color: #065f46;
-            border: 1px solid #10b981;
-        }
-        
-        .feedback.incorrect {
-            background: #fee2e2;
-            color: #991b1b;
-            border: 1px solid #ef4444;
-        }
-        
-        .game-controls {
-            text-align: center;
-            margin-top: 30px;
-        }
-        
-        .submit-btn {
-            padding: 14px 40px;
-            background: #1e40af;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            min-width: 200px;
-        }
-        
-        .submit-btn:hover:not(:disabled) {
-            background: #1e3a8a;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 6px rgba(30, 64, 175, 0.2);
-        }
-        
-        .submit-btn:disabled {
-            background: #94a3b8;
-            cursor: not-allowed;
-            transform: none;
-        }
-        
-        .completion-screen {
-            text-align: center;
-            padding: 40px 30px;
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
-        
-        .completion-screen h2 {
-            color: #1e40af;
-            font-size: 1.8rem;
-            margin-bottom: 15px;
-        }
-        
-        .score-result {
-            font-size: 1.2rem;
-            color: #334155;
-            margin-bottom: 25px;
+        .email-body {
+            padding: 20px;
+            font-size: 13px;
         }
         
         .completion-actions {
-            display: flex;
-            gap: 15px;
-            justify-content: center;
-            margin-top: 30px;
-            flex-wrap: wrap;
+            flex-direction: column;
+            align-items: stretch;
         }
         
         .action-btn {
-            padding: 12px 30px;
-            background: #1e40af;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            font-size: 0.95rem;
-            font-weight: 600;
-            cursor: pointer;
-            text-decoration: none;
-            display: inline-block;
-            transition: all 0.2s ease;
-        }
-        
-        .action-btn:hover {
-            background: #1e3a8a;
-            transform: translateY(-2px);
-        }
-        
-        .action-btn.secondary {
-            background: white;
-            color: #64748b;
-            border: 2px solid #e2e8f0;
-        }
-        
-        .action-btn.secondary:hover {
-            background: #f8fafc;
-            border-color: #cbd5e1;
-        }
-        
-        @media (max-width: 768px) {
-            .game-interface {
-                padding: 15px;
-            }
-            
-            .options-container {
-                flex-direction: column;
-                align-items: center;
-            }
-            
-            .option-btn {
-                width: 100%;
-                max-width: 300px;
-            }
-            
-            .email-body {
-                padding: 20px;
-            }
-            
-            .completion-actions {
-                flex-direction: column;
-                align-items: center;
-            }
-            
-            .action-btn {
-                width: 100%;
-                max-width: 250px;
-                text-align: center;
-            }
-        }
-        
-        .tip-box {
-            background: #e0f2fe;
-            padding: 15px;
-            border-radius: 6px;
-            margin: 20px 0;
-            font-size: 0.95rem;
-            color: #0369a1;
-            border-left: 4px solid #0ea5e9;
-        }
-        
-        .game-stats {
-            display: flex;
-            justify-content: space-between;
-            background: #f8fafc;
-            padding: 15px;
-            border-radius: 6px;
-            margin-bottom: 20px;
-            border: 1px solid #e2e8f0;
-        }
-        
-        .stat-item {
+            width: 100%;
+            max-width: 100%;
             text-align: center;
-            flex: 1;
+            margin-bottom: 10px;
         }
         
-        .stat-label {
-            font-size: 0.85rem;
-            color: #64748b;
-            margin-bottom: 5px;
+        .submit-btn {
+            width: 100%;
+            max-width: 100%;
+        }
+    }
+    
+    @media (max-width: 480px) {
+        .game-header h1 {
+            font-size: 1.5rem;
         }
         
-        .stat-value {
-            font-size: 1.2rem;
-            font-weight: 600;
-            color: #1e40af;
+        .email-subject {
+            font-size: 1rem;
         }
-    </style>
+        
+        .option-btn {
+            padding: 14px;
+            font-size: 0.95rem;
+        }
+    }
+    
+    /* Ensure consistent alignment */
+    .game-interface {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .game-interface > * {
+        align-self: stretch;
+    }
+</style>
 </head>
 <body>
     <div class="container">
@@ -1041,16 +1089,6 @@ if($current_question > $total_questions && !$game_completed) {
                 <div class="game-header">
                     <h1>Phishing Detective</h1>
                     <p>Analyze emails and identify phishing attempts</p>
-                </div>
-                
-                <div class="progress-container">
-                    <div class="progress-info">
-                        <span>Question <?php echo $display_question; ?> of <?php echo $total_questions; ?></span>
-                        <span>Score: <?php echo $score; ?>/<?php echo $total_questions; ?></span>
-                    </div>
-                    <div class="progress-bar">
-                        <div class="progress-fill"></div>
-                    </div>
                 </div>
                 
                 <?php if($feedback): ?>
@@ -1089,10 +1127,6 @@ if($current_question > $total_questions && !$game_completed) {
                             <input type="hidden" name="question_id" value="<?php echo $current_question; ?>">
                             <input type="hidden" name="answer" id="selectedAnswer" value="">
                             
-                            <div class="tip-box">
-                                <strong>Tip:</strong> Look for suspicious sender addresses, urgent language, and suspicious links.
-                            </div>
-                            
                             <div class="email-container">
                                 <div class="email-header">
                                     <div class="email-subject"><?php echo htmlspecialchars($current_email['subject']); ?></div>
@@ -1110,17 +1144,13 @@ if($current_question > $total_questions && !$game_completed) {
                                 </div>
                             </div>
                             
-                            <div class="decision-section">
-                                <div class="decision-title">Is this email legitimate or a phishing attempt?</div>
-                                
-                                <div class="options-container">
-                                    <button type="button" class="option-btn legit-btn" onclick="selectAnswer('legitimate')">
-                                        Legitimate Email
-                                    </button>
-                                    <button type="button" class="option-btn phishing-btn" onclick="selectAnswer('phishing')">
-                                        Phishing Attempt
-                                    </button>
-                                </div>
+                            <div class="options-container">
+                                <button type="button" class="option-btn legit-btn" onclick="selectAnswer('legitimate')">
+                                    Legitimate Email
+                                </button>
+                                <button type="button" class="option-btn phishing-btn" onclick="selectAnswer('phishing')">
+                                    Phishing Attempt
+                                </button>
                             </div>
                             
                             <div class="game-controls">
