@@ -62,9 +62,9 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
             if($user_answer === $correct_answer) {
                 $score++;
                 $_SESSION['phishing_score'] = $score;
-                $feedback = "✅ Correct!";
+                $feedback = "Correct!";
             } else {
-                $feedback = "❌ This was actually " . ucfirst($correct_answer);
+                $feedback = "This was actually " . ucfirst($correct_answer);
             }
             
             $current_question = $question_id + 1;
@@ -441,11 +441,9 @@ if($current_question > $total_questions && !$game_completed) {
                                 
                                 <div class="options-container">
                                     <div class="option-btn phishing-btn" onclick="selectAnswer('phishing')">
-                                        <span style="font-size: 1.3rem; margin-bottom: 5px;">🚨</span>
                                         <span>Phishing</span>
                                     </div>
                                     <div class="option-btn legit-btn" onclick="selectAnswer('legitimate')">
-                                        <span style="font-size: 1.3rem; margin-bottom: 5px;">✅</span>
                                         <span>Legitimate</span>
                                     </div>
                                 </div>
@@ -519,7 +517,7 @@ if($current_question > $total_questions && !$game_completed) {
             const tipBox = document.querySelector('.tip-box');
             if(tipBox) {
                 const randomTip = tips[Math.floor(Math.random() * tips.length)];
-                tipBox.innerHTML = '💡 <strong>Tip:</strong> ' + randomTip;
+                tipBox.innerHTML = '<strong>Tip:</strong> ' + randomTip;
             }
         });
     </script>
