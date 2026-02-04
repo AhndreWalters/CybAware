@@ -13,3 +13,14 @@ CREATE TABLE users (
     INDEX idx_last_name (last_name),
     INDEX idx_full_name (first_name, last_name)
 );
+
+CREATE TABLE game_scores (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    game_type VARCHAR(50) NOT NULL,
+    score INT NOT NULL,
+    total_questions INT NOT NULL,
+    completed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
+    UNIQUE KEY unique_user_game (user_id, game_type)
+);
