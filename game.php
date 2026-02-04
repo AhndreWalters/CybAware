@@ -12,9 +12,11 @@ require_once "config/database.php";
 // Get user scores from database
 $user_id = $_SESSION['id'];
 $password_score = 0;
-$phishing_score = 0;
+$phishing_lvl1_score = 0;
+$phishing_lvl2_score = 0;
+$phishing_lvl3_score = 0;
 $games_completed = 0;
-$total_games = 2; // We have 2 games
+$total_games = 4; // Now we have: Password Fortress + 3 Phishing levels
 $can_download_certificate = false;
 
 // Fetch scores from database
@@ -29,18 +31,28 @@ if($stmt = mysqli_prepare($link, $sql)) {
         if($game_type == 'password_fortress') {
             $password_score = $score;
             $games_completed++;
-        } elseif($game_type == 'phishing_detective') {
-            $phishing_score = $score;
+        } elseif($game_type == 'phishing_detective_lvl1') {
+            $phishing_lvl1_score = $score;
+            $games_completed++;
+        } elseif($game_type == 'phishing_detective_lvl2') {
+            $phishing_lvl2_score = $score;
+            $games_completed++;
+        } elseif($game_type == 'phishing_detective_lvl3') {
+            $phishing_lvl3_score = $score;
             $games_completed++;
         }
     }
     mysqli_stmt_close($stmt);
     
-    // Check if user can download certificate (both games completed)
+    // Calculate total phishing score (sum of all 3 levels)
+    $total_phishing_score = $phishing_lvl1_score + $phishing_lvl2_score + $phishing_lvl3_score;
+    $total_phishing_questions = 15; // 5 questions per level × 3 levels
+    
+    // Check if user can download certificate (all 4 games completed)
     if($games_completed == $total_games) {
         $can_download_certificate = true;
-        $overall_score = $password_score + $phishing_score;
-        $max_score = 10; // 5 questions per game * 2 games
+        $overall_score = $password_score + $total_phishing_score;
+        $max_score = 20; // 5 questions (password) + 15 questions (phishing 3×5)
         $percentage = ($overall_score / $max_score) * 100;
     }
 }
@@ -141,7 +153,7 @@ if($stmt = mysqli_prepare($link, $sql)) {
         
         .play-btn {
             display: inline-block;
-            padding: 14px 30px;
+            padding: 12px 25px;
             background: linear-gradient(to right, #1e40af, #1e3a8a);
             color: white;
             border-radius: 6px;
@@ -149,13 +161,51 @@ if($stmt = mysqli_prepare($link, $sql)) {
             font-weight: 600;
             transition: all 0.3s;
             width: 100%;
-            max-width: 200px;
+            max-width: 180px;
             text-align: center;
+            margin: 5px;
+            font-size: 0.9rem;
         }
         
         .play-btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(30, 64, 175, 0.3);
+        }
+        
+        .play-btn.secondary {
+            background: linear-gradient(to right, #475569, #334155);
+        }
+        
+        .play-btn.secondary:hover {
+            box-shadow: 0 5px 15px rgba(71, 85, 105, 0.3);
+        }
+        
+        .play-btn.tertiary {
+            background: linear-gradient(to right, #7c3aed, #6d28d9);
+        }
+        
+        .play-btn.tertiary:hover {
+            box-shadow: 0 5px 15px rgba(124, 58, 237, 0.3);
+        }
+        
+        .play-btn.coming-soon {
+            background: linear-gradient(to right, #64748b, #475569);
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+        
+        .play-btn.coming-soon:hover {
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .level-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 10px;
+            width: 100%;
+            align-items: center;
         }
         
         .stats-header {
@@ -304,6 +354,17 @@ if($stmt = mysqli_prepare($link, $sql)) {
             .game-container {
                 padding: 15px;
             }
+            
+            .level-buttons {
+                flex-direction: row;
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+            
+            .play-btn {
+                max-width: 150px;
+                margin: 5px;
+            }
         }
         
         .score-details {
@@ -316,6 +377,59 @@ if($stmt = mysqli_prepare($link, $sql)) {
             font-size: 0.9rem;
             color: #64748b;
         }
+        
+        .level-indicator {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 24px;
+            height: 24px;
+            background: #e2e8f0;
+            color: #64748b;
+            border-radius: 50%;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-right: 8px;
+        }
+        
+        .level-title {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 15px;
+        }
+        
+        .phishing-levels {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            margin-top: 10px;
+        }
+        
+        .level-container {
+            background: #f8fafc;
+            border-radius: 8px;
+            padding: 15px;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .level-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .level-name {
+            font-weight: 600;
+            color: #1e40af;
+        }
+        
+        .level-score {
+            font-weight: 600;
+            color: #059669;
+            font-size: 0.9rem;
+        }
     </style>
 </head>
 <body>
@@ -326,14 +440,12 @@ if($stmt = mysqli_prepare($link, $sql)) {
             <div class="game-container">
                 <div class="game-header">
                     <h1>Cybersecurity Missions</h1>
-                    <p>Complete both missions to earn your cybersecurity awareness certificate.</p>
-                    
-                    <div>
-                    </div>
+                    <p>Complete all missions to earn your cybersecurity awareness certificate.</p>
                 </div>
                 
                 <div class="dashboard">
                     <div class="games-section">
+                        <!-- Password Fortress Card -->
                         <div class="game-card">
                             <div class="game-content">
                                 <img src="images/ui-icon-password-security.png" alt="Password Security Icon">
@@ -359,30 +471,53 @@ if($stmt = mysqli_prepare($link, $sql)) {
                             </div>
                         </div>
 
+                        <!-- Phishing Detective Card with 3 Levels -->
                         <div class="game-card">
                             <div class="game-content">
                                 <img src="images/ui-icon-social-engineering.png" alt="Phishing Detection Icon">
                                 <h2>Phishing Detective</h2>
-                                <p>Learn to spot fake emails and protect yourself from online scams. Analyze 5 different email scenarios.</p>
+                                <p>Learn to spot fake emails and protect yourself from online scams. Complete 3 levels of increasing difficulty.</p>
                                 
-                                <?php if($phishing_score > 0): ?>
-                                    <div style="margin-bottom: 20px; width: 100%;">
+                                <div class="level-buttons">
+                                    <!-- Level 1 -->
+                                    <a href="phishing-game-lvl1.php" class="play-btn">
+                                        <?php echo $phishing_lvl1_score > 0 ? 'Level 1: ' . $phishing_lvl1_score . '/5' : 'Level 1: Beginner'; ?>
+                                    </a>
+                                    
+                                    <!-- Level 2 -->
+                                    <a href="phishing-game-lvl2.php" class="play-btn secondary">
+                                        <?php 
+                                        if($phishing_lvl1_score >= 3) {
+                                            echo $phishing_lvl2_score > 0 ? 'Level 2: ' . $phishing_lvl2_score . '/5' : 'Level 2: Intermediate';
+                                        } else {
+                                            echo 'Level 2: Locked';
+                                        }
+                                        ?>
+                                    </a>
+                                    
+                                    <!-- Level 3 -->
+                                    <a href="#" class="play-btn tertiary coming-soon">
+                                        <?php 
+                                        if($phishing_lvl2_score >= 3) {
+                                            echo $phishing_lvl3_score > 0 ? 'Level 3: ' . $phishing_lvl3_score . '/5' : 'Level 3: Advanced';
+                                        } else {
+                                            echo 'Level 3: Coming Soon';
+                                        }
+                                        ?>
+                                    </a>
+                                </div>
+                                
+                                <?php if($phishing_lvl1_score > 0 || $phishing_lvl2_score > 0): ?>
+                                    <div style="margin-top: 20px; width: 100%;">
                                         <div class="score-details">
-                                            <span class="score-label">Your Score:</span>
-                                            <span class="score-value"><?php echo $phishing_score; ?>/10</span>
+                                            <span class="score-label">Total Phishing Score:</span>
+                                            <span class="score-value"><?php echo $total_phishing_score; ?>/15</span>
                                         </div>
                                         <div class="score-progress">
-                                            <div class="score-fill" style="width: <?php echo ($phishing_score / 5) * 100; ?>%"></div>
+                                            <div class="score-fill" style="width: <?php echo ($total_phishing_score / 15) * 100; ?>%"></div>
                                         </div>
-                                        <div class="score-percentage"><?php echo round(($phishing_score / 5) * 100); ?>% completed</div>
                                     </div>
                                 <?php endif; ?>
-                                
-                                <a href="phishing-game.php" class="play-btn">
-                                    <?php echo $phishing_score > 0 ? 'Play Again' : 'Start Mission'; ?>
-                                </a>
-                                <a href="level2.php" class="play-btn">
-                                </a>
                             </div>
                         </div>
                     </div>
@@ -398,18 +533,66 @@ if($stmt = mysqli_prepare($link, $sql)) {
                             </div>
                         </div>
                         
+                        <div class="phishing-levels">
+                            <div class="level-container">
+                                <div class="level-header">
+                                    <div class="level-name">Phishing Level 1</div>
+                                    <div class="level-score"><?php echo $phishing_lvl1_score; ?>/5</div>
+                                </div>
+                                <div class="score-progress">
+                                    <div class="score-fill" style="width: <?php echo ($phishing_lvl1_score / 5) * 100; ?>%"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="level-container">
+                                <div class="level-header">
+                                    <div class="level-name">Phishing Level 2</div>
+                                    <div class="level-score">
+                                        <?php 
+                                        if($phishing_lvl1_score >= 3) {
+                                            echo $phishing_lvl2_score . '/5';
+                                        } else {
+                                            echo 'Locked (Complete Level 1)';
+                                        }
+                                        ?>
+                                    </div>
+                                </div>
+                                <div class="score-progress">
+                                    <div class="score-fill" style="width: <?php echo $phishing_lvl1_score >= 3 ? ($phishing_lvl2_score / 5) * 100 : 0; ?>%"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="level-container">
+                                <div class="level-header">
+                                    <div class="level-name">Phishing Level 3</div>
+                                    <div class="level-score">
+                                        <?php 
+                                        if($phishing_lvl2_score >= 3) {
+                                            echo $phishing_lvl3_score . '/5';
+                                        } else {
+                                            echo 'Coming Soon';
+                                        }
+                                        ?>
+                                    </div>
+                                </div>
+                                <div class="score-progress">
+                                    <div class="score-fill" style="width: <?php echo $phishing_lvl2_score >= 3 ? ($phishing_lvl3_score / 5) * 100 : 0; ?>%"></div>
+                                </div>
+                            </div>
+                        </div>
+                        
                         <div class="score-item">
-                            <div class="score-label">Phishing Detective Score</div>
-                            <div class="score-value"><?php echo $phishing_score; ?>/10</div>
+                            <div class="score-label">Total Games Completed</div>
+                            <div class="score-value"><?php echo $games_completed; ?>/<?php echo $total_games; ?></div>
                             <div class="score-progress">
-                                <div class="score-fill" style="width: <?php echo ($phishing_score / 5) * 100; ?>%"></div>
+                                <div class="score-fill" style="width: <?php echo ($games_completed / $total_games) * 100; ?>%"></div>
                             </div>
                         </div>
                         
                         <?php if($can_download_certificate): ?>
                             <div class="certificate-section">
                                 <h3>Certificate Ready!</h3>
-                                <p>Congratulations! You've completed both cybersecurity missions with a score of <?php echo $overall_score; ?>/10 (<?php echo round($percentage); ?>%).</p>
+                                <p>Congratulations! You've completed all cybersecurity missions with a score of <?php echo $overall_score; ?>/20 (<?php echo round($percentage); ?>%).</p>
                                 <p>Download your certificate to showcase your cybersecurity awareness skills.</p>
                                 <a href="certificate.php" class="certificate-btn">
                                     Download Certificate
@@ -418,10 +601,10 @@ if($stmt = mysqli_prepare($link, $sql)) {
                         <?php else: ?>
                             <div class="certificate-section" style="background: linear-gradient(135deg, #64748b, #475569);">
                                 <h3>Certificate Locked</h3>
-                                <p>Complete both missions to unlock your cybersecurity awareness certificate.</p>
+                                <p>Complete all missions to unlock your cybersecurity awareness certificate.</p>
                                 <p>You need to complete <?php echo ($total_games - $games_completed); ?> more game<?php echo ($total_games - $games_completed) == 1 ? '' : 's'; ?>.</p>
                                 <span class="certificate-btn disabled">
-                                    Complete Both Missions
+                                    Complete All Missions
                                 </span>
                             </div>
                         <?php endif; ?>
