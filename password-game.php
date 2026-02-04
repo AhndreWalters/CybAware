@@ -34,7 +34,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
         if($user_answer === $correct_answers[$question_id]) {
             $score++;
             $_SESSION['password_score'] = $score;
-            $feedback = "<div class='feedback correct'><span style='color: #10b981;'>2Correct</span></div>";
+            $feedback = "<div class='feedback correct'><span style='color: #10b981;'>Correct</span></div>";
         } else {
             // Show what the correct answer should have been
             $correct_hint = "";
