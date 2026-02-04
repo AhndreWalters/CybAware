@@ -18,7 +18,6 @@ $feedback_type = "";
 $game_completed = false;
 
 // Game data - Realistic looking emails
-// Game data - Realistic looking emails
 $emails = [
     1 => [
         'sender' => 'security@paypal-support.com',
@@ -293,10 +292,10 @@ $emails = [
         'hint' => 'Excessive urgency, threats of data loss, and suspicious domain "microsoft-security.net"'
     ],
     6 => [
-    'sender' => 'appleid@id-apple.com',
-    'sender_name' => 'Apple Support',
-    'subject' => 'Your Apple ID has been locked',
-    'body' => '<div style="font-family: Arial, Helvetica, sans-serif; color: #1d1d1f; line-height: 1.5; font-size: 14px; max-width: 600px; margin: 0 auto;">
+        'sender' => 'appleid@id-apple.com',
+        'sender_name' => 'Apple Support',
+        'subject' => 'Your Apple ID has been locked',
+        'body' => '<div style="font-family: Arial, Helvetica, sans-serif; color: #1d1d1f; line-height: 1.5; font-size: 14px; max-width: 600px; margin: 0 auto;">
                 <div style="border-bottom: 1px solid #d2d2d7; padding-bottom: 20px; margin-bottom: 20px;">
                     <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse: collapse;">
                         <tr>
@@ -337,15 +336,14 @@ $emails = [
                     <p style="margin: 0;">This is an automated message. Please do not reply.</p>
                 </div>
             </div>',
-    'answer' => 'phishing',
-    'hint' => 'Apple uses "apple.com" domains, not "id-apple.com". Legitimate Apple emails never ask you to click links to unlock accounts.'
-],
-
-7 => [
-    'sender' => 'accounts.google.com',
-    'sender_name' => 'Google',
-    'subject' => 'Security checkup required',
-    'body' => '<div style="font-family: Arial, Helvetica, sans-serif; color: #202124; line-height: 1.5; font-size: 14px; max-width: 600px; margin: 0 auto;">
+        'answer' => 'phishing',
+        'hint' => 'Apple uses "apple.com" domains, not "id-apple.com". Legitimate Apple emails never ask you to click links to unlock accounts.'
+    ],
+    7 => [
+        'sender' => 'accounts.google.com',
+        'sender_name' => 'Google',
+        'subject' => 'Security checkup required',
+        'body' => '<div style="font-family: Arial, Helvetica, sans-serif; color: #202124; line-height: 1.5; font-size: 14px; max-width: 600px; margin: 0 auto;">
                 <div style="border-bottom: 1px solid #dadce0; padding-bottom: 20px; margin-bottom: 20px;">
                     <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse: collapse;">
                         <tr>
@@ -391,15 +389,14 @@ $emails = [
                     <p style="margin: 0;">© 2025 Google LLC, 1600 Amphitheatre Parkway, Mountain View, CA 94043</p>
                 </div>
             </div>',
-    'answer' => 'legitimate',
-    'hint' => 'Legitimate Google email with proper domain, links to official Google site, and no urgent demands for immediate action.'
-],
-
-8 => [
-    'sender' => 'support@linkedin-professional.com',
-    'sender_name' => 'LinkedIn Member Support',
-    'subject' => 'Someone viewed your profile',
-    'body' => '<div style="font-family: Arial, Helvetica, sans-serif; color: #000000; line-height: 1.5; font-size: 14px; max-width: 600px; margin: 0 auto;">
+        'answer' => 'legitimate',
+        'hint' => 'Legitimate Google email with proper domain, links to official Google site, and no urgent demands for immediate action.'
+    ],
+    8 => [
+        'sender' => 'support@linkedin-professional.com',
+        'sender_name' => 'LinkedIn Member Support',
+        'subject' => 'Someone viewed your profile',
+        'body' => '<div style="font-family: Arial, Helvetica, sans-serif; color: #000000; line-height: 1.5; font-size: 14px; max-width: 600px; margin: 0 auto;">
                 <div style="border-bottom: 1px solid #0077b5; padding-bottom: 20px; margin-bottom: 20px;">
                     <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse: collapse;">
                         <tr>
@@ -436,15 +433,14 @@ $emails = [
                     <p style="margin: 0;">© 2025 LinkedIn Corporation, 1000 W Maude Ave, Sunnyvale, CA 94085</p>
                 </div>
             </div>',
-    'answer' => 'phishing',
-    'hint' => 'LinkedIn uses "linkedin.com" domains. Fake domains like "linkedin-professional.com" with urgent limited-time offers are classic phishing tactics.'
-],
-
-9 => [
-    'sender' => 'noreply@github.com',
-    'sender_name' => 'GitHub',
-    'subject' => 'New sign-in to your GitHub account',
-    'body' => '<div style="font-family: Arial, Helvetica, sans-serif; color: #24292e; line-height: 1.5; font-size: 14px; max-width: 600px; margin: 0 auto;">
+        'answer' => 'phishing',
+        'hint' => 'LinkedIn uses "linkedin.com" domains. Fake domains like "linkedin-professional.com" with urgent limited-time offers are classic phishing tactics.'
+    ],
+    9 => [
+        'sender' => 'noreply@github.com',
+        'sender_name' => 'GitHub',
+        'subject' => 'New sign-in to your GitHub account',
+        'body' => '<div style="font-family: Arial, Helvetica, sans-serif; color: #24292e; line-height: 1.5; font-size: 14px; max-width: 600px; margin: 0 auto;">
                 <div style="border-bottom: 1px solid #e1e4e8; padding-bottom: 20px; margin-bottom: 20px;">
                     <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse: collapse;">
                         <tr>
@@ -503,15 +499,14 @@ $emails = [
                     <p style="margin: 0;">© 2025 GitHub, Inc. | 88 Colin P Kelly Jr St, San Francisco, CA 94107</p>
                 </div>
             </div>',
-    'answer' => 'legitimate',
-    'hint' => 'Proper GitHub domain, detailed sign-in information without urgent demands, and links to official GitHub security settings.'
-],
-
-10 => [
-    'sender' => 'banking@wellsfargo-security.com',
-    'sender_name' => 'Wells Fargo Security',
-    'subject' => 'SUSPICIOUS TRANSACTION ALERT - Immediate Action Required',
-    'body' => '<div style="font-family: Arial, Helvetica, sans-serif; color: #333; line-height: 1.5; font-size: 14px; max-width: 600px; margin: 0 auto;">
+        'answer' => 'legitimate',
+        'hint' => 'Proper GitHub domain, detailed sign-in information without urgent demands, and links to official GitHub security settings.'
+    ],
+    10 => [
+        'sender' => 'banking@wellsfargo-security.com',
+        'sender_name' => 'Wells Fargo Security',
+        'subject' => 'SUSPICIOUS TRANSACTION ALERT - Immediate Action Required',
+        'body' => '<div style="font-family: Arial, Helvetica, sans-serif; color: #333; line-height: 1.5; font-size: 14px; max-width: 600px; margin: 0 auto;">
                 <div style="background-color: #c00; color: white; padding: 20px; border-radius: 4px 4px 0 0; margin-bottom: 20px;">
                     <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse: collapse;">
                         <tr>
@@ -567,9 +562,9 @@ $emails = [
                     <p style="margin: 0;">This is an automated security alert. Do not reply to this email.</p>
                 </div>
             </div>',
-    'answer' => 'phishing',
-    'hint' => 'Extreme urgency, threats of account lockout, fake domain "wellsfargo-security.com" instead of official "wellsfargo.com", and pressure to click links immediately.'
-],
+        'answer' => 'phishing',
+        'hint' => 'Extreme urgency, threats of account lockout, fake domain "wellsfargo-security.com" instead of official "wellsfargo.com", and pressure to click links immediately.'
+    ]
 ];
 
 // Process form submission
@@ -584,11 +579,9 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
             if($user_answer === $correct_answer) {
                 $score++;
                 $_SESSION['phishing_score'] = $score;
-                $feedback = "Correct! " . $emails[$question_id]['hint'];
-                $feedback_type = "correct";
+                // No feedback shown
             } else {
-                $feedback = "Incorrect. " . $emails[$question_id]['hint'];
-                $feedback_type = "incorrect";
+                // No feedback shown
             }
             
             $current_question = $question_id + 1;
@@ -651,434 +644,490 @@ if($current_question > $total_questions && !$game_completed) {
     <title>Phishing Detective | CybAware</title>
     <link rel="stylesheet" href="css/styles.css">
     <style>
-    .game-interface {
-        max-width: 800px;
-        margin: 0 auto;
-        padding: 20px;
-    }
-    
-    .game-header {
-        text-align: center;
-        margin-bottom: 30px;
-    }
-    
-    .game-header h1 {
-        color: #1e40af;
-        font-size: 2rem;
-        margin-bottom: 10px;
-    }
-    
-    .game-header p {
-        color: #64748b;
-        font-size: 1.1rem;
-    }
-    
-    .progress-container {
-        background: white;
-        border-radius: 8px;
-        padding: 20px;
-        margin-bottom: 20px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        width: 100%;
-        box-sizing: border-box;
-    }
-    
-    .progress-info {
-        display: flex;
-        justify-content: space-between;
-        margin-bottom: 10px;
-        font-size: 0.9rem;
-        color: #64748b;
-    }
-    
-    .progress-bar {
-        height: 8px;
-        background: #e2e8f0;
-        border-radius: 4px;
-        overflow: hidden;
-        width: 100%;
-    }
-    
-    .progress-fill {
-        height: 100%;
-        background: #3b82f6;
-        width: <?php echo $game_completed ? '100' : (($display_question-1)/$total_questions)*100; ?>%;
-        transition: width 0.3s ease;
-    }
-    
-    .score-display {
-        text-align: center;
-        font-size: 1.1rem;
-        color: #1e40af;
-        font-weight: 600;
-        background: #eff6ff;
-        padding: 12px;
-        border-radius: 6px;
-        margin-bottom: 20px;
-        width: 100%;
-        box-sizing: border-box;
-    }
-    
-    .email-container {
-        background: white;
-        border-radius: 8px;
-        padding: 0;
-        margin-bottom: 30px;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        border: 1px solid #e2e8f0;
-        overflow: hidden;
-        width: 100%;
-        box-sizing: border-box;
-    }
-    
-    .email-header {
-        background: #f8fafc;
-        padding: 20px;
-        border-bottom: 1px solid #e2e8f0;
-        width: 100%;
-        box-sizing: border-box;
-    }
-    
-    .email-subject {
-        font-size: 1.2rem;
-        font-weight: 600;
-        color: #1e293b;
-        margin-bottom: 15px;
-        width: 100%;
-    }
-    
-    .email-from {
-        display: flex;
-        align-items: center;
-        margin-bottom: 10px;
-        width: 100%;
-    }
-    
-    .from-label {
-        color: #64748b;
-        min-width: 60px;
-        font-size: 0.9rem;
-    }
-    
-    .from-details {
-        flex: 1;
-        width: calc(100% - 60px);
-    }
-    
-    .sender-name {
-        font-weight: 600;
-        color: #1e293b;
-        width: 100%;
-    }
-    
-    .sender-email {
-        color: #64748b;
-        font-size: 0.9rem;
-        width: 100%;
-    }
-    
-    .email-body {
-        padding: 30px;
-        min-height: 300px;
-        background: white;
-        text-align: left;
-        font-family: Arial, Helvetica, sans-serif;
-        width: 100%;
-        box-sizing: border-box;
-        overflow-wrap: break-word;
-        word-wrap: break-word;
-    }
-    
-    .decision-section {
-        background: #f8fafc;
-        padding: 25px;
-        border-radius: 8px;
-        margin-top: 20px;
-        border: 1px solid #e2e8f0;
-        width: 100%;
-        box-sizing: border-box;
-    }
-    
-    .decision-title {
-        font-size: 1.1rem;
-        color: #1e293b;
-        margin-bottom: 20px;
-        text-align: center;
-        font-weight: 600;
-        width: 100%;
-    }
-    
-    .options-container {
-        display: flex;
-        gap: 20px;
-        justify-content: center;
-        flex-wrap: wrap;
-        width: 100%;
-    }
-    
-    .option-btn {
-        flex: 1;
-        min-width: 150px;
-        max-width: 250px;
-        padding: 16px;
-        border: 2px solid #e2e8f0;
-        border-radius: 6px;
-        background: white;
-        font-size: 1rem;
-        font-weight: 600;
-        cursor: pointer;
-        text-align: center;
-        transition: all 0.2s ease;
-        box-sizing: border-box;
-        width: calc(50% - 10px); /* Makes two buttons equal width */
-    }
-    
-    .option-btn:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-    }
-    
-    .phishing-btn {
-        color: #dc2626;
-        border-color: #fecaca;
-    }
-    
-    .phishing-btn:hover {
-        background: #fee2e2;
-        border-color: #dc2626;
-    }
-    
-    .phishing-btn.selected {
-        background: #dc2626;
-        color: white;
-        border-color: #dc2626;
-    }
-    
-    .legit-btn {
-        color: #059669;
-        border-color: #a7f3d0;
-    }
-    
-    .legit-btn:hover {
-        background: #d1fae5;
-        border-color: #059669;
-    }
-    
-    .legit-btn.selected {
-        background: #059669;
-        color: white;
-        border-color: #059669;
-    }
-    
-    .feedback {
-        padding: 16px;
-        border-radius: 6px;
-        margin: 20px 0;
-        font-weight: 500;
-        text-align: center;
-        animation: fadeIn 0.3s ease;
-        width: 100%;
-        box-sizing: border-box;
-    }
-    
-    @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(-10px); }
-        to { opacity: 1; transform: translateY(0); }
-    }
-    
-    .feedback.correct {
-        background: #d1fae5;
-        color: #065f46;
-        border: 1px solid #10b981;
-    }
-    
-    .feedback.incorrect {
-        background: #fee2e2;
-        color: #991b1b;
-        border: 1px solid #ef4444;
-    }
-    
-    .game-controls {
-        text-align: center;
-        margin-top: 30px;
-        width: 100%;
-    }
-    
-    .submit-btn {
-        padding: 14px 40px;
-        background: #1e40af;
-        color: white;
-        border: none;
-        border-radius: 6px;
-        font-size: 1rem;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.2s ease;
-        min-width: 200px;
-        width: auto;
-        display: inline-block;
-    }
-    
-    .submit-btn:hover:not(:disabled) {
-        background: #1e3a8a;
-        transform: translateY(-2px);
-        box-shadow: 0 4px 6px rgba(30, 64, 175, 0.2);
-    }
-    
-    .submit-btn:disabled {
-        background: #94a3b8;
-        cursor: not-allowed;
-        transform: none;
-    }
-    
-    .completion-screen {
-        text-align: center;
-        padding: 40px 30px;
-        background: white;
-        border-radius: 8px;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        width: 100%;
-        box-sizing: border-box;
-    }
-    
-    .completion-screen h2 {
-        color: #1e40af;
-        font-size: 1.8rem;
-        margin-bottom: 15px;
-    }
-    
-    .score-result {
-        font-size: 1.2rem;
-        color: #334155;
-        margin-bottom: 25px;
-        width: 100%;
-    }
-    
-    .completion-actions {
-        display: flex;
-        gap: 15px;
-        justify-content: center;
-        margin-top: 30px;
-        flex-wrap: wrap;
-        width: 100%;
-    }
-    
-    .action-btn {
-        padding: 12px 30px;
-        background: #1e40af;
-        color: white;
-        border: none;
-        border-radius: 6px;
-        font-size: 0.95rem;
-        font-weight: 600;
-        cursor: pointer;
-        text-decoration: none;
-        display: inline-block;
-        transition: all 0.2s ease;
-        box-sizing: border-box;
-        min-width: 150px;
-    }
-    
-    .action-btn:hover {
-        background: #1e3a8a;
-        transform: translateY(-2px);
-    }
-    
-    .action-btn.secondary {
-        background: white;
-        color: #64748b;
-        border: 2px solid #e2e8f0;
-    }
-    
-    .action-btn.secondary:hover {
-        background: #f8fafc;
-        border-color: #cbd5e1;
-    }
-    
-    .tip-box {
-        background: #e0f2fe;
-        padding: 15px;
-        border-radius: 6px;
-        margin: 20px 0;
-        font-size: 0.95rem;
-        color: #0369a1;
-        border-left: 4px solid #0ea5e9;
-        width: 100%;
-        box-sizing: border-box;
-    }
-    
-    /* Container alignment fix */
-    .game-interface > * {
-        width: 100%;
-        box-sizing: border-box;
-        display: block;
-    }
-    
-    @media (max-width: 768px) {
         .game-interface {
-            padding: 15px;
-        }
-        
-        .options-container {
-            flex-direction: column;
-            align-items: stretch;
-        }
-        
-        .option-btn {
-            width: 100%;
-            max-width: 100%;
-            margin-bottom: 10px;
-        }
-        
-        .email-body {
+            max-width: 800px;
+            margin: 0 auto;
             padding: 20px;
-            font-size: 13px;
-        }
-        
-        .completion-actions {
-            flex-direction: column;
-            align-items: stretch;
-        }
-        
-        .action-btn {
             width: 100%;
-            max-width: 100%;
+        }
+        
+        .game-header {
             text-align: center;
+            margin-bottom: 30px;
+            width: 100%;
+        }
+        
+        .game-header h1 {
+            color: #1e40af;
+            font-size: 2rem;
             margin-bottom: 10px;
         }
         
-        .submit-btn {
-            width: 100%;
-            max-width: 100%;
-        }
-    }
-    
-    @media (max-width: 480px) {
-        .game-header h1 {
-            font-size: 1.5rem;
+        .game-header p {
+            color: #64748b;
+            font-size: 1.1rem;
         }
         
-        .email-subject {
+        .score-display {
+            text-align: center;
+            font-size: 1.2rem;
+            color: #1e40af;
+            font-weight: 600;
+            background: #eff6ff;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            width: 100%;
+            box-sizing: border-box;
+            border: 1px solid #dbeafe;
+        }
+        
+        .email-container {
+            background: white;
+            border-radius: 8px;
+            padding: 0;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border: 1px solid #e2e8f0;
+            overflow: hidden;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        
+        .email-header {
+            background: #f8fafc;
+            padding: 25px;
+            border-bottom: 1px solid #e2e8f0;
+            width: 100%;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+        
+        .email-subject-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .email-subject-label {
+            color: #374151;
+            font-weight: 600;
+            font-size: 0.9rem;
+            min-width: 70px;
+            margin-right: 15px;
+        }
+        
+        .email-subject-value {
+            flex: 1;
+            font-weight: 600;
+            font-size: 1.2rem;
+            color: #1f2937;
+        }
+        
+        .email-sender-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .sender-info-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex: 1;
+            min-width: 300px;
+        }
+        
+        .sender-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+        
+        .sender-details {
+            flex: 1;
+        }
+        
+        .sender-name-email {
+            display: flex;
+            align-items: baseline;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 3px;
+        }
+        
+        .sender-display-name {
+            font-weight: 600;
+            color: #1f2937;
             font-size: 1rem;
         }
         
-        .option-btn {
-            padding: 14px;
-            font-size: 0.95rem;
+        .sender-email-address {
+            color: #6b7280;
+            font-size: 0.9rem;
         }
-    }
-    
-    /* Ensure consistent alignment */
-    .game-interface {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-    }
-    
-    .game-interface > * {
-        align-self: stretch;
-    }
-</style>
+        
+        .email-time {
+            color: #6b7280;
+            font-size: 0.85rem;
+            white-space: nowrap;
+            margin-left: 20px;
+            min-width: 180px;
+            text-align: right;
+        }
+        
+        .email-to-row {
+            display: flex;
+            align-items: center;
+            padding-top: 15px;
+            border-top: 1px solid #e5e7eb;
+        }
+        
+        .email-to-label {
+            color: #374151;
+            font-weight: 600;
+            font-size: 0.9rem;
+            min-width: 70px;
+            margin-right: 15px;
+        }
+        
+        .email-to-value {
+            color: #6b7280;
+            font-size: 0.9rem;
+        }
+        
+        .email-body {
+            padding: 30px;
+            min-height: 300px;
+            background: white;
+            text-align: left;
+            font-family: Arial, Helvetica, sans-serif;
+            width: 100%;
+            box-sizing: border-box;
+            overflow-wrap: break-word;
+            word-wrap: break-word;
+        }
+        
+        .options-container {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+            width: 100%;
+            margin-bottom: 20px;
+        }
+        
+        .option-btn {
+            flex: 1;
+            min-width: 150px;
+            max-width: 300px;
+            padding: 18px 30px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            background: white;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s ease;
+            box-sizing: border-box;
+        }
+        
+        .option-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        
+        .phishing-btn {
+            color: #dc2626;
+            border-color: #fecaca;
+        }
+        
+        .phishing-btn:hover {
+            background: #fee2e2;
+            border-color: #dc2626;
+        }
+        
+        .phishing-btn.selected {
+            background: #dc2626;
+            color: white;
+            border-color: #dc2626;
+        }
+        
+        .legit-btn {
+            color: #059669;
+            border-color: #a7f3d0;
+        }
+        
+        .legit-btn:hover {
+            background: #d1fae5;
+            border-color: #059669;
+        }
+        
+        .legit-btn.selected {
+            background: #059669;
+            color: white;
+            border-color: #059669;
+        }
+        
+        .game-controls {
+            text-align: center;
+            margin-top: 20px;
+            width: 100%;
+        }
+        
+        .submit-btn {
+            padding: 16px 50px;
+            background: #1e40af;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            min-width: 250px;
+            width: auto;
+            display: inline-block;
+            box-shadow: 0 4px 6px rgba(30, 64, 175, 0.2);
+        }
+        
+        .submit-btn:hover:not(:disabled) {
+            background: #1e3a8a;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(30, 64, 175, 0.3);
+        }
+        
+        .submit-btn:disabled {
+            background: #94a3b8;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .completion-screen {
+            text-align: center;
+            padding: 40px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            width: 100%;
+            box-sizing: border-box;
+            border: 1px solid #e2e8f0;
+        }
+        
+        .completion-screen h2 {
+            color: #1e40af;
+            font-size: 2rem;
+            margin-bottom: 15px;
+        }
+        
+        .score-result {
+            font-size: 1.3rem;
+            color: #334155;
+            margin-bottom: 25px;
+            font-weight: 600;
+        }
+        
+        .completion-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+            flex-wrap: wrap;
+            width: 100%;
+        }
+        
+        .action-btn {
+            padding: 14px 35px;
+            background: #1e40af;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.2s ease;
+            box-sizing: border-box;
+            min-width: 180px;
+            text-align: center;
+        }
+        
+        .action-btn:hover {
+            background: #1e3a8a;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(30, 64, 175, 0.2);
+        }
+        
+        .action-btn.secondary {
+            background: white;
+            color: #64748b;
+            border: 2px solid #e2e8f0;
+        }
+        
+        .action-btn.secondary:hover {
+            background: #f8fafc;
+            border-color: #cbd5e1;
+        }
+        
+        /* Container alignment fix */
+        .game-interface > * {
+            width: 100%;
+            box-sizing: border-box;
+            display: block;
+        }
+        
+        /* Responsive styles for sender row */
+        @media (max-width: 768px) {
+            .game-interface {
+                padding: 15px;
+            }
+            
+            .email-sender-row {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            
+            .sender-info-container {
+                min-width: 100%;
+                margin-bottom: 5px;
+            }
+            
+            .email-time {
+                margin-left: 0;
+                text-align: left;
+                min-width: auto;
+            }
+            
+            .sender-name-email {
+                flex-direction: column;
+                gap: 5px;
+            }
+            
+            .email-subject-row {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 5px;
+            }
+            
+            .email-subject-label {
+                min-width: auto;
+            }
+            
+            .email-to-row {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 5px;
+            }
+            
+            .email-to-label {
+                min-width: auto;
+            }
+            
+            .options-container {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .option-btn {
+                width: 100%;
+                max-width: 100%;
+                margin-bottom: 10px;
+            }
+            
+            .email-body {
+                padding: 20px;
+                font-size: 13px;
+            }
+            
+            .completion-actions {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .action-btn {
+                width: 100%;
+                max-width: 300px;
+                text-align: center;
+                margin-bottom: 10px;
+            }
+            
+            .submit-btn {
+                width: 100%;
+                max-width: 100%;
+            }
+            
+            .game-header h1 {
+                font-size: 1.6rem;
+            }
+            
+            .email-header {
+                padding: 20px;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .game-header h1 {
+                font-size: 1.4rem;
+            }
+            
+            .email-subject-value {
+                font-size: 1rem;
+            }
+            
+            .option-btn {
+                padding: 16px;
+                font-size: 1rem;
+            }
+            
+            .sender-name-email {
+                flex-direction: column;
+                gap: 3px;
+            }
+            
+            .sender-display-name {
+                font-size: 0.95rem;
+            }
+            
+            .sender-email-address {
+                font-size: 0.85rem;
+            }
+        }
+        
+        /* Ensure consistent alignment */
+        .game-interface {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        /* Make all boxes equal width */
+        .score-display,
+        .email-container,
+        .options-container,
+        .game-controls,
+        .completion-screen {
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
@@ -1091,11 +1140,10 @@ if($current_question > $total_questions && !$game_completed) {
                     <p>Analyze emails and identify phishing attempts</p>
                 </div>
                 
-                <?php if($feedback): ?>
-                    <div class="feedback <?php echo $feedback_type; ?>">
-                        <?php echo $feedback; ?>
-                    </div>
-                <?php endif; ?>
+                <div class="score-display">
+                    Score: <?php echo $score; ?>/<?php echo $total_questions; ?> 
+                    | Question: <?php echo $display_question; ?>/<?php echo $total_questions; ?>
+                </div>
                 
                 <?php if($game_completed): ?>
                     <div class="completion-screen">
@@ -1107,11 +1155,11 @@ if($current_question > $total_questions && !$game_completed) {
                         <?php
                         $percentage = ($score / $total_questions) * 100;
                         if($percentage >= 80) {
-                            echo '<p style="color: #059669; font-weight: 600;">Excellent! You have strong phishing detection skills.</p>';
+                            echo '<p style="color: #059669; font-weight: 600; font-size: 1.1rem; margin-bottom: 20px;">Excellent! You have strong phishing detection skills.</p>';
                         } elseif($percentage >= 60) {
-                            echo '<p style="color: #d97706; font-weight: 600;">Good job! You can identify most phishing attempts.</p>';
+                            echo '<p style="color: #d97706; font-weight: 600; font-size: 1.1rem; margin-bottom: 20px;">Good job! You can identify most phishing attempts.</p>';
                         } else {
-                            echo '<p style="color: #dc2626; font-weight: 600;">Practice makes perfect! Review phishing indicators to improve.</p>';
+                            echo '<p style="color: #dc2626; font-weight: 600; font-size: 1.1rem; margin-bottom: 20px;">Practice makes perfect! Review phishing indicators to improve.</p>';
                         }
                         ?>
                         
@@ -1129,12 +1177,43 @@ if($current_question > $total_questions && !$game_completed) {
                             
                             <div class="email-container">
                                 <div class="email-header">
-                                    <div class="email-subject"><?php echo htmlspecialchars($current_email['subject']); ?></div>
-                                    <div class="email-from">
-                                        <div class="from-label">From:</div>
-                                        <div class="from-details">
-                                            <div class="sender-name"><?php echo htmlspecialchars($current_email['sender_name']); ?></div>
-                                            <div class="sender-email"><?php echo htmlspecialchars($current_email['sender']); ?></div>
+                                    <!-- Subject Row -->
+                                    <div class="email-subject-row">
+                                        <div class="email-subject-label">Subject:</div>
+                                        <div class="email-subject-value"><?php echo htmlspecialchars($current_email['subject']); ?></div>
+                                    </div>
+                                    
+                                    <!-- Sender Row with Name, Email, and Time on same line -->
+                                    <div class="email-sender-row">
+                                        <div class="sender-info-container">
+                                            <div class="sender-avatar">
+                                                <?php 
+                                                // Get first letter of sender name for avatar
+                                                echo strtoupper(substr($current_email['sender_name'], 0, 1));
+                                                ?>
+                                            </div>
+                                            <div class="sender-details">
+                                                <div class="sender-name-email">
+                                                    <div class="sender-display-name"><?php echo htmlspecialchars($current_email['sender_name']); ?></div>
+                                                    <div class="sender-email-address"><?php echo htmlspecialchars($current_email['sender']); ?></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Time on same line, aligned to right -->
+                                        <div class="email-time">
+                                            <?php 
+                                            // Display current date and time
+                                            echo date('l, F j, Y') . ' at ' . date('g:i A');
+                                            ?>
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- To Row -->
+                                    <div class="email-to-row">
+                                        <div class="email-to-label">To:</div>
+                                        <div class="email-to-value">
+                                            <span>Me (<?php echo htmlspecialchars($_SESSION['email'] ?? 'you@example.com'); ?>)</span>
                                         </div>
                                     </div>
                                 </div>
@@ -1206,43 +1285,23 @@ if($current_question > $total_questions && !$game_completed) {
             return true;
         });
         
-        // Add hover effects
-        document.addEventListener('DOMContentLoaded', function() {
-            const optionButtons = document.querySelectorAll('.option-btn');
-            optionButtons.forEach(btn => {
-                btn.addEventListener('mouseenter', function() {
-                    if(!this.classList.contains('selected')) {
-                        this.style.transform = 'translateY(-2px)';
-                        this.style.boxShadow = '0 4px 6px rgba(0,0,0,0.1)';
-                    }
-                });
-                
-                btn.addEventListener('mouseleave', function() {
-                    if(!this.classList.contains('selected')) {
-                        this.style.transform = 'translateY(0)';
-                        this.style.boxShadow = 'none';
-                    }
-                });
-            });
-            
-            // Add keyboard navigation
-            document.addEventListener('keydown', function(e) {
-                if(e.key === '1' || e.key === 'l') {
-                    const legitBtn = document.querySelector('.legit-btn');
-                    if(legitBtn) {
-                        selectAnswer('legitimate');
-                        legitBtn.click();
-                    }
-                } else if(e.key === '2' || e.key === 'p') {
-                    const phishingBtn = document.querySelector('.phishing-btn');
-                    if(phishingBtn) {
-                        selectAnswer('phishing');
-                        phishingBtn.click();
-                    }
-                } else if(e.key === 'Enter' && selectedAnswer) {
-                    document.getElementById('submitBtn').click();
+        // Add keyboard navigation
+        document.addEventListener('keydown', function(e) {
+            if(e.key === '1' || e.key === 'l') {
+                const legitBtn = document.querySelector('.legit-btn');
+                if(legitBtn) {
+                    selectAnswer('legitimate');
+                    legitBtn.click();
                 }
-            });
+            } else if(e.key === '2' || e.key === 'p') {
+                const phishingBtn = document.querySelector('.phishing-btn');
+                if(phishingBtn) {
+                    selectAnswer('phishing');
+                    phishingBtn.click();
+                }
+            } else if(e.key === 'Enter' && selectedAnswer) {
+                document.getElementById('submitBtn').click();
+            }
         });
     </script>
 </body>
