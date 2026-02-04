@@ -106,527 +106,661 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action'])) {
     <link rel="stylesheet" href="css/styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* ===== LEVEL 2 GAME STYLES ===== */
-        .level-container {
-            max-width: 1200px;
-            margin: 0 auto;
+    /* ===== LEVEL 2 GAME STYLES ===== */
+    .game-interface {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+        width: 100%;
+    }
+    
+    .game-header {
+        text-align: center;
+        margin-bottom: 30px;
+        width: 100%;
+    }
+    
+    .game-header h1 {
+        color: #1e40af;
+        font-size: 2rem;
+        margin-bottom: 10px;
+    }
+    
+    .game-header p {
+        color: #64748b;
+        font-size: 1.1rem;
+    }
+    
+    .score-display {
+        text-align: center;
+        font-size: 1.2rem;
+        color: #1e40af;
+        font-weight: 600;
+        background: #eff6ff;
+        padding: 15px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        width: 100%;
+        box-sizing: border-box;
+        border: 1px solid #dbeafe;
+    }
+    
+    .email-container {
+        background: white;
+        border-radius: 8px;
+        padding: 0;
+        margin-bottom: 30px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        border: 1px solid #e2e8f0;
+        overflow: hidden;
+        width: 100%;
+        box-sizing: border-box;
+    }
+    
+    .email-header {
+        background: #f8fafc;
+        padding: 25px;
+        border-bottom: 1px solid #e2e8f0;
+        width: 100%;
+        box-sizing: border-box;
+        font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    }
+    
+    .email-subject-row {
+        display: flex;
+        align-items: center;
+        margin-bottom: 20px;
+        padding-bottom: 15px;
+        border-bottom: 1px solid #e5e7eb;
+    }
+    
+    .email-subject-label {
+        color: #374151;
+        font-weight: 600;
+        font-size: 0.9rem;
+        min-width: 70px;
+        margin-right: 15px;
+    }
+    
+    .email-subject-value {
+        flex: 1;
+        font-weight: 600;
+        font-size: 1.2rem;
+        color: #1f2937;
+    }
+    
+    .email-sender-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 15px;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+    
+    .sender-info-container {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        flex: 1;
+        min-width: 300px;
+    }
+    
+    .sender-avatar {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-weight: 600;
+        font-size: 1rem;
+        flex-shrink: 0;
+    }
+    
+    .sender-details {
+        flex: 1;
+    }
+    
+    .sender-name-email {
+        display: flex;
+        align-items: baseline;
+        gap: 10px;
+        flex-wrap: wrap;
+        margin-bottom: 3px;
+    }
+    
+    .sender-display-name {
+        font-weight: 600;
+        color: #1f2937;
+        font-size: 1rem;
+    }
+    
+    .sender-email-address {
+        color: #6b7280;
+        font-size: 0.9rem;
+    }
+    
+    .email-time {
+        color: #6b7280;
+        font-size: 0.85rem;
+        white-space: nowrap;
+        margin-left: 20px;
+        min-width: 180px;
+        text-align: right;
+    }
+    
+    .email-to-row {
+        display: flex;
+        align-items: center;
+        padding-top: 15px;
+        border-top: 1px solid #e5e7eb;
+    }
+    
+    .email-to-label {
+        color: #374151;
+        font-weight: 600;
+        font-size: 0.9rem;
+        min-width: 70px;
+        margin-right: 15px;
+    }
+    
+    .email-to-value {
+        color: #6b7280;
+        font-size: 0.9rem;
+    }
+    
+    .email-body {
+        padding: 30px;
+        min-height: 400px;
+        background: white;
+        text-align: left;
+        font-family: Arial, Helvetica, sans-serif;
+        width: 100%;
+        box-sizing: border-box;
+        overflow-wrap: break-word;
+        word-wrap: break-word;
+        line-height: 1.7;
+    }
+    
+    /* Clue Styling for Level 2 */
+    .clue {
+        cursor: pointer;
+        transition: all 0.3s;
+        border-radius: 4px;
+        padding: 2px 6px;
+        position: relative;
+        background: transparent !important;
+        border-bottom: none !important;
+        color: inherit;
+    }
+    
+    .clue:hover {
+        background: #ffeb3b !important;
+        border-bottom: 3px dashed #ffc107 !important;
+        transform: scale(1.03);
+        box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+    }
+    
+    .clue.found {
+        background: #ff6b6b !important;
+        color: white !important;
+        border-bottom: 3px solid #e53935 !important;
+        text-decoration: line-through;
+    }
+    
+    .clue.found::after {
+        content: '🚩';
+        position: absolute;
+        top: -10px;
+        right: -10px;
+        font-size: 14px;
+        background: white;
+        border-radius: 50%;
+        width: 24px;
+        height: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    }
+    
+    /* Game Options (Legitimate/Phishing) */
+    .options-container {
+        display: flex;
+        gap: 20px;
+        justify-content: center;
+        flex-wrap: wrap;
+        width: 100%;
+        margin-bottom: 20px;
+    }
+    
+    .option-btn {
+        flex: 1;
+        min-width: 150px;
+        max-width: 300px;
+        padding: 18px 30px;
+        border: 2px solid #e2e8f0;
+        border-radius: 8px;
+        background: white;
+        font-size: 1.1rem;
+        font-weight: 600;
+        cursor: pointer;
+        text-align: center;
+        transition: all 0.2s ease;
+        box-sizing: border-box;
+    }
+    
+    .option-btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    
+    .phishing-btn {
+        color: #dc2626;
+        border-color: #fecaca;
+    }
+    
+    .phishing-btn:hover {
+        background: #fee2e2;
+        border-color: #dc2626;
+    }
+    
+    .phishing-btn.selected {
+        background: #dc2626;
+        color: white;
+        border-color: #dc2626;
+    }
+    
+    .legit-btn {
+        color: #059669;
+        border-color: #a7f3d0;
+    }
+    
+    .legit-btn:hover {
+        background: #d1fae5;
+        border-color: #059669;
+    }
+    
+    .legit-btn.selected {
+        background: #059669;
+        color: white;
+        border-color: #059669;
+    }
+    
+    /* Game Controls */
+    .game-controls {
+        text-align: center;
+        margin-top: 20px;
+        width: 100%;
+    }
+    
+    .submit-btn {
+        padding: 16px 50px;
+        background: #1e40af;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 1.1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        min-width: 250px;
+        width: auto;
+        display: inline-block;
+        box-shadow: 0 4px 6px rgba(30, 64, 175, 0.2);
+    }
+    
+    .submit-btn:hover:not(:disabled) {
+        background: #1e3a8a;
+        transform: translateY(-3px);
+        box-shadow: 0 6px 12px rgba(30, 64, 175, 0.3);
+    }
+    
+    .submit-btn:disabled {
+        background: #94a3b8;
+        cursor: not-allowed;
+        transform: none;
+        box-shadow: none;
+    }
+    
+    /* Completion Screen */
+    .completion-screen {
+        text-align: center;
+        padding: 40px;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        width: 100%;
+        box-sizing: border-box;
+        border: 1px solid #e2e8f0;
+    }
+    
+    .completion-screen h2 {
+        color: #1e40af;
+        font-size: 2rem;
+        margin-bottom: 15px;
+    }
+    
+    .score-result {
+        font-size: 1.3rem;
+        color: #334155;
+        margin-bottom: 25px;
+        font-weight: 600;
+    }
+    
+    .completion-actions {
+        display: flex;
+        gap: 15px;
+        justify-content: center;
+        margin-top: 30px;
+        flex-wrap: wrap;
+        width: 100%;
+    }
+    
+    .action-btn {
+        padding: 14px 35px;
+        background: #1e40af;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        text-decoration: none;
+        display: inline-block;
+        transition: all 0.2s ease;
+        box-sizing: border-box;
+        min-width: 180px;
+        text-align: center;
+    }
+    
+    .action-btn:hover {
+        background: #1e3a8a;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(30, 64, 175, 0.2);
+    }
+    
+    .action-btn.secondary {
+        background: white;
+        color: #64748b;
+        border: 2px solid #e2e8f0;
+    }
+    
+    .action-btn.secondary:hover {
+        background: #f8fafc;
+        border-color: #cbd5e1;
+    }
+    
+    /* Container alignment fix */
+    .game-interface > * {
+        width: 100%;
+        box-sizing: border-box;
+        display: block;
+    }
+    
+    /* Additional Level 2 Specific Styles */
+    .clue-checklist {
+        background: #f8fafc;
+        border-radius: 8px;
+        padding: 20px;
+        margin: 20px 0;
+        border: 1px solid #e2e8f0;
+    }
+    
+    .clue-checklist h3 {
+        color: #1e40af;
+        margin-bottom: 15px;
+        font-size: 1.2rem;
+    }
+    
+    #clue-list {
+        columns: 2;
+        gap: 15px;
+        list-style: none;
+        padding: 0;
+    }
+    
+    #clue-list li {
+        background: white;
+        border-radius: 6px;
+        padding: 12px;
+        margin-bottom: 10px;
+        break-inside: avoid;
+        border-left: 4px solid #3b82f6;
+        transition: all 0.3s;
+    }
+    
+    #clue-list li.found {
+        background: #f0fdf4;
+        border-left-color: #10b981;
+    }
+    
+    .feedback-area {
+        background: #eff6ff;
+        border-radius: 8px;
+        padding: 20px;
+        margin: 20px 0;
+        border: 1px solid #dbeafe;
+    }
+    
+    .feedback-area h3 {
+        color: #1e40af;
+        margin-bottom: 10px;
+        font-size: 1.2rem;
+    }
+    
+    /* Level 2 Specific Controls */
+    .level2-controls {
+        display: flex;
+        justify-content: center;
+        gap: 15px;
+        margin-top: 30px;
+    }
+    
+    .level2-btn {
+        padding: 14px 30px;
+        background: #1e40af;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .level2-btn:hover {
+        background: #1e3a8a;
+        transform: translateY(-2px);
+    }
+    
+    .level2-btn.secondary {
+        background: #64748b;
+    }
+    
+    .level2-btn.secondary:hover {
+        background: #475569;
+    }
+    
+    /* Locked Level Styles */
+    .level-locked {
+        text-align: center;
+        padding: 60px 30px;
+        background: white;
+        border-radius: 12px;
+        margin: 30px 0;
+        border: 1px solid #e2e8f0;
+    }
+    
+    .level-locked h2 {
+        color: #dc2626;
+        margin-bottom: 15px;
+    }
+    
+    .level-locked p {
+        color: #64748b;
+        font-size: 1.1rem;
+        max-width: 600px;
+        margin: 0 auto 30px;
+        line-height: 1.6;
+    }
+    
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .game-interface {
+            padding: 15px;
+        }
+        
+        .email-sender-row {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 15px;
+        }
+        
+        .sender-info-container {
+            min-width: 100%;
+            margin-bottom: 5px;
+        }
+        
+        .email-time {
+            margin-left: 0;
+            text-align: left;
+            min-width: auto;
+        }
+        
+        .sender-name-email {
+            flex-direction: column;
+            gap: 5px;
+        }
+        
+        .email-subject-row {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 5px;
+        }
+        
+        .email-subject-label {
+            min-width: auto;
+        }
+        
+        .email-to-row {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 5px;
+        }
+        
+        .email-to-label {
+            min-width: auto;
+        }
+        
+        .options-container {
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .option-btn {
+            width: 100%;
+            max-width: 100%;
+            margin-bottom: 10px;
+        }
+        
+        .email-body {
+            padding: 20px;
+            font-size: 13px;
+        }
+        
+        .completion-actions {
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .action-btn {
+            width: 100%;
+            max-width: 300px;
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        
+        .submit-btn {
+            width: 100%;
+            max-width: 100%;
+        }
+        
+        .game-header h1 {
+            font-size: 1.6rem;
+        }
+        
+        .email-header {
             padding: 20px;
         }
         
-        .level-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: linear-gradient(135deg, #1a2980, #26d0ce);
-            color: white;
-            padding: 20px 30px;
-            border-radius: 12px;
-            margin-bottom: 30px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-        }
-        
-        .back-to-games {
-            color: white;
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 10px 20px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 8px;
-            transition: all 0.3s;
-        }
-        
-        .back-to-games:hover {
-            background: rgba(255,255,255,0.2);
-            transform: translateX(-3px);
-        }
-        
-        .level-info {
-            text-align: center;
-        }
-        
-        .level-tag {
-            display: block;
-            background: rgba(255,255,255,0.2);
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-size: 0.9rem;
-            margin-bottom: 8px;
-        }
-        
-        .level-title {
-            font-size: 1.4rem;
-            font-weight: 600;
-        }
-        
-        .header-score {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 10px 20px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 20px;
-            font-weight: 600;
-        }
-        
-        .header-score i {
-            color: #ffd32a;
-        }
-        
-        /* Game Content */
-        .game-content {
-            background: white;
-            border-radius: 15px;
-            padding: 30px;
-            box-shadow: 0 5px 25px rgba(0,0,0,0.1);
-        }
-        
-        .game-title {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-        
-        .game-title h1 {
-            color: #1a2980;
-            font-size: 2.2rem;
-            margin-bottom: 10px;
-        }
-        
-        .game-title p {
-            color: #666;
-            font-size: 1.1rem;
-            max-width: 800px;
-            margin: 0 auto;
-        }
-        
-        /* Score Display */
-        .score-display {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 20px;
-            margin: 30px 0;
-        }
-        
-        .score-card {
-            background: linear-gradient(135deg, #1a2980, #26d0ce);
-            color: white;
-            padding: 25px;
-            border-radius: 12px;
-            text-align: center;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
-        }
-        
-        .score-card i {
-            font-size: 2rem;
-            margin-bottom: 15px;
-            display: block;
-        }
-        
-        .score-value {
-            font-size: 2rem;
-            font-weight: bold;
-            margin: 5px 0;
-        }
-        
-        .score-value#score {
-            color: #ffd32a;
-        }
-        
-        .score-value#found-count {
-            color: #4cd137;
-        }
-        
-        .score-value#progress-percent {
-            color: #ff6b6b;
-        }
-        
-        .score-label {
-            font-size: 0.95rem;
-            opacity: 0.9;
-            margin-top: 5px;
-        }
-        
-        /* Email Box */
-        .email-box {
-            border: 2px solid #e2e8f0;
-            border-radius: 12px;
-            padding: 35px;
-            background: #f8fafc;
-            font-family: 'Georgia', serif;
-            line-height: 1.7;
-            margin: 30px 0;
-            position: relative;
-            font-size: 1.05rem;
-            min-height: 500px;
-        }
-        
-        .email-box h2 {
-            color: #1a2980;
-            margin-bottom: 25px;
-            font-family: 'Segoe UI', sans-serif;
-            font-size: 1.4rem;
-        }
-        
-        .email-box h3 {
-            color: #1a2980;
-            margin: 25px 0 20px;
-            font-family: 'Segoe UI', sans-serif;
-            font-size: 1.2rem;
-        }
-        
-        .email-box hr {
-            border: none;
-            border-top: 1px solid #cbd5e1;
-            margin: 30px 0;
-        }
-        
-        .email-box ul {
-            margin-left: 30px;
-            margin-bottom: 25px;
-        }
-        
-        .email-box li {
-            margin-bottom: 12px;
-        }
-        
-        /* Clue Styling */
-        .clue {
-            cursor: pointer;
-            transition: all 0.3s;
-            border-radius: 4px;
-            padding: 2px 6px;
-            position: relative;
-            background: transparent !important;
-            border-bottom: none !important;
-            color: inherit;
-        }
-        
-        .clue:hover {
-            background: #ffeb3b !important;
-            border-bottom: 3px dashed #ffc107 !important;
-            transform: scale(1.03);
-            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
-        }
-        
-        .clue.found {
-            background: #ff6b6b !important;
-            color: white !important;
-            border-bottom: 3px solid #e53935 !important;
-            text-decoration: line-through;
-        }
-        
-        .clue.found::after {
-            content: '🚩';
-            position: absolute;
-            top: -10px;
-            right: -10px;
-            font-size: 14px;
-            background: white;
-            border-radius: 50%;
-            width: 24px;
-            height: 24px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-        }
-        
-        /* Feedback Area */
-        .feedback-area {
-            background: #e3f2fd;
-            border-radius: 12px;
-            padding: 25px;
-            margin: 30px 0;
-            border-left: 6px solid #2196f3;
-        }
-        
-        .feedback-area h3 {
-            color: #0d47a1;
-            margin-bottom: 15px;
-            font-size: 1.3rem;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        #feedback-text {
-            font-size: 1.1rem;
-            line-height: 1.6;
-            color: #333;
-            min-height: 60px;
-            padding: 15px;
-            background: white;
-            border-radius: 8px;
-            border: 1px solid #bbdefb;
-        }
-        
-        /* Clue Checklist */
-        .clue-checklist {
-            background: #fffde7;
-            border-radius: 12px;
-            padding: 25px;
-            margin: 30px 0;
-            border: 1px dashed #ffd54f;
-        }
-        
-        .clue-checklist h3 {
-            margin-top: 0;
-            color: #5d4037;
-            font-size: 1.4rem;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
         #clue-list {
-            columns: 2;
-            gap: 20px;
-            list-style: none;
-            padding: 0;
+            columns: 1;
         }
         
-        #clue-list li {
-            background: white;
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 15px;
-            break-inside: avoid;
-            border-left: 5px solid #4a69bd;
-            transition: all 0.3s;
+        .level2-controls {
+            flex-direction: column;
+            align-items: center;
         }
         
-        #clue-list li strong {
-            color: #1a2980;
-            display: block;
-            margin-bottom: 8px;
+        .level2-btn {
+            width: 100%;
+            max-width: 300px;
+        }
+    }
+    
+    @media (max-width: 480px) {
+        .game-header h1 {
+            font-size: 1.4rem;
+        }
+        
+        .email-subject-value {
             font-size: 1rem;
         }
         
-        #clue-list li.found {
-            background: #e8f5e9;
-            border-left-color: #4cd137;
+        .option-btn {
+            padding: 16px;
+            font-size: 1rem;
         }
         
-        .clue-points {
-            float: right;
-            background: #4cd137;
-            color: white;
-            padding: 3px 12px;
-            border-radius: 15px;
+        .sender-name-email {
+            flex-direction: column;
+            gap: 3px;
+        }
+        
+        .sender-display-name {
+            font-size: 0.95rem;
+        }
+        
+        .sender-email-address {
             font-size: 0.85rem;
-            font-weight: bold;
         }
-        
-        /* Controls */
-        .game-controls {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            margin-top: 40px;
-            padding-top: 30px;
-            border-top: 1px solid #e2e8f0;
-        }
-        
-        .game-btn {
-            padding: 15px 35px;
-            border: none;
-            border-radius: 10px;
-            font-size: 1.1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-            min-width: 180px;
-        }
-        
-        .game-btn:hover:not(:disabled) {
-            transform: translateY(-3px);
-            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
-        }
-        
-        .btn-reset {
-            background: #e74c3c;
-            color: white;
-        }
-        
-        .btn-reset:hover {
-            background: #c0392b;
-        }
-        
-        .btn-hint {
-            background: #f39c12;
-            color: white;
-        }
-        
-        .btn-hint:hover {
-            background: #d35400;
-        }
-        
-        .btn-next {
-            background: linear-gradient(135deg, #4a69bd, #1e3799);
-            color: white;
-            display: none;
-            animation: pulse 1.5s infinite;
-        }
-        
-        .btn-next:hover {
-            background: linear-gradient(135deg, #1e3799, #0c2461);
-        }
-        
-        .btn-save {
-            background: linear-gradient(135deg, #2ecc71, #27ae60);
-            color: white;
-        }
-        
-        .btn-save:hover {
-            background: linear-gradient(135deg, #27ae60, #219653);
-        }
-        
-        .game-btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none !important;
-        }
-        
-        /* Locked Level Styles */
-        .level-locked {
-            text-align: center;
-            padding: 60px 30px;
-            background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
-            border-radius: 15px;
-            margin: 30px 0;
-        }
-        
-        .level-locked i {
-            font-size: 5rem;
-            color: #e74c3c;
-            margin-bottom: 20px;
-        }
-        
-        .level-locked h2 {
-            color: #2c3e50;
-            margin-bottom: 15px;
-        }
-        
-        .level-locked p {
-            color: #7f8c8d;
-            font-size: 1.1rem;
-            max-width: 600px;
-            margin: 0 auto 30px;
-            line-height: 1.6;
-        }
-        
-        /* Animations */
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
-        }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        /* Responsive Design */
-        @media (max-width: 992px) {
-            .score-display {
-                grid-template-columns: 1fr;
-            }
-            
-            #clue-list {
-                columns: 1;
-            }
-        }
-        
-        @media (max-width: 768px) {
-            .level-container {
-                padding: 15px;
-            }
-            
-            .level-header {
-                flex-direction: column;
-                gap: 15px;
-                text-align: center;
-            }
-            
-            .game-content {
-                padding: 20px;
-            }
-            
-            .email-box {
-                padding: 25px;
-            }
-            
-            .game-controls {
-                flex-direction: column;
-                align-items: center;
-            }
-            
-            .game-btn {
-                width: 100%;
-                max-width: 300px;
-            }
-        }
-        
-        @media (max-width: 480px) {
-            .game-title h1 {
-                font-size: 1.8rem;
-            }
-            
-            .email-box {
-                padding: 20px;
-                font-size: 0.95rem;
-            }
-            
-            .score-card {
-                padding: 20px;
-            }
-            
-            .score-value {
-                font-size: 1.5rem;
-            }
-        }
-        
-        /* Achievement Badge */
-        .achievement-badge {
-            position: fixed;
-            top: 100px;
-            right: 30px;
-            background: linear-gradient(135deg, #ffd700, #ff8c00);
-            color: #333;
-            padding: 15px;
-            border-radius: 10px;
-            box-shadow: 0 5px 25px rgba(0,0,0,0.2);
-            animation: fadeIn 0.5s ease-out;
-            display: none;
-            z-index: 1000;
-            text-align: center;
-            max-width: 250px;
-        }
-        
-        .achievement-badge i {
-            font-size: 2.5rem;
-            margin-bottom: 10px;
-            display: block;
-        }
-        
-        .achievement-badge h4 {
-            margin: 0 0 5px 0;
-            font-size: 1.1rem;
-        }
-        
-        .achievement-badge p {
-            margin: 0;
-            font-size: 0.9rem;
-            opacity: 0.8;
-        }
-    </style>
+    }
+    
+    /* Ensure consistent alignment */
+    .game-interface {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    /* Make all boxes equal width */
+    .score-display,
+    .email-container,
+    .options-container,
+    .game-controls,
+    .completion-screen {
+        max-width: 800px;
+        margin-left: auto;
+        margin-right: auto;
+    }
+</style>
 </head>
 <body>
     <div class="container">
