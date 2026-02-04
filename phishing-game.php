@@ -12,7 +12,7 @@ require_once "config/database.php";
 // Initialize game variables
 $score = isset($_SESSION['phishing_score']) ? $_SESSION['phishing_score'] : 0;
 $current_question = isset($_SESSION['phishing_question']) ? $_SESSION['phishing_question'] : 1;
-$total_questions = 5;
+$total_questions = 10;
 $feedback = "";
 $feedback_type = "";
 $game_completed = false;
@@ -291,7 +291,285 @@ $emails = [
                 </div>',
         'answer' => 'phishing',
         'hint' => 'Excessive urgency, threats of data loss, and suspicious domain "microsoft-security.net"'
-    ]
+    ],
+    6 => [
+    'sender' => 'appleid@id-apple.com',
+    'sender_name' => 'Apple Support',
+    'subject' => 'Your Apple ID has been locked',
+    'body' => '<div style="font-family: Arial, Helvetica, sans-serif; color: #1d1d1f; line-height: 1.5; font-size: 14px; max-width: 600px; margin: 0 auto;">
+                <div style="border-bottom: 1px solid #d2d2d7; padding-bottom: 20px; margin-bottom: 20px;">
+                    <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse: collapse;">
+                        <tr>
+                            <td style="padding: 0;">
+                                <span style="color: #000; font-size: 24px; font-weight: 600; display: inline-block; margin-bottom: 10px;">Apple</span>
+                            </td>
+                        </tr>
+                    </table>
+                    <h1 style="font-size: 20px; font-weight: 400; color: #1d1d1f; margin: 0 0 10px 0;">Apple ID Locked</h1>
+                    <p style="font-size: 13px; color: #86868b; margin: 0;">Account Security Alert</p>
+                </div>
+                
+                <p style="margin: 0 0 20px 0;">Dear Apple User,</p>
+                
+                <p style="margin: 0 0 20px 0;">We detected multiple failed login attempts to your Apple ID from an unrecognized device. To protect your account, we have temporarily locked your Apple ID.</p>
+                
+                <div style="background-color: #f5f5f7; border: 1px solid #d2d2d7; border-radius: 8px; padding: 20px; margin: 0 0 20px 0;">
+                    <p style="margin: 0 0 15px 0; font-weight: 600; color: #1d1d1f;">To unlock your account:</p>
+                    <ol style="margin: 0 0 15px 0; padding-left: 20px;">
+                        <li style="margin: 0 0 8px 0;">Click the link below</li>
+                        <li style="margin: 0 0 8px 0;">Verify your identity with security questions</li>
+                        <li style="margin: 0 0 8px 0;">Reset your password</li>
+                    </ol>
+                    <p style="margin: 0;">
+                        <a href="http://appleid-verify-security.com/unlock" style="color: #06c; text-decoration: none; font-weight: 500; display: inline-block; padding: 10px 20px; background-color: #0071e3; color: white; border-radius: 980px;">Unlock Apple ID Now</a>
+                    </p>
+                </div>
+                
+                <p style="margin: 0 0 20px 0; font-size: 13px; color: #86868b;">If you did not attempt to access your account, please secure it immediately.</p>
+                
+                <p style="margin: 0 0 20px 0;">
+                    Sincerely,<br>
+                    <strong>Apple Support</strong>
+                </p>
+                
+                <div style="border-top: 1px solid #d2d2d7; padding-top: 20px; margin-top: 30px; font-size: 12px; color: #86868b;">
+                    <p style="margin: 0 0 10px 0;">Apple Inc. | One Apple Park Way, Cupertino, CA 95014</p>
+                    <p style="margin: 0;">This is an automated message. Please do not reply.</p>
+                </div>
+            </div>',
+    'answer' => 'phishing',
+    'hint' => 'Apple uses "apple.com" domains, not "id-apple.com". Legitimate Apple emails never ask you to click links to unlock accounts.'
+],
+
+7 => [
+    'sender' => 'accounts.google.com',
+    'sender_name' => 'Google',
+    'subject' => 'Security checkup required',
+    'body' => '<div style="font-family: Arial, Helvetica, sans-serif; color: #202124; line-height: 1.5; font-size: 14px; max-width: 600px; margin: 0 auto;">
+                <div style="border-bottom: 1px solid #dadce0; padding-bottom: 20px; margin-bottom: 20px;">
+                    <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse: collapse;">
+                        <tr>
+                            <td style="padding: 0;">
+                                <span style="color: #4285f4; font-size: 24px; font-weight: 500; display: inline-block; margin-bottom: 10px;">G</span>
+                                <span style="color: #ea4335; font-size: 24px; font-weight: 500;">o</span>
+                                <span style="color: #fbbc05; font-size: 24px; font-weight: 500;">o</span>
+                                <span style="color: #4285f4; font-size: 24px; font-weight: 500;">g</span>
+                                <span style="color: #34a853; font-size: 24px; font-weight: 500;">l</span>
+                                <span style="color: #ea4335; font-size: 24px; font-weight: 500;">e</span>
+                            </td>
+                        </tr>
+                    </table>
+                    <h1 style="font-size: 20px; font-weight: 400; color: #202124; margin: 0;">Security checkup</h1>
+                </div>
+                
+                <p style="margin: 0 0 20px 0;">Hi,</p>
+                
+                <p style="margin: 0 0 20px 0;">We noticed some unusual activity in your Google Account. To keep your account secure, please review your recent security events.</p>
+                
+                <div style="background-color: #f8f9fa; border: 1px solid #dadce0; border-radius: 8px; padding: 20px; margin: 0 0 20px 0;">
+                    <p style="margin: 0 0 15px 0; font-weight: 500; color: #202124;">Recent activity to review:</p>
+                    <ul style="margin: 0 0 15px 0; padding-left: 20px;">
+                        <li style="margin: 0 0 8px 0;">New sign-in from Windows device</li>
+                        <li style="margin: 0 0 8px 0;">Password change requested</li>
+                        <li style="margin: 0 0 8px 0;">Recovery email updated</li>
+                    </ul>
+                </div>
+                
+                <p style="margin: 0 0 20px 0;">
+                    <a href="https://myaccount.google.com/security-checkup" style="color: #1a73e8; text-decoration: none; font-weight: 500;">Review your security settings</a>
+                </p>
+                
+                <p style="margin: 0 0 20px 0;">If this wasn\'t you, your account may have been compromised. You should change your password immediately.</p>
+                
+                <p style="margin: 0 0 20px 0;">
+                    Thanks,<br>
+                    <strong>The Google Accounts team</strong>
+                </p>
+                
+                <div style="border-top: 1px solid #dadce0; padding-top: 20px; margin-top: 30px; font-size: 12px; color: #5f6368;">
+                    <p style="margin: 0 0 10px 0;">You received this email to let you know about important changes to your Google Account and services.</p>
+                    <p style="margin: 0;">© 2025 Google LLC, 1600 Amphitheatre Parkway, Mountain View, CA 94043</p>
+                </div>
+            </div>',
+    'answer' => 'legitimate',
+    'hint' => 'Legitimate Google email with proper domain, links to official Google site, and no urgent demands for immediate action.'
+],
+
+8 => [
+    'sender' => 'support@linkedin-professional.com',
+    'sender_name' => 'LinkedIn Member Support',
+    'subject' => 'Someone viewed your profile',
+    'body' => '<div style="font-family: Arial, Helvetica, sans-serif; color: #000000; line-height: 1.5; font-size: 14px; max-width: 600px; margin: 0 auto;">
+                <div style="border-bottom: 1px solid #0077b5; padding-bottom: 20px; margin-bottom: 20px;">
+                    <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse: collapse;">
+                        <tr>
+                            <td style="padding: 0;">
+                                <span style="color: #0077b5; font-size: 24px; font-weight: bold; display: inline-block; margin-bottom: 10px;">in</span>
+                            </td>
+                        </tr>
+                    </table>
+                    <h1 style="font-size: 20px; font-weight: 600; color: #000000; margin: 0;">See who\'s viewed your profile</h1>
+                </div>
+                
+                <p style="margin: 0 0 20px 0;">Hi Member,</p>
+                
+                <p style="margin: 0 0 20px 0;">Your profile was viewed 15 times in the last 7 days. Upgrade to LinkedIn Premium to see everyone who\'s viewed your profile and get insights that can help you grow your network.</p>
+                
+                <div style="background-color: #f3f6f8; border: 1px solid #0077b5; border-radius: 4px; padding: 20px; margin: 0 0 20px 0; text-align: center;">
+                    <p style="margin: 0 0 15px 0; font-weight: 600; color: #0077b5;">Limited Time Offer: 50% OFF Premium</p>
+                    <p style="margin: 0 0 15px 0; font-size: 18px; font-weight: bold;">Only $14.99/month</p>
+                    <p style="margin: 0;">
+                        <a href="http://linkedin-premium-offer.com/upgrade" style="color: #ffffff; text-decoration: none; font-weight: 600; display: inline-block; padding: 12px 30px; background-color: #0077b5; border-radius: 24px; text-transform: uppercase;">Claim Your Discount Now</a>
+                    </p>
+                    <p style="margin: 15px 0 0 0; font-size: 12px; color: #666;">Offer expires in 48 hours</p>
+                </div>
+                
+                <p style="margin: 0 0 20px 0;">Premium members get 5x more profile views and are 40% more likely to receive opportunities.</p>
+                
+                <p style="margin: 0 0 20px 0;">
+                    Best,<br>
+                    <strong>The LinkedIn Team</strong>
+                </p>
+                
+                <div style="border-top: 1px solid #e0e0e0; padding-top: 20px; margin-top: 30px; font-size: 12px; color: #666;">
+                    <p style="margin: 0 0 10px 0;">This message was sent to LinkedIn member</p>
+                    <p style="margin: 0;">© 2025 LinkedIn Corporation, 1000 W Maude Ave, Sunnyvale, CA 94085</p>
+                </div>
+            </div>',
+    'answer' => 'phishing',
+    'hint' => 'LinkedIn uses "linkedin.com" domains. Fake domains like "linkedin-professional.com" with urgent limited-time offers are classic phishing tactics.'
+],
+
+9 => [
+    'sender' => 'noreply@github.com',
+    'sender_name' => 'GitHub',
+    'subject' => 'New sign-in to your GitHub account',
+    'body' => '<div style="font-family: Arial, Helvetica, sans-serif; color: #24292e; line-height: 1.5; font-size: 14px; max-width: 600px; margin: 0 auto;">
+                <div style="border-bottom: 1px solid #e1e4e8; padding-bottom: 20px; margin-bottom: 20px;">
+                    <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse: collapse;">
+                        <tr>
+                            <td style="padding: 0;">
+                                <span style="color: #24292e; font-size: 24px; font-weight: 600; display: inline-block; margin-bottom: 10px;">GitHub</span>
+                            </td>
+                        </tr>
+                    </table>
+                    <h1 style="font-size: 20px; font-weight: 400; color: #24292e; margin: 0;">New sign-in to your account</h1>
+                </div>
+                
+                <p style="margin: 0 0 20px 0;">Hello,</p>
+                
+                <p style="margin: 0 0 20px 0;">We noticed a new sign-in to your GitHub account.</p>
+                
+                <div style="background-color: #f6f8fa; border: 1px solid #e1e4e8; border-radius: 6px; padding: 20px; margin: 0 0 20px 0;">
+                    <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse: collapse; font-size: 13px;">
+                        <tr>
+                            <td style="padding: 8px 0; color: #586069; width: 100px;">Date:</td>
+                            <td style="padding: 8px 0; font-weight: 600;">' . date('F j, Y') . '</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px 0; color: #586069;">Time:</td>
+                            <td style="padding: 8px 0;">' . date('g:i A') . ' UTC</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px 0; color: #586069;">IP Address:</td>
+                            <td style="padding: 8px 0;">192.168.1.105</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px 0; color: #586069;">Location:</td>
+                            <td style="padding: 8px 0;">San Francisco, CA, US</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px 0; color: #586069;">Device:</td>
+                            <td style="padding: 8px 0;">Chrome on Windows</td>
+                        </tr>
+                    </table>
+                </div>
+                
+                <p style="margin: 0 0 20px 0;">If this was you, you can disregard this email. There\'s no need to take any action.</p>
+                
+                <p style="margin: 0 0 20px 0;">If you don\'t recognize this activity, please secure your account:</p>
+                
+                <p style="margin: 0 0 20px 0;">
+                    <a href="https://github.com/settings/security" style="color: #0366d6; text-decoration: none; font-weight: 500;">Review account security</a>
+                </p>
+                
+                <p style="margin: 0 0 20px 0;">
+                    Thanks,<br>
+                    <strong>GitHub Security</strong>
+                </p>
+                
+                <div style="border-top: 1px solid #e1e4e8; padding-top: 20px; margin-top: 30px; font-size: 12px; color: #586069;">
+                    <p style="margin: 0 0 10px 0;">This email was automatically sent by GitHub Security to keep you informed about your account.</p>
+                    <p style="margin: 0;">© 2025 GitHub, Inc. | 88 Colin P Kelly Jr St, San Francisco, CA 94107</p>
+                </div>
+            </div>',
+    'answer' => 'legitimate',
+    'hint' => 'Proper GitHub domain, detailed sign-in information without urgent demands, and links to official GitHub security settings.'
+],
+
+10 => [
+    'sender' => 'banking@wellsfargo-security.com',
+    'sender_name' => 'Wells Fargo Security',
+    'subject' => 'SUSPICIOUS TRANSACTION ALERT - Immediate Action Required',
+    'body' => '<div style="font-family: Arial, Helvetica, sans-serif; color: #333; line-height: 1.5; font-size: 14px; max-width: 600px; margin: 0 auto;">
+                <div style="background-color: #c00; color: white; padding: 20px; border-radius: 4px 4px 0 0; margin-bottom: 20px;">
+                    <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse: collapse;">
+                        <tr>
+                            <td style="padding: 0;">
+                                <span style="font-size: 24px; font-weight: bold; display: inline-block; margin-bottom: 10px;">WELLS FARGO</span>
+                            </td>
+                        </tr>
+                    </table>
+                    <h1 style="font-size: 22px; font-weight: 700; color: white; margin: 0;">URGENT: Fraud Alert</h1>
+                </div>
+                
+                <p style="margin: 0 0 20px 0; font-weight: 600;">ATTENTION VALUED CUSTOMER,</p>
+                
+                <p style="margin: 0 0 20px 0;">Our fraud detection system has identified a suspicious transaction on your Wells Fargo account ending in ••••4321.</p>
+                
+                <div style="background-color: #fff3f3; border: 2px solid #c00; border-radius: 4px; padding: 20px; margin: 0 0 20px 0;">
+                    <p style="margin: 0 0 15px 0; font-weight: 700; color: #c00; text-transform: uppercase;">Transaction Details:</p>
+                    <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse: collapse; font-size: 13px;">
+                        <tr>
+                            <td style="padding: 8px 0; color: #333; width: 120px;">Amount:</td>
+                            <td style="padding: 8px 0; font-weight: 700; color: #c00;">$2,450.00</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px 0; color: #333;">Merchant:</td>
+                            <td style="padding: 8px 0;">Electronics Plus Inc.</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px 0; color: #333;">Location:</td>
+                            <td style="padding: 8px 0;">Miami, FL</td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 8px 0; color: #333;">Time:</td>
+                            <td style="padding: 8px 0;">' . date('g:i A') . ' EST</td>
+                        </tr>
+                    </table>
+                    
+                    <p style="margin: 20px 0 15px 0; font-weight: 700; color: #c00;">THIS TRANSACTION WILL BE PROCESSED IN 1 HOUR UNLESS CONFIRMED BY YOU.</p>
+                    
+                    <div style="text-align: center; margin: 20px 0 0 0;">
+                        <a href="http://wellsfargo-security-verify.com/confirm" style="color: white; text-decoration: none; font-weight: 700; display: inline-block; padding: 15px 40px; background-color: #c00; border-radius: 4px; font-size: 16px; text-transform: uppercase;">VERIFY TRANSACTION NOW</a>
+                    </div>
+                </div>
+                
+                <p style="margin: 0 0 20px 0; font-weight: 600;">If you did not authorize this transaction, your account will be immediately locked to prevent further unauthorized activity.</p>
+                
+                <p style="margin: 0 0 20px 0;">
+                    Sincerely,<br>
+                    <strong>Wells Fargo Fraud Prevention Department</strong>
+                </p>
+                
+                <div style="border-top: 1px solid #ccc; padding-top: 20px; margin-top: 30px; font-size: 11px; color: #666;">
+                    <p style="margin: 0 0 10px 0;">Wells Fargo Bank, N.A. | 420 Montgomery Street, San Francisco, CA 94104</p>
+                    <p style="margin: 0;">This is an automated security alert. Do not reply to this email.</p>
+                </div>
+            </div>',
+    'answer' => 'phishing',
+    'hint' => 'Extreme urgency, threats of account lockout, fake domain "wellsfargo-security.com" instead of official "wellsfargo.com", and pressure to click links immediately.'
+],
 ];
 
 // Process form submission
