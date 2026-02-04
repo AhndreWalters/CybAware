@@ -560,6 +560,13 @@ nav {
     }
 }
 
+/* Add to existing media queries */
+@media (max-width: 480px) {
+    .game-interface { padding: 15px; }
+    .option { padding: 12px 15px; }
+    .btn-game { padding: 12px 20px; font-size: 0.9rem; }
+}
+
 @media (max-width: 768px) {
     nav {
         flex-direction: column;
