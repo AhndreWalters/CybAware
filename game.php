@@ -381,6 +381,8 @@ if($stmt = mysqli_prepare($link, $sql)) {
                                 <a href="phishing-game.php" class="play-btn">
                                     <?php echo $phishing_score > 0 ? 'Play Again' : 'Start Mission'; ?>
                                 </a>
+                                <a href="level2.php" class="play-btn">
+                                </a>
                             </div>
                         </div>
                     </div>
