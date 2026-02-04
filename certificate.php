@@ -11,16 +11,18 @@ require_once "config/database.php";
 $user_id = $_SESSION['id'];
 $password_score = 0;
 $phishing_score = 0;
+$password_total = 5;  // Password game has 5 questions
+$phishing_total = 10; // Phishing game now has 10 questions
 $total_games = 2;
 $games_completed = 0;
 
 // Fetch scores from database
-$sql = "SELECT game_type, score, total_questions FROM game_scores WHERE user_id = ?";
+$sql = "SELECT game_type, score FROM game_scores WHERE user_id = ?";
 if($stmt = mysqli_prepare($link, $sql)) {
     mysqli_stmt_bind_param($stmt, "i", $user_id);
     mysqli_stmt_execute($stmt);
     mysqli_stmt_store_result($stmt);
-    mysqli_stmt_bind_result($stmt, $game_type, $score, $total_questions);
+    mysqli_stmt_bind_result($stmt, $game_type, $score);
     
     while(mysqli_stmt_fetch($stmt)) {
         if($game_type == 'password_fortress') {
@@ -39,8 +41,8 @@ $both_games_completed = ($games_completed == $total_games);
 
 // Calculate overall statistics
 $overall_score = $password_score + $phishing_score;
-$max_total_score = 10; // 5 questions per game * 2 games
-$overall_percentage = ($overall_score / $max_total_score) * 100;
+$max_total_score = $password_total + $phishing_total; // 5 + 10 = 15
+$overall_percentage = ($max_total_score > 0) ? ($overall_score / $max_total_score) * 100 : 0;
 
 // Calculate grade
 function calculateGrade($percentage) {
@@ -265,7 +267,7 @@ $overall_grade = calculateGrade($overall_percentage);
                         
                         <div class="game-details">
                             <div class="detail-item">
-                                <div class="detail-value"><?php echo $overall_score; ?>/10</div>
+                                <div class="detail-value"><?php echo $overall_score; ?>/<?php echo $max_total_score; ?></div>
                                 <div class="detail-label">Total Score</div>
                             </div>
                             
@@ -280,7 +282,7 @@ $overall_grade = calculateGrade($overall_percentage);
                             </div>
                         </div>
                         
-                        <!-- Individual Mission Scores - REVERTED TO OLD STYLE -->
+                        <!-- Individual Mission Scores -->
                         <div style="margin: 30px 0;">
                             <h4 style="color: #64748b; margin-bottom: 20px;">Mission Breakdown</h4>
                             <div class="progress-status">
@@ -289,7 +291,7 @@ $overall_grade = calculateGrade($overall_percentage);
                                         <?php echo $password_score; ?>
                                     </div>
                                     <div class="mission-title">Password Fortress</div>
-                                    <div class="mission-score"><?php echo $password_score; ?>/5</div>
+                                    <div class="mission-score"><?php echo $password_score; ?>/<?php echo $password_total; ?></div>
                                 </div>
                                 
                                 <div class="game-progress">
@@ -297,7 +299,7 @@ $overall_grade = calculateGrade($overall_percentage);
                                         <?php echo $phishing_score; ?>
                                     </div>
                                     <div class="mission-title">Phishing Detective</div>
-                                    <div class="mission-score"><?php echo $phishing_score; ?>/5</div>
+                                    <div class="mission-score"><?php echo $phishing_score; ?>/<?php echo $phishing_total; ?></div>
                                 </div>
                             </div>
                         </div>
@@ -335,7 +337,7 @@ $overall_grade = calculateGrade($overall_percentage);
                                     </div>
                                     <div class="mission-title">Password Fortress</div>
                                     <div class="mission-score">
-                                        <?php echo $password_score > 0 ? "{$password_score}/5" : "Not Started"; ?>
+                                        <?php echo $password_score > 0 ? "{$password_score}/{$password_total}" : "Not Started"; ?>
                                     </div>
                                 </div>
                                 
@@ -345,7 +347,7 @@ $overall_grade = calculateGrade($overall_percentage);
                                     </div>
                                     <div class="mission-title">Phishing Detective</div>
                                     <div class="mission-score">
-                                        <?php echo $phishing_score > 0 ? "{$phishing_score}/5" : "Not Started"; ?>
+                                        <?php echo $phishing_score > 0 ? "{$phishing_score}/{$phishing_total}" : "Not Started"; ?>
                                     </div>
                                 </div>
                             </div>
