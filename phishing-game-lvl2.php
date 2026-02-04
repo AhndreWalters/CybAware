@@ -252,124 +252,95 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action'])) {
             font-size: 1.05rem;
         }
         
-        /* Interactive Clue Styling */
+        /* Interactive Clue Styling - FIXED */
         .clue {
             cursor: pointer;
             transition: all 0.3s;
             border-radius: 4px;
             padding: 2px 6px;
             position: relative;
-            background: transparent !important;
-            border-bottom: none !important;
+            display: inline-block;
+            background: transparent;
             color: inherit;
+            text-decoration: none;
+            border-bottom: 2px dotted #ffc107;
+            margin: 0 2px;
         }
         
         .clue:hover {
-            background: #ffeb3b !important;
-            border-bottom: 3px dashed #ffc107 !important;
-            transform: scale(1.03);
-            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+            background: #ffeb3b;
+            border-bottom: 2px solid #ff9800;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(255, 193, 7, 0.3);
         }
         
         .clue.found {
             background: #ff6b6b !important;
             color: white !important;
-            border-bottom: 3px solid #e53935 !important;
+            border-bottom: 2px solid #e53935 !important;
             text-decoration: line-through;
+            box-shadow: 0 3px 6px rgba(255, 107, 107, 0.3);
         }
         
         .clue.found::after {
             content: '🚩';
             position: absolute;
-            top: -10px;
-            right: -10px;
-            font-size: 14px;
+            top: -12px;
+            right: -12px;
+            font-size: 16px;
             background: white;
             border-radius: 50%;
-            width: 24px;
-            height: 24px;
+            width: 28px;
+            height: 28px;
             display: flex;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+            border: 2px solid #e53935;
+            z-index: 100;
         }
         
-        /* Game Options Container */
-        .options-container {
-            display: flex;
-            gap: 20px;
-            justify-content: center;
-            flex-wrap: wrap;
-            width: 100%;
-            margin-bottom: 20px;
-        }
-        
-        .option-btn {
-            flex: 1;
-            min-width: 150px;
-            max-width: 300px;
-            padding: 18px 30px;
-            border: 2px solid #e2e8f0;
-            border-radius: 8px;
-            background: white;
-            font-size: 1.1rem;
-            font-weight: 600;
-            cursor: pointer;
-            text-align: center;
-            transition: all 0.2s ease;
-            box-sizing: border-box;
-        }
-        
-        .option-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        }
-        
-        .phishing-btn {
-            color: #dc2626;
-            border-color: #fecaca;
-        }
-        
-        .phishing-btn:hover {
-            background: #fee2e2;
-            border-color: #dc2626;
-        }
-        
-        .phishing-btn.selected {
-            background: #dc2626;
-            color: white;
-            border-color: #dc2626;
-        }
-        
-        .legit-btn {
-            color: #059669;
-            border-color: #a7f3d0;
-        }
-        
-        .legit-btn:hover {
-            background: #d1fae5;
-            border-color: #059669;
-        }
-        
-        .legit-btn.selected {
-            background: #059669;
-            color: white;
-            border-color: #059669;
-        }
-        
-        /* Feedback Area */
-        .feedback-area {
-            background: #eff6ff;
+        /* Game Info Area */
+        .game-info {
+            background: #f8fafc;
             border-radius: 8px;
             padding: 20px;
-            margin: 20px 0;
-            border: 1px solid #dbeafe;
+            margin-bottom: 20px;
+            border: 1px solid #e2e8f0;
         }
         
-        .feedback-area h3 {
+        .game-info h3 {
             color: #1e40af;
             margin-bottom: 10px;
             font-size: 1.2rem;
+        }
+        
+        .game-info p {
+            color: #64748b;
+            margin-bottom: 15px;
+            font-size: 0.95rem;
+        }
+        
+        /* Feedback Area */
+        #feedback-area {
+            background: #f0f9ff;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border: 1px solid #0ea5e9;
+            min-height: 100px;
+        }
+        
+        #feedback-area h3 {
+            color: #0369a1;
+            margin-bottom: 10px;
+            font-size: 1.2rem;
+        }
+        
+        #feedback-text {
+            color: #334155;
+            font-size: 1rem;
+            line-height: 1.6;
         }
         
         /* Clue Checklist */
@@ -377,14 +348,21 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action'])) {
             background: #f8fafc;
             border-radius: 8px;
             padding: 20px;
-            margin: 20px 0;
+            margin-bottom: 20px;
             border: 1px solid #e2e8f0;
+            max-height: 300px;
+            overflow-y: auto;
         }
         
         .clue-checklist h3 {
             color: #1e40af;
             margin-bottom: 15px;
             font-size: 1.2rem;
+            position: sticky;
+            top: 0;
+            background: #f8fafc;
+            padding: 5px 0;
+            z-index: 10;
         }
         
         #clue-list {
@@ -402,14 +380,72 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action'])) {
             break-inside: avoid;
             border-left: 4px solid #3b82f6;
             transition: all 0.3s;
+            opacity: 0.6;
         }
         
         #clue-list li.found {
             background: #f0fdf4;
             border-left-color: #10b981;
+            opacity: 1;
+            transform: translateX(5px);
         }
         
-        /* Game Controls */
+        #clue-list li strong {
+            display: block;
+            color: #374151;
+            margin-bottom: 5px;
+            font-size: 0.9rem;
+        }
+        
+        #clue-list li em {
+            display: block;
+            color: #6b7280;
+            font-size: 0.85rem;
+            margin-bottom: 5px;
+        }
+        
+        #clue-list li .points {
+            float: right;
+            color: #10b981;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+        
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .action-btn {
+            padding: 14px 25px;
+            border: 2px solid;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 150px;
+            text-align: center;
+            box-sizing: border-box;
+        }
+        
+        #hint-btn {
+            background: #fef3c7;
+            color: #92400e;
+            border-color: #f59e0b;
+        }
+        
+        #hint-btn:hover {
+            background: #fde68a;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(245, 158, 11, 0.2);
+        }
+        
+        /* Submit Button */
         .game-controls {
             text-align: center;
             margin-top: 20px;
@@ -479,7 +515,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action'])) {
             width: 100%;
         }
         
-        .action-btn {
+        .nav-btn {
             padding: 14px 35px;
             background: #1e40af;
             color: white;
@@ -496,28 +532,21 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action'])) {
             text-align: center;
         }
         
-        .action-btn:hover {
+        .nav-btn:hover {
             background: #1e3a8a;
             transform: translateY(-2px);
             box-shadow: 0 4px 8px rgba(30, 64, 175, 0.2);
         }
         
-        .action-btn.secondary {
+        .nav-btn.secondary {
             background: white;
             color: #64748b;
             border: 2px solid #e2e8f0;
         }
         
-        .action-btn.secondary:hover {
+        .nav-btn.secondary:hover {
             background: #f8fafc;
             border-color: #cbd5e1;
-        }
-        
-        /* Container alignment fix */
-        .game-interface > * {
-            width: 100%;
-            box-sizing: border-box;
-            display: block;
         }
         
         /* Responsive Design */
@@ -582,7 +611,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action'])) {
                 align-items: center;
             }
             
-            .action-btn {
+            .nav-btn, .action-btn, .submit-btn {
                 width: 100%;
                 max-width: 300px;
                 text-align: center;
@@ -663,11 +692,18 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action'])) {
                         ?>
                         
                         <div class="completion-actions">
-                            <a href="game.php" class="action-btn secondary">Back to Games</a>
-                            <a href="phishing-game-lvl2.php" class="action-btn">Play Again</a>
+                            <a href="game.php" class="nav-btn secondary">Back to Games</a>
+                            <a href="phishing-game-lvl2.php?reset=1" class="nav-btn">Play Again</a>
                         </div>
                     </div>
                 <?php else: ?>
+                    <!-- Game Information -->
+                    <div class="game-info">
+                        <h3>How to Play:</h3>
+                        <p><strong>Click on suspicious elements</strong> in the email below to find phishing clues. Each clue is worth 10 points. Find all 14 clues to get a perfect score!</p>
+                        <p><strong>Hint:</strong> Look for spelling errors, character substitutions (like using "1" instead of "l"), grammar mistakes, and suspicious content.</p>
+                    </div>
+                    
                     <!-- Email Content -->
                     <div class="email-container">
                         <div class="email-header">
@@ -728,33 +764,33 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action'])) {
                     </div>
                     
                     <!-- Feedback Area -->
-                    <div class="feedback-area">
-                        <h3>📝 Clue Explanation</h3>
+                    <div id="feedback-area">
+                        <h3>📝 Clue Feedback</h3>
                         <div id="feedback-text">
-                            <?php if($clues_found == 0): ?>
-                                <strong>💡 How to Play:</strong><br>
-                                Hover over suspicious text in the email to reveal clues.<br>
-                                Click on anything that looks like a phishing clue! Each clue is worth 10 points.
+                            <?php if($clues_found > 0): ?>
+                                You've found <?php echo $clues_found; ?> clues so far. Click on more suspicious elements!
                             <?php else: ?>
-                                You've found <?php echo $clues_found; ?> clues so far. Keep going to find all 14 clues!
+                                Click on suspicious elements in the email to find phishing clues.
                             <?php endif; ?>
                         </div>
                     </div>
                     
                     <!-- Clue Checklist -->
                     <div class="clue-checklist">
-                        <h3>🕵️ Phishing Clues to Find (14 total):</h3>
+                        <h3>🔍 Clue Checklist (14 Total)</h3>
                         <ul id="clue-list">
-                            <!-- Will be populated by JavaScript -->
+                            <!-- Populated by JavaScript -->
                         </ul>
+                    </div>
+                    
+                    <!-- Action Buttons -->
+                    <div class="action-buttons">
+                        <button id="hint-btn" class="action-btn">💡 Get a Hint</button>
                     </div>
                     
                     <!-- Game Controls -->
                     <div class="game-controls">
-                        <button id="hint-btn" class="submit-btn" style="background: #f59e0b;">
-                            💡 Get Hint
-                        </button>
-                        <button id="submit-btn" class="submit-btn">
+                        <button id="submit-btn" class="submit-btn" <?php echo $clues_found == 0 ? 'disabled' : ''; ?>>
                             ✅ Submit Score (<?php echo $clues_found; ?>/14 clues)
                         </button>
                     </div>
@@ -786,7 +822,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action'])) {
         
         // Game State
         let score = <?php echo $current_score; ?>;
-        let foundClues = new Set(<?php echo json_encode(range(1, $clues_found)); ?>);
+        let foundClues = new Set(<?php echo $clues_found > 0 ? json_encode(range(1, $clues_found)) : '[]'; ?>);
         const totalClues = 14;
         const maxScore = 140;
         
@@ -798,13 +834,22 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action'])) {
         
         // Initialize Game
         function initGame() {
+            // Mark already found clues from PHP session
+            document.querySelectorAll('.clue').forEach(clueEl => {
+                const clueId = parseInt(clueEl.getAttribute('data-id'));
+                if (foundClues.has(clueId)) {
+                    clueEl.classList.add('found');
+                }
+            });
+            
             // Populate clue checklist
             clues.forEach(clue => {
                 const li = document.createElement('li');
                 li.id = `clue-item-${clue.id}`;
                 li.innerHTML = `
-                    <strong>${clue.category}:</strong> ${clue.info}
-                    <span style="float: right; color: #10b981; font-weight: 600;">+10 pts</span>
+                    <strong>Clue #${clue.id}: ${clue.category}</strong>
+                    <em>${clue.info}</em>
+                    <span class="points">+10 pts</span>
                 `;
                 if (foundClues.has(clue.id)) {
                     li.classList.add('found');
@@ -815,27 +860,36 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action'])) {
             // Add click listeners to clues
             document.querySelectorAll('.clue').forEach(clueEl => {
                 clueEl.addEventListener('click', handleClueClick);
+                clueEl.addEventListener('mouseenter', function() {
+                    if (!this.classList.contains('found')) {
+                        this.style.transform = 'translateY(-2px)';
+                        this.style.boxShadow = '0 4px 8px rgba(255, 193, 7, 0.3)';
+                    }
+                });
+                clueEl.addEventListener('mouseleave', function() {
+                    if (!this.classList.contains('found')) {
+                        this.style.transform = '';
+                        this.style.boxShadow = '';
+                    }
+                });
             });
             
             // Button event listeners
             hintBtn.addEventListener('click', giveHint);
             submitBtn.addEventListener('click', submitScore);
             
-            // Update submit button text
+            // Update submit button
             updateSubmitButton();
-            
-            // Mark level as accessed
-            <?php $_SESSION['level2_accessed'] = true; ?>
         }
         
         // Handle clue click
         function handleClueClick(event) {
-            const clueEl = event.target;
+            const clueEl = event.currentTarget;
             const clueId = parseInt(clueEl.getAttribute('data-id'));
             
-            // If already found, do nothing
+            // If already found, show message
             if (foundClues.has(clueId)) {
-                feedbackText.innerHTML = `<strong>Already found!</strong> You already flagged this clue.`;
+                showFeedback(`Already found! You already flagged this clue.`, 'info');
                 return;
             }
             
@@ -846,18 +900,23 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action'])) {
             // Update score (10 points per clue)
             score += 10;
             
-            // Show feedback
+            // Find clue info
             const clue = clues.find(c => c.id === clueId);
-            feedbackText.innerHTML = `
+            
+            // Show feedback
+            showFeedback(`
                 <strong>✅ Found Clue #${clue.id}: "${clue.text}"</strong><br>
                 <em>${clue.category}</em>: ${clue.info}<br>
                 <small>+10 points! Total: ${score}/${maxScore}</small>
-            `;
+            `, 'success');
             
             // Mark in checklist
             const checklistItem = document.getElementById(`clue-item-${clueId}`);
             if (checklistItem) {
                 checklistItem.classList.add('found');
+                checklistItem.style.animation = 'none';
+                checklistItem.offsetHeight; // Trigger reflow
+                checklistItem.style.animation = 'fadeIn 0.5s ease';
             }
             
             // Update submit button
@@ -865,19 +924,39 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action'])) {
             
             // Check if all clues found
             if (foundClues.size === totalClues) {
-                feedbackText.innerHTML = `
+                showFeedback(`
                     <strong>🎉 All clues found!</strong><br>
                     You found all ${totalClues} phishing clues!<br>
                     Final Score: <strong>${score}/${maxScore}</strong> points<br>
                     <em>Click "Submit Score" to save your progress.</em>
-                `;
+                `, 'success');
+            }
+            
+            // Add celebration effect for all clues found
+            if (foundClues.size === totalClues) {
+                celebrateAllCluesFound();
             }
         }
         
-        // Update submit button text
+        // Show feedback message
+        function showFeedback(message, type = 'info') {
+            const feedbackArea = document.getElementById('feedback-area');
+            feedbackText.innerHTML = message;
+            
+            // Update feedback area style based on type
+            feedbackArea.style.borderColor = type === 'success' ? '#10b981' : 
+                                           type === 'error' ? '#dc2626' : 
+                                           type === 'info' ? '#0ea5e9' : '#d1d5db';
+            feedbackArea.style.backgroundColor = type === 'success' ? '#f0fdf4' : 
+                                               type === 'error' ? '#fef2f2' : 
+                                               type === 'info' ? '#f0f9ff' : '#f8fafc';
+        }
+        
+        // Update submit button text and state
         function updateSubmitButton() {
             if (submitBtn) {
                 submitBtn.textContent = `✅ Submit Score (${foundClues.size}/${totalClues} clues)`;
+                submitBtn.disabled = foundClues.size === 0;
             }
         }
         
@@ -886,27 +965,31 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action'])) {
             const unfoundClues = clues.filter(clue => !foundClues.has(clue.id));
             
             if (unfoundClues.length === 0) {
-                feedbackText.innerHTML = `<strong>🎉 All clues found!</strong> No hints needed.`;
+                showFeedback(`<strong>🎉 All clues found!</strong> No hints needed.`, 'success');
                 return;
             }
             
             const randomClue = unfoundClues[Math.floor(Math.random() * unfoundClues.length)];
-            feedbackText.innerHTML = `
+            showFeedback(`
                 <strong>💡 Hint:</strong> Look for "<em>${randomClue.text}</em>"<br>
                 <small>Category: ${randomClue.category}</small>
-            `;
+            `, 'info');
             
             // Briefly highlight the clue
             const clueEl = document.querySelector(`.clue[data-id="${randomClue.id}"]`);
-            if (clueEl) {
-                const originalColor = clueEl.style.backgroundColor;
-                clueEl.style.backgroundColor = '#ffeb3b';
-                clueEl.style.borderBottom = '3px dashed #ffc107';
+            if (clueEl && !clueEl.classList.contains('found')) {
+                const originalBorder = clueEl.style.borderBottom;
+                clueEl.style.borderBottom = '3px solid #ff9800';
+                clueEl.style.boxShadow = '0 0 15px rgba(255, 152, 0, 0.5)';
+                
+                // Pulse animation
+                clueEl.style.animation = 'pulse 1s ease-in-out 2';
                 
                 setTimeout(() => {
                     if (!clueEl.classList.contains('found')) {
-                        clueEl.style.backgroundColor = originalColor;
-                        clueEl.style.borderBottom = '';
+                        clueEl.style.borderBottom = originalBorder;
+                        clueEl.style.boxShadow = '';
+                        clueEl.style.animation = '';
                     }
                 }, 2000);
             }
@@ -915,9 +998,13 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action'])) {
         // Submit score to server
         async function submitScore() {
             if (foundClues.size === 0) {
-                feedbackText.innerHTML = `<strong style="color: #dc2626;">Please find at least one clue before submitting!</strong>`;
+                showFeedback(`<strong style="color: #dc2626;">Please find at least one clue before submitting!</strong>`, 'error');
                 return;
             }
+            
+            // Disable button and show loading
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '⏳ Saving...';
             
             try {
                 const response = await fetch('phishing-game-lvl2.php', {
@@ -931,15 +1018,90 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action'])) {
                 const result = await response.json();
                 
                 if (result.success) {
-                    // Reload page to show completion screen
-                    window.location.href = 'phishing-game-lvl2.php?success=true';
+                    showFeedback(`
+                        <strong>✅ Score saved successfully!</strong><br>
+                        <strong>Final Score:</strong> ${score}/${maxScore}<br>
+                        <strong>Clues Found:</strong> ${foundClues.size}/14<br>
+                        <em>Redirecting...</em>
+                    `, 'success');
+                    
+                    // Reload page after 2 seconds to show completion screen
+                    setTimeout(() => {
+                        window.location.href = 'phishing-game-lvl2.php';
+                    }, 2000);
                 } else {
-                    feedbackText.innerHTML = `<strong style="color: #dc2626;">Error saving score. Please try again.</strong>`;
+                    showFeedback(`<strong style="color: #dc2626;">Error saving score. Please try again.</strong>`, 'error');
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = `✅ Submit Score (${foundClues.size}/${totalClues} clues)`;
                 }
             } catch (error) {
-                feedbackText.innerHTML = `<strong style="color: #dc2626;">Network error. Please check your connection.</strong>`;
+                showFeedback(`<strong style="color: #dc2626;">Network error. Please check your connection.</strong>`, 'error');
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = `✅ Submit Score (${foundClues.size}/${totalClues} clues)`;
             }
         }
+        
+        // Celebration effect for all clues found
+        function celebrateAllCluesFound() {
+            // Add celebration animation to all found clues
+            document.querySelectorAll('.clue.found').forEach(clue => {
+                clue.style.animation = 'bounce 0.5s ease-in-out 3';
+            });
+            
+            // Add confetti effect
+            createConfetti();
+        }
+        
+        // Simple confetti effect
+        function createConfetti() {
+            const colors = ['#ff6b6b', '#4ecdc4', '#ffd166', '#06d6a0', '#118ab2'];
+            
+            for (let i = 0; i < 50; i++) {
+                setTimeout(() => {
+                    const confetti = document.createElement('div');
+                    confetti.style.position = 'fixed';
+                    confetti.style.width = '10px';
+                    confetti.style.height = '10px';
+                    confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
+                    confetti.style.borderRadius = '50%';
+                    confetti.style.left = Math.random() * 100 + 'vw';
+                    confetti.style.top = '-20px';
+                    confetti.style.zIndex = '9999';
+                    confetti.style.pointerEvents = 'none';
+                    document.body.appendChild(confetti);
+                    
+                    // Animate
+                    confetti.animate([
+                        { transform: 'translateY(0) rotate(0deg)', opacity: 1 },
+                        { transform: `translateY(${window.innerHeight + 20}px) rotate(${Math.random() * 360}deg)`, opacity: 0 }
+                    ], {
+                        duration: 1000 + Math.random() * 1000,
+                        easing: 'cubic-bezier(0.1, 0.8, 0.3, 1)'
+                    }).onfinish = () => confetti.remove();
+                }, i * 50);
+            }
+        }
+        
+        // Add CSS animations
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes pulse {
+                0% { transform: scale(1); }
+                50% { transform: scale(1.05); }
+                100% { transform: scale(1); }
+            }
+            
+            @keyframes bounce {
+                0%, 100% { transform: translateY(0); }
+                50% { transform: translateY(-10px); }
+            }
+            
+            @keyframes fadeIn {
+                from { opacity: 0; transform: translateY(10px); }
+                to { opacity: 1; transform: translateY(0); }
+            }
+        `;
+        document.head.appendChild(style);
         
         // Initialize game when page loads
         document.addEventListener('DOMContentLoaded', initGame);
