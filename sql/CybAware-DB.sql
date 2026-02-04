@@ -21,6 +21,16 @@ CREATE TABLE game_scores (
     score INT NOT NULL,
     total_questions INT NOT NULL,
     completed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     UNIQUE KEY unique_user_game (user_id, game_type)
+);
+
+CREATE TABLE game_levels (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    level_name VARCHAR(100) NOT NULL,
+    score INT DEFAULT 0,
+    clues_found INT DEFAULT 0,
+    completed BOOLEAN DEFAULT FALSE,
+    played_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE KEY unique_user_level (user_id, level_name)
 );
