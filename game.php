@@ -484,26 +484,14 @@ if($stmt = mysqli_prepare($link, $sql)) {
                                         <?php echo $phishing_lvl1_score > 0 ? 'Level 1: ' . $phishing_lvl1_score . '/5' : 'Level 1: Beginner'; ?>
                                     </a>
                                     
-                                    <!-- Level 2 -->
+                                    <!-- Level 2 - REMOVED REQUIREMENT -->
                                     <a href="phishing-game-lvl2.php" class="play-btn secondary">
-                                        <?php 
-                                        if($phishing_lvl1_score >= 3) {
-                                            echo $phishing_lvl2_score > 0 ? 'Level 2: ' . $phishing_lvl2_score . '/5' : 'Level 2: Intermediate';
-                                        } else {
-                                            echo 'Level 2: Locked';
-                                        }
-                                        ?>
+                                        <?php echo $phishing_lvl2_score > 0 ? 'Level 2: ' . $phishing_lvl2_score . '/5' : 'Level 2: Intermediate'; ?>
                                     </a>
                                     
                                     <!-- Level 3 -->
                                     <a href="#" class="play-btn tertiary coming-soon">
-                                        <?php 
-                                        if($phishing_lvl2_score >= 3) {
-                                            echo $phishing_lvl3_score > 0 ? 'Level 3: ' . $phishing_lvl3_score . '/5' : 'Level 3: Advanced';
-                                        } else {
-                                            echo 'Level 3: Coming Soon';
-                                        }
-                                        ?>
+                                        <?php echo 'Level 3: Coming Soon'; ?>
                                     </a>
                                 </div>
                                 
@@ -547,36 +535,20 @@ if($stmt = mysqli_prepare($link, $sql)) {
                             <div class="level-container">
                                 <div class="level-header">
                                     <div class="level-name">Phishing Level 2</div>
-                                    <div class="level-score">
-                                        <?php 
-                                        if($phishing_lvl1_score >= 3) {
-                                            echo $phishing_lvl2_score . '/5';
-                                        } else {
-                                            echo 'Locked (Complete Level 1)';
-                                        }
-                                        ?>
-                                    </div>
+                                    <div class="level-score"><?php echo $phishing_lvl2_score; ?>/5</div>
                                 </div>
                                 <div class="score-progress">
-                                    <div class="score-fill" style="width: <?php echo $phishing_lvl1_score >= 3 ? ($phishing_lvl2_score / 5) * 100 : 0; ?>%"></div>
+                                    <div class="score-fill" style="width: <?php echo ($phishing_lvl2_score / 5) * 100; ?>%"></div>
                                 </div>
                             </div>
                             
                             <div class="level-container">
                                 <div class="level-header">
                                     <div class="level-name">Phishing Level 3</div>
-                                    <div class="level-score">
-                                        <?php 
-                                        if($phishing_lvl2_score >= 3) {
-                                            echo $phishing_lvl3_score . '/5';
-                                        } else {
-                                            echo 'Coming Soon';
-                                        }
-                                        ?>
-                                    </div>
+                                    <div class="level-score">Coming Soon</div>
                                 </div>
                                 <div class="score-progress">
-                                    <div class="score-fill" style="width: <?php echo $phishing_lvl2_score >= 3 ? ($phishing_lvl3_score / 5) * 100 : 0; ?>%"></div>
+                                    <div class="score-fill" style="width: 0%;"></div>
                                 </div>
                             </div>
                         </div>
