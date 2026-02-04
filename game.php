@@ -369,7 +369,7 @@ if($stmt = mysqli_prepare($link, $sql)) {
                                     <div style="margin-bottom: 20px; width: 100%;">
                                         <div class="score-details">
                                             <span class="score-label">Your Score:</span>
-                                            <span class="score-value"><?php echo $phishing_score; ?>/5</span>
+                                            <span class="score-value"><?php echo $phishing_score; ?>/10</span>
                                         </div>
                                         <div class="score-progress">
                                             <div class="score-fill" style="width: <?php echo ($phishing_score / 5) * 100; ?>%"></div>
@@ -398,17 +398,9 @@ if($stmt = mysqli_prepare($link, $sql)) {
                         
                         <div class="score-item">
                             <div class="score-label">Phishing Detective Score</div>
-                            <div class="score-value"><?php echo $phishing_score; ?>/5</div>
+                            <div class="score-value"><?php echo $phishing_score; ?>/10</div>
                             <div class="score-progress">
                                 <div class="score-fill" style="width: <?php echo ($phishing_score / 5) * 100; ?>%"></div>
-                            </div>
-                        </div>
-                        
-                        <div class="score-item">
-                            <div class="score-label">Games Completed</div>
-                            <div class="score-value"><?php echo $games_completed; ?>/<?php echo $total_games; ?></div>
-                            <div class="score-progress">
-                                <div class="score-fill" style="width: <?php echo ($games_completed / $total_games) * 100; ?>%"></div>
                             </div>
                         </div>
                         
