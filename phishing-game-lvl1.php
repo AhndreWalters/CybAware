@@ -593,9 +593,9 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
                 
                 // Save score to database
                 $user_id = $_SESSION['id'];
-                $sql = "INSERT INTO game_scores (user_id, game_type, score, total_questions, completed_at) 
-                        VALUES (?, 'phishing_detective', ?, ?, NOW())
-                        ON DUPLICATE KEY UPDATE score = VALUES(score), completed_at = NOW()";
+                $sql = "INSERT INTO game_scores (user_id, game_type, score, total_questions, completed_at)
+                    VALUES (?, 'phishing_detective_lvl1', ?, ?, NOW())
+                    ON DUPLICATE KEY UPDATE score = VALUES(score), completed_at = NOW()";
                 
                 if($stmt = mysqli_prepare($link, $sql)) {
                     mysqli_stmt_bind_param($stmt, "iii", $user_id, $score, $total_questions);
