@@ -9,7 +9,7 @@ if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){
 
 require_once "config/database.php";
 
-// Get user's current score for level 2
+// Initialize variables
 $user_id = $_SESSION['id'];
 $current_score = 0;
 $clues_found = 0;
@@ -30,6 +30,21 @@ if($stmt = mysqli_prepare($link, $sql)) {
         $game_completed = ($current_score > 0);
     }
     mysqli_stmt_close($stmt);
+}
+
+// Handle reset request
+if(isset($_GET['reset'])) {
+    // Delete the score from database to reset the game
+    $delete_sql = "DELETE FROM game_scores WHERE user_id = ? AND game_type = 'phishing_detective_lvl2'";
+    if($stmt = mysqli_prepare($link, $delete_sql)) {
+        mysqli_stmt_bind_param($stmt, "i", $user_id);
+        mysqli_stmt_execute($stmt);
+        mysqli_stmt_close($stmt);
+    }
+    
+    // Redirect to reset the game
+    header("location: phishing-game-lvl2.php");
+    exit;
 }
 
 // Handle form submission for saving progress
@@ -72,7 +87,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action'])) {
     <title>Phishing Detective - Level 2 | CybAware</title>
     <link rel="stylesheet" href="css/styles.css">
     <style>
-        /* ===== LEVEL 2 STYLES (Matches Level 1 Design) ===== */
+        /* ===== LEVEL 2 STYLES ===== */
         .game-interface {
             max-width: 900px;
             margin: 0 auto;
@@ -252,7 +267,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action'])) {
             font-size: 1.05rem;
         }
         
-        /* Interactive Clue Styling - FIXED */
+        /* Interactive Clue Styling */
         .clue {
             cursor: pointer;
             transition: all 0.3s;
@@ -300,6 +315,17 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action'])) {
             z-index: 100;
         }
         
+        /* Incorrect clue styling */
+        .clue.incorrect.found {
+            background: #94a3b8 !important;
+            border-bottom: 2px solid #64748b !important;
+        }
+        
+        .clue.incorrect.found::after {
+            content: '❌';
+            border: 2px solid #64748b;
+        }
+        
         /* Game Info Area */
         .game-info {
             background: #f8fafc;
@@ -319,130 +345,6 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action'])) {
             color: #64748b;
             margin-bottom: 15px;
             font-size: 0.95rem;
-        }
-        
-        /* Feedback Area */
-        #feedback-area {
-            background: #f0f9ff;
-            border-radius: 8px;
-            padding: 20px;
-            margin-bottom: 20px;
-            border: 1px solid #0ea5e9;
-            min-height: 100px;
-        }
-        
-        #feedback-area h3 {
-            color: #0369a1;
-            margin-bottom: 10px;
-            font-size: 1.2rem;
-        }
-        
-        #feedback-text {
-            color: #334155;
-            font-size: 1rem;
-            line-height: 1.6;
-        }
-        
-        /* Clue Checklist */
-        .clue-checklist {
-            background: #f8fafc;
-            border-radius: 8px;
-            padding: 20px;
-            margin-bottom: 20px;
-            border: 1px solid #e2e8f0;
-            max-height: 300px;
-            overflow-y: auto;
-        }
-        
-        .clue-checklist h3 {
-            color: #1e40af;
-            margin-bottom: 15px;
-            font-size: 1.2rem;
-            position: sticky;
-            top: 0;
-            background: #f8fafc;
-            padding: 5px 0;
-            z-index: 10;
-        }
-        
-        #clue-list {
-            columns: 2;
-            gap: 15px;
-            list-style: none;
-            padding: 0;
-        }
-        
-        #clue-list li {
-            background: white;
-            border-radius: 6px;
-            padding: 12px;
-            margin-bottom: 10px;
-            break-inside: avoid;
-            border-left: 4px solid #3b82f6;
-            transition: all 0.3s;
-            opacity: 0.6;
-        }
-        
-        #clue-list li.found {
-            background: #f0fdf4;
-            border-left-color: #10b981;
-            opacity: 1;
-            transform: translateX(5px);
-        }
-        
-        #clue-list li strong {
-            display: block;
-            color: #374151;
-            margin-bottom: 5px;
-            font-size: 0.9rem;
-        }
-        
-        #clue-list li em {
-            display: block;
-            color: #6b7280;
-            font-size: 0.85rem;
-            margin-bottom: 5px;
-        }
-        
-        #clue-list li .points {
-            float: right;
-            color: #10b981;
-            font-weight: 600;
-            font-size: 0.9rem;
-        }
-        
-        /* Action Buttons */
-        .action-buttons {
-            display: flex;
-            gap: 15px;
-            justify-content: center;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-        }
-        
-        .action-btn {
-            padding: 14px 25px;
-            border: 2px solid;
-            border-radius: 8px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            min-width: 150px;
-            text-align: center;
-            box-sizing: border-box;
-        }
-        
-        #hint-btn {
-            background: #fef3c7;
-            color: #92400e;
-            border-color: #f59e0b;
-        }
-        
-        #hint-btn:hover {
-            background: #fde68a;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(245, 158, 11, 0.2);
         }
         
         /* Submit Button */
@@ -479,6 +381,19 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action'])) {
             cursor: not-allowed;
             transform: none;
             box-shadow: none;
+        }
+        
+        /* Penalty Message */
+        .penalty-message {
+            background: #fee2e2;
+            border: 1px solid #fecaca;
+            border-radius: 6px;
+            padding: 10px 15px;
+            margin-top: 10px;
+            color: #dc2626;
+            font-size: 0.9rem;
+            display: none;
+            text-align: center;
         }
         
         /* Completion Screen */
@@ -602,16 +517,12 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action'])) {
                 font-size: 13px;
             }
             
-            #clue-list {
-                columns: 1;
-            }
-            
             .completion-actions {
                 flex-direction: column;
                 align-items: center;
             }
             
-            .nav-btn, .action-btn, .submit-btn {
+            .nav-btn, .submit-btn {
                 width: 100%;
                 max-width: 300px;
                 text-align: center;
@@ -664,18 +575,19 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action'])) {
             <div class="game-interface">
                 <div class="game-header">
                     <h1>Phishing Detective - Level 2</h1>
-                    <p>Advanced email inspection: Click on suspicious elements to find phishing clues</p>
+                    <p>Expert level: Identify real phishing clues among decoys</p>
                 </div>
                 
                 <div class="score-display">
                     Score: <?php echo $current_score; ?>/140 
-                    | Clues Found: <?php echo $clues_found; ?>/14
+                    | Correct: <?php echo $clues_found; ?>/14
+                    | Penalty: <span id="penalty-count">0</span> incorrect selections
                 </div>
                 
                 <?php if($game_completed): ?>
                     <!-- Completion Screen -->
                     <div class="completion-screen">
-                        <h2>🎉 Level Complete!</h2>
+                        <h2>Level Complete!</h2>
                         <div class="score-result">
                             You scored <?php echo $current_score; ?> out of 140 points.
                         </div>
@@ -683,11 +595,11 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action'])) {
                         <?php
                         $percentage = ($current_score / 140) * 100;
                         if($percentage >= 80) {
-                            echo '<p style="color: #059669; font-weight: 600; font-size: 1.1rem; margin-bottom: 20px;">Excellent! You have expert-level phishing detection skills.</p>';
+                            echo '<p style="color: #059669; font-weight: 600; font-size: 1.1rem; margin-bottom: 20px;">Excellent! You can distinguish real threats from false alarms.</p>';
                         } elseif($percentage >= 60) {
-                            echo '<p style="color: #d97706; font-weight: 600; font-size: 1.1rem; margin-bottom: 20px;">Good job! You can identify most advanced phishing techniques.</p>';
+                            echo '<p style="color: #d97706; font-weight: 600; font-size: 1.1rem; margin-bottom: 20px;">Good job! You identified most real threats.</p>';
                         } else {
-                            echo '<p style="color: #dc2626; font-weight: 600; font-size: 1.1rem; margin-bottom: 20px;">Keep practicing! Review the clues to improve your skills.</p>';
+                            echo '<p style="color: #dc2626; font-weight: 600; font-size: 1.1rem; margin-bottom: 20px;">Keep practicing! Focus on identifying genuine phishing indicators.</p>';
                         }
                         ?>
                         
@@ -699,9 +611,10 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action'])) {
                 <?php else: ?>
                     <!-- Game Information -->
                     <div class="game-info">
-                        <h3>How to Play:</h3>
-                        <p><strong>Click on suspicious elements</strong> in the email below to find phishing clues. Each clue is worth 10 points. Find all 14 clues to get a perfect score!</p>
-                        <p><strong>Hint:</strong> Look for spelling errors, character substitutions (like using "1" instead of "l"), grammar mistakes, and suspicious content.</p>
+                        <h3>⚠️ Expert Challenge:</h3>
+                        <p><strong>Warning:</strong> Not all suspicious-looking elements are actual phishing clues. Some are normal text or legitimate elements.</p>
+                        <p><strong>How to Play:</strong> Click <strong>ONLY</strong> on genuine phishing clues. Each correct clue is worth 10 points.</p>
+                        <p><strong>Penalty:</strong> Clicking on incorrect elements reduces your score by 5 points each.</p>
                     </div>
                     
                     <!-- Email Content -->
@@ -742,56 +655,53 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action'])) {
                         <div class="email-body">
                             <h2>Subject: <span class="clue" data-id="1" data-info="Spelling error: 'Congradulations' should be 'Congratulations'">Congradulations</span>! You've Won with <span class="clue" data-id="2" data-info="Character substitution: 'Digice1' uses number 1 instead of letter l">Digice1</span></h2>
                             <p><span class="clue" data-id="3" data-info="Grammar error: 'Madman' instead of 'Madam'">Dear Sir/Madman</span></p>
-                            <p>We have some exciting news!</p>
+                            <p>We have some <span class="clue incorrect" data-id="101" data-info="Normal emphasis text - NOT a phishing clue">exciting news</span>!</p>
+                            
                             <p>You have been selected as a winner in our recent <span class="clue" data-id="4" data-info="Spelling error: 'promotianal' should be 'promotional'">promotianal</span> giveaway. We are <span class="clue" data-id="5" data-info="Grammar error: 'delight to rewarding' should be 'delighted to reward'">delight to rewarding</span> you for being a part of the <span class="clue" data-id="6" data-info="Social engineering: 'Digicel family' emotional manipulation">Digicel family</span> and participating in our latest event.</p>
+                            
+                            <p><span class="clue incorrect" data-id="102" data-info="Normal promotional language - NOT a phishing clue">Thank you for your continued support</span> as a valued customer.</p>
+                            
                             <hr>
-                            <h3>Your Prize Details</h3>
+                            <h3>Your <span class="clue incorrect" data-id="103" data-info="Normal header text - NOT a phishing clue">Prize Details</span></h3>
                             <p>You have won: <span class="clue" data-id="7" data-info="Fake product: 'Apple lphone 18' doesn't exist">Apple lphone 18</span></p>
+                            
                             <p>To ensure you receive your prize <span class="clue" data-id="8" data-info="Urgency tactic: 'as quickly as possible' pressures victim">as quickly as possible</span>, please take note of the following information:</p>
+                            
                             <ul>
-                                <li><strong>Verification:</strong> You may be asked to provide a valid photo <span class="clue" data-id="9" data-info="Character substitution: 'lD' uses lowercase L instead of I">lD</span> and proof of your Digicel mobile number.</li>
-                                <li><strong>Next Steps:</strong> Simply reply to this email or visit your nearest Digicel flagship store. <span class="clue" data-id="10" data-info="Vague instructions: no official contact or process">[no official link or address]</span></li>
+                                <strong>Verification:</strong> You may be asked to provide a valid photo <span class="clue" data-id="9" data-info="Character substitution: 'lD' uses lowercase L instead of I">lD</span> and proof of your Digicel mobile number.
+                                <strong>Next Steps:</strong> Simply reply to this email or visit your nearest <span class="clue incorrect" data-id="104" data-info="Legitimate store reference - NOT a phishing clue">Digicel flagship store</span>. <span class="clue" data-id="10" data-info="Vague instructions: no official contact or process">[no official link or address]</span>
+                                <strong>Claim Period:</strong> You have <span class="clue incorrect" data-id="105" data-info="Normal time frame - NOT a phishing clue">30 days</span> to claim your prize.
                             </ul>
+                            
                             <hr>
                             <h3>Stay Safe <span class="clue" data-id="11" data-info="Character substitution: '0nline' uses zero instead of O">0nline</span></h3>
-                            <p>Please remember that <span class="clue" data-id="12" data-info="Contradictory security: implies Digicel WILL ask for sensitive info">Digicel will ask you for your bank account details, PINs, or to send us mobile credit</span> in order to claim a prize. Your security is our priority.</p>
+                            
+                            <p>Please remember that <span class="clue" data-id="12" data-info="Contradictory security: implies Digicel WILL ask for sensitive info">Digicel will ask you for your bank account details, PINs, or to send us mobile credit</span> in order to claim a prize. Your security is <span class="clue incorrect" data-id="106" data-info="Normal security statement - NOT a phishing clue">our priority</span>.</p>
+                            
+                            <p>Always verify communications through <span class="clue incorrect" data-id="107" data-info="Normal security advice - NOT a phishing clue">official channels</span> before sharing personal information.</p>
+                            
                             <hr>
                             <p>Congratulations once again on your win! We look forward to hearing from you soon.</p>
-                            <p>Warm regards,</p>
+                            
+                            <p><span class="clue incorrect" data-id="108" data-info="Normal closing phrase - NOT a phishing clue">Warm regards</span>,</p>
+                            
                             <p>The <span class="clue" data-id="13" data-info="Character substitution: 'DigiceI' uses capital I instead of lowercase l">DigiceI</span> Team</p>
+                            
                             <p class="clue" data-id="14" data-info="Missing corporate info: no address, phone, links, or footer">[No corporate address, phone, or links provided]</p>
+                            
+                            <p><em><span class="clue incorrect" data-id="109" data-info="Normal disclaimer text - NOT a phishing clue">This is an automated message. Please do not reply to this email.</span></em></p>
                         </div>
                     </div>
                     
-                    <!-- Feedback Area -->
-                    <div id="feedback-area">
-                        <h3>📝 Clue Feedback</h3>
-                        <div id="feedback-text">
-                            <?php if($clues_found > 0): ?>
-                                You've found <?php echo $clues_found; ?> clues so far. Click on more suspicious elements!
-                            <?php else: ?>
-                                Click on suspicious elements in the email to find phishing clues.
-                            <?php endif; ?>
-                        </div>
-                    </div>
-                    
-                    <!-- Clue Checklist -->
-                    <div class="clue-checklist">
-                        <h3>🔍 Clue Checklist (14 Total)</h3>
-                        <ul id="clue-list">
-                            <!-- Populated by JavaScript -->
-                        </ul>
-                    </div>
-                    
-                    <!-- Action Buttons -->
-                    <div class="action-buttons">
-                        <button id="hint-btn" class="action-btn">💡 Get a Hint</button>
+                    <!-- Penalty Message -->
+                    <div class="penalty-message" id="penalty-message">
+                        ⚠️ Penalty applied: -5 points for incorrect selection
                     </div>
                     
                     <!-- Game Controls -->
                     <div class="game-controls">
                         <button id="submit-btn" class="submit-btn" <?php echo $clues_found == 0 ? 'disabled' : ''; ?>>
-                            ✅ Submit Score (<?php echo $clues_found; ?>/14 clues)
+                            Submit Score
                         </button>
                     </div>
                 <?php endif; ?>
@@ -803,7 +713,8 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action'])) {
     
     <script>
         // Game Configuration
-        const clues = [
+        // CORRECT clues (14 total)
+        const correctClues = [
             { id: 1, text: "Congradulations", info: "Spelling error: 'Congradulations' should be 'Congratulations'", category: "Spelling Error", points: 10 },
             { id: 2, text: "Digice1", info: "Character substitution: 'Digice1' uses number 1 instead of letter l", category: "Character Substitution", points: 10 },
             { id: 3, text: "Dear Sir/Madman", info: "Grammar error: 'Madman' instead of 'Madam'", category: "Grammar Error", points: 10 },
@@ -820,44 +731,45 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action'])) {
             { id: 14, text: "[No corporate address, phone, or links provided]", info: "Missing corporate info: no address, phone, links, or footer", category: "Missing Corporate Info", points: 10 }
         ];
         
+        // INCORRECT clues (9 decoys)
+        const incorrectClues = [
+            { id: 101, text: "exciting news", info: "Normal emphasis text - NOT a phishing clue", category: "Decoy" },
+            { id: 102, text: "Thank you for your continued support", info: "Normal promotional language - NOT a phishing clue", category: "Decoy" },
+            { id: 103, text: "Prize Details", info: "Normal header text - NOT a phishing clue", category: "Decoy" },
+            { id: 104, text: "Digicel flagship store", info: "Legitimate store reference - NOT a phishing clue", category: "Decoy" },
+            { id: 105, text: "30 days", info: "Normal time frame - NOT a phishing clue", category: "Decoy" },
+            { id: 106, text: "our priority", info: "Normal security statement - NOT a phishing clue", category: "Decoy" },
+            { id: 107, text: "official channels", info: "Normal security advice - NOT a phishing clue", category: "Decoy" },
+            { id: 108, text: "Warm regards", info: "Normal closing phrase - NOT a phishing clue", category: "Decoy" },
+            { id: 109, text: "This is an automated message. Please do not reply to this email.", info: "Normal disclaimer text - NOT a phishing clue", category: "Decoy" }
+        ];
+        
         // Game State
         let score = <?php echo $current_score; ?>;
-        let foundClues = new Set(<?php echo $clues_found > 0 ? json_encode(range(1, $clues_found)) : '[]'; ?>);
-        const totalClues = 14;
+        let foundCorrectClues = new Set(<?php echo $clues_found > 0 ? json_encode(range(1, $clues_found)) : '[]'; ?>);
+        let foundIncorrectClues = new Set();
+        const penaltyPerMistake = 5;
+        let penaltyCount = 0;
+        const totalCorrectClues = 14;
+        const totalClues = 23; // 14 correct + 9 incorrect
         const maxScore = 140;
         
         // DOM Elements
-        const feedbackText = document.getElementById('feedback-text');
-        const clueListEl = document.getElementById('clue-list');
-        const hintBtn = document.getElementById('hint-btn');
         const submitBtn = document.getElementById('submit-btn');
+        const penaltyCountEl = document.getElementById('penalty-count');
+        const penaltyMessage = document.getElementById('penalty-message');
         
         // Initialize Game
         function initGame() {
-            // Mark already found clues from PHP session
-            document.querySelectorAll('.clue').forEach(clueEl => {
+            // Mark already found correct clues from PHP session
+            document.querySelectorAll('.clue:not(.incorrect)').forEach(clueEl => {
                 const clueId = parseInt(clueEl.getAttribute('data-id'));
-                if (foundClues.has(clueId)) {
+                if (foundCorrectClues.has(clueId)) {
                     clueEl.classList.add('found');
                 }
             });
             
-            // Populate clue checklist
-            clues.forEach(clue => {
-                const li = document.createElement('li');
-                li.id = `clue-item-${clue.id}`;
-                li.innerHTML = `
-                    <strong>Clue #${clue.id}: ${clue.category}</strong>
-                    <em>${clue.info}</em>
-                    <span class="points">+10 pts</span>
-                `;
-                if (foundClues.has(clue.id)) {
-                    li.classList.add('found');
-                }
-                clueListEl.appendChild(li);
-            });
-            
-            // Add click listeners to clues
+            // Add click listeners to ALL clues
             document.querySelectorAll('.clue').forEach(clueEl => {
                 clueEl.addEventListener('click', handleClueClick);
                 clueEl.addEventListener('mouseenter', function() {
@@ -874,12 +786,11 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action'])) {
                 });
             });
             
-            // Button event listeners
-            hintBtn.addEventListener('click', giveHint);
+            // Button event listener
             submitBtn.addEventListener('click', submitScore);
             
-            // Update submit button
-            updateSubmitButton();
+            // Update UI
+            updateUI();
         }
         
         // Handle clue click
@@ -887,124 +798,110 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action'])) {
             const clueEl = event.currentTarget;
             const clueId = parseInt(clueEl.getAttribute('data-id'));
             
-            // If already found, show message
-            if (foundClues.has(clueId)) {
-                showFeedback(`Already found! You already flagged this clue.`, 'info');
-                return;
-            }
-            
-            // Mark as found
-            foundClues.add(clueId);
-            clueEl.classList.add('found');
-            
-            // Update score (10 points per clue)
-            score += 10;
-            
-            // Find clue info
-            const clue = clues.find(c => c.id === clueId);
-            
-            // Show feedback
-            showFeedback(`
-                <strong>✅ Found Clue #${clue.id}: "${clue.text}"</strong><br>
-                <em>${clue.category}</em>: ${clue.info}<br>
-                <small>+10 points! Total: ${score}/${maxScore}</small>
-            `, 'success');
-            
-            // Mark in checklist
-            const checklistItem = document.getElementById(`clue-item-${clueId}`);
-            if (checklistItem) {
-                checklistItem.classList.add('found');
-                checklistItem.style.animation = 'none';
-                checklistItem.offsetHeight; // Trigger reflow
-                checklistItem.style.animation = 'fadeIn 0.5s ease';
-            }
-            
-            // Update submit button
-            updateSubmitButton();
-            
-            // Check if all clues found
-            if (foundClues.size === totalClues) {
-                showFeedback(`
-                    <strong>🎉 All clues found!</strong><br>
-                    You found all ${totalClues} phishing clues!<br>
-                    Final Score: <strong>${score}/${maxScore}</strong> points<br>
-                    <em>Click "Submit Score" to save your progress.</em>
-                `, 'success');
-            }
-            
-            // Add celebration effect for all clues found
-            if (foundClues.size === totalClues) {
-                celebrateAllCluesFound();
-            }
-        }
-        
-        // Show feedback message
-        function showFeedback(message, type = 'info') {
-            const feedbackArea = document.getElementById('feedback-area');
-            feedbackText.innerHTML = message;
-            
-            // Update feedback area style based on type
-            feedbackArea.style.borderColor = type === 'success' ? '#10b981' : 
-                                           type === 'error' ? '#dc2626' : 
-                                           type === 'info' ? '#0ea5e9' : '#d1d5db';
-            feedbackArea.style.backgroundColor = type === 'success' ? '#f0fdf4' : 
-                                               type === 'error' ? '#fef2f2' : 
-                                               type === 'info' ? '#f0f9ff' : '#f8fafc';
-        }
-        
-        // Update submit button text and state
-        function updateSubmitButton() {
-            if (submitBtn) {
-                submitBtn.textContent = `✅ Submit Score (${foundClues.size}/${totalClues} clues)`;
-                submitBtn.disabled = foundClues.size === 0;
-            }
-        }
-        
-        // Give hint
-        function giveHint() {
-            const unfoundClues = clues.filter(clue => !foundClues.has(clue.id));
-            
-            if (unfoundClues.length === 0) {
-                showFeedback(`<strong>🎉 All clues found!</strong> No hints needed.`, 'success');
-                return;
-            }
-            
-            const randomClue = unfoundClues[Math.floor(Math.random() * unfoundClues.length)];
-            showFeedback(`
-                <strong>💡 Hint:</strong> Look for "<em>${randomClue.text}</em>"<br>
-                <small>Category: ${randomClue.category}</small>
-            `, 'info');
-            
-            // Briefly highlight the clue
-            const clueEl = document.querySelector(`.clue[data-id="${randomClue.id}"]`);
-            if (clueEl && !clueEl.classList.contains('found')) {
-                const originalBorder = clueEl.style.borderBottom;
-                clueEl.style.borderBottom = '3px solid #ff9800';
-                clueEl.style.boxShadow = '0 0 15px rgba(255, 152, 0, 0.5)';
+            // Check if already found
+            if (clueEl.classList.contains('found')) {
+                // Allow toggling off
+                clueEl.classList.remove('found');
+                if (clueEl.classList.contains('incorrect')) {
+                    foundIncorrectClues.delete(clueId);
+                    // Remove penalty for unselecting incorrect clue
+                    score += penaltyPerMistake;
+                    penaltyCount = Math.max(0, penaltyCount - 1);
+                } else {
+                    foundCorrectClues.delete(clueId);
+                    score -= 10; // Remove points for correct clue
+                }
+            } else {
+                // Mark as found
+                clueEl.classList.add('found');
                 
-                // Pulse animation
-                clueEl.style.animation = 'pulse 1s ease-in-out 2';
-                
-                setTimeout(() => {
-                    if (!clueEl.classList.contains('found')) {
-                        clueEl.style.borderBottom = originalBorder;
-                        clueEl.style.boxShadow = '';
+                if (clueEl.classList.contains('incorrect')) {
+                    // User clicked on an incorrect clue (decoy)
+                    foundIncorrectClues.add(clueId);
+                    score = Math.max(0, score - penaltyPerMistake); // Apply penalty, don't go below 0
+                    penaltyCount++;
+                    
+                    // Show penalty message
+                    showPenaltyMessage();
+                } else {
+                    // User clicked on a correct clue
+                    foundCorrectClues.add(clueId);
+                    score += 10; // Add points for correct clue
+                    
+                    // Brief success animation
+                    clueEl.style.animation = 'successFlash 0.5s ease-in-out';
+                    setTimeout(() => {
                         clueEl.style.animation = '';
-                    }
-                }, 2000);
+                    }, 500);
+                }
+            }
+            
+            // Update UI
+            updateUI();
+            
+            // Check if all correct clues found
+            if (foundCorrectClues.size === totalCorrectClues) {
+                celebrateAllCorrectCluesFound();
+            }
+        }
+        
+        // Show penalty message
+        function showPenaltyMessage() {
+            penaltyMessage.style.display = 'block';
+            penaltyMessage.style.animation = 'fadeIn 0.3s ease-in-out';
+            
+            setTimeout(() => {
+                penaltyMessage.style.animation = 'fadeOut 0.5s ease-in-out forwards';
+                setTimeout(() => {
+                    penaltyMessage.style.display = 'none';
+                    penaltyMessage.style.animation = '';
+                }, 500);
+            }, 2000);
+        }
+        
+        // Update UI elements
+        function updateUI() {
+            // Update submit button - only enable/disable, keep text as "Submit Score"
+            if (submitBtn) {
+                submitBtn.disabled = foundCorrectClues.size === 0;
+                // Keep the text as "Submit Score" - don't update it
+            }
+            
+            // Update penalty count display
+            if (penaltyCountEl) {
+                penaltyCountEl.textContent = penaltyCount;
+                if (penaltyCount > 0) {
+                    penaltyCountEl.style.color = '#dc2626';
+                    penaltyCountEl.style.fontWeight = 'bold';
+                } else {
+                    penaltyCountEl.style.color = '';
+                    penaltyCountEl.style.fontWeight = '';
+                }
+            }
+            
+            // Update score display in header
+            const scoreDisplay = document.querySelector('.score-display');
+            if (scoreDisplay) {
+                scoreDisplay.innerHTML = `
+                    Score: ${score}/140 
+                    | Correct: ${foundCorrectClues.size}/${totalCorrectClues}
+                    | Penalty: <span id="penalty-count">${penaltyCount}</span> incorrect selections
+                `;
+                // Re-attach event listeners to the new penalty count element
+                penaltyCountEl = document.getElementById('penalty-count');
             }
         }
         
         // Submit score to server
         async function submitScore() {
-            if (foundClues.size === 0) {
-                showFeedback(`<strong style="color: #dc2626;">Please find at least one clue before submitting!</strong>`, 'error');
+            if (foundCorrectClues.size === 0) {
+                alert('Please find at least one correct clue before submitting!');
                 return;
             }
             
             // Disable button and show loading
             submitBtn.disabled = true;
-            submitBtn.innerHTML = '⏳ Saving...';
+            submitBtn.innerHTML = 'Saving...';
             
             try {
                 const response = await fetch('phishing-game-lvl2.php', {
@@ -1018,43 +915,60 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action'])) {
                 const result = await response.json();
                 
                 if (result.success) {
-                    showFeedback(`
-                        <strong>✅ Score saved successfully!</strong><br>
-                        <strong>Final Score:</strong> ${score}/${maxScore}<br>
-                        <strong>Clues Found:</strong> ${foundClues.size}/14<br>
-                        <em>Redirecting...</em>
-                    `, 'success');
-                    
-                    // Reload page after 2 seconds to show completion screen
-                    setTimeout(() => {
-                        window.location.href = 'phishing-game-lvl2.php';
-                    }, 2000);
+                    // Reload page to show completion screen
+                    window.location.href = 'phishing-game-lvl2.php';
                 } else {
-                    showFeedback(`<strong style="color: #dc2626;">Error saving score. Please try again.</strong>`, 'error');
+                    alert('Error saving score. Please try again.');
                     submitBtn.disabled = false;
-                    submitBtn.innerHTML = `✅ Submit Score (${foundClues.size}/${totalClues} clues)`;
+                    submitBtn.innerHTML = 'Submit Score';
                 }
             } catch (error) {
-                showFeedback(`<strong style="color: #dc2626;">Network error. Please check your connection.</strong>`, 'error');
+                alert('Network error. Please check your connection.');
                 submitBtn.disabled = false;
-                submitBtn.innerHTML = `✅ Submit Score (${foundClues.size}/${totalClues} clues)`;
+                submitBtn.innerHTML = 'Submit Score';
             }
         }
         
-        // Celebration effect for all clues found
-        function celebrateAllCluesFound() {
-            // Add celebration animation to all found clues
-            document.querySelectorAll('.clue.found').forEach(clue => {
+        // Celebration effect for all correct clues found
+        function celebrateAllCorrectCluesFound() {
+            // Add celebration animation to all found correct clues
+            document.querySelectorAll('.clue.found:not(.incorrect)').forEach(clue => {
                 clue.style.animation = 'bounce 0.5s ease-in-out 3';
             });
             
+            // Show celebration message
+            const celebrationMsg = document.createElement('div');
+            celebrationMsg.style.cssText = `
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                background: #10b981;
+                color: white;
+                padding: 20px 30px;
+                border-radius: 10px;
+                font-weight: bold;
+                font-size: 1.2rem;
+                z-index: 10000;
+                box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+                animation: popIn 0.5s ease-out;
+            `;
+            celebrationMsg.textContent = '🎉 All correct clues found! Submit your score!';
+            document.body.appendChild(celebrationMsg);
+            
             // Add confetti effect
             createConfetti();
+            
+            // Remove message after 3 seconds
+            setTimeout(() => {
+                celebrationMsg.style.animation = 'fadeOut 0.5s ease-in-out forwards';
+                setTimeout(() => celebrationMsg.remove(), 500);
+            }, 3000);
         }
         
         // Simple confetti effect
         function createConfetti() {
-            const colors = ['#ff6b6b', '#4ecdc4', '#ffd166', '#06d6a0', '#118ab2'];
+            const colors = ['#10b981', '#3b82f6', '#8b5cf6', '#ef4444', '#f59e0b'];
             
             for (let i = 0; i < 50; i++) {
                 setTimeout(() => {
@@ -1085,20 +999,30 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action'])) {
         // Add CSS animations
         const style = document.createElement('style');
         style.textContent = `
-            @keyframes pulse {
-                0% { transform: scale(1); }
-                50% { transform: scale(1.05); }
-                100% { transform: scale(1); }
-            }
-            
             @keyframes bounce {
                 0%, 100% { transform: translateY(0); }
                 50% { transform: translateY(-10px); }
             }
             
             @keyframes fadeIn {
-                from { opacity: 0; transform: translateY(10px); }
-                to { opacity: 1; transform: translateY(0); }
+                from { opacity: 0; }
+                to { opacity: 1; }
+            }
+            
+            @keyframes fadeOut {
+                from { opacity: 1; }
+                to { opacity: 0; }
+            }
+            
+            @keyframes successFlash {
+                0%, 100% { background-color: #ff6b6b; }
+                50% { background-color: #4ade80; }
+            }
+            
+            @keyframes popIn {
+                0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+                70% { transform: translate(-50%, -50%) scale(1.1); }
+                100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
             }
         `;
         document.head.appendChild(style);

@@ -17,7 +17,7 @@ $phishing_lvl2_score = 0;
 $phishing_lvl3_score = 0;
 $games_completed = 0;
 $total_games = 4; // Password Fortress + 3 Phishing levels
-$can_download_certificate = false;
+$can_download_certificate = true; // Always allow certificate access
 
 // Fetch scores from database
 $sql = "SELECT game_type, score, total_questions FROM game_scores WHERE user_id = ?";
@@ -43,21 +43,6 @@ if($stmt = mysqli_prepare($link, $sql)) {
         }
     }
     mysqli_stmt_close($stmt);
-    
-    // Check if user can download certificate (all 4 games completed)
-    if($games_completed == $total_games) {
-        $can_download_certificate = true;
-        // Calculate overall score based on actual max scores
-        $overall_score = $password_score + $phishing_lvl1_score + $phishing_lvl2_score + $phishing_lvl3_score;
-        
-        // Max scores based on your game designs:
-        // Password Fortress: 5 questions
-        // Phishing Level 1: 10 questions
-        // Phishing Level 2: 14 clues × 10 points = 140
-        // Phishing Level 3: Not implemented yet
-        $max_total_score = 5 + 10 + 140 + 0; // 155 total max score (excluding level 3)
-        $percentage = ($overall_score / $max_total_score) * 100;
-    }
 }
 ?>
 <!DOCTYPE html>
@@ -156,23 +141,27 @@ if($stmt = mysqli_prepare($link, $sql)) {
         
         .play-btn {
             display: inline-block;
-            padding: 12px 25px;
+            padding: 16px 30px; /* Bigger padding */
             background: linear-gradient(to right, #1e40af, #1e3a8a);
             color: white;
-            border-radius: 6px;
+            border-radius: 8px; /* Slightly larger radius */
             text-decoration: none;
             font-weight: 600;
             transition: all 0.3s;
             width: 100%;
-            max-width: 180px;
+            max-width: 220px; /* Larger max width */
             text-align: center;
-            margin: 5px;
-            font-size: 0.9rem;
+            margin: 8px;
+            font-size: 1rem; /* Larger font size */
+            min-height: 60px; /* Consistent minimum height */
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         
         .play-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(30, 64, 175, 0.3);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 18px rgba(30, 64, 175, 0.3);
         }
 
         .play-btn.coming-soon {
@@ -189,8 +178,8 @@ if($stmt = mysqli_prepare($link, $sql)) {
         .level-buttons {
             display: flex;
             flex-direction: column;
-            gap: 10px;
-            margin-top: 10px;
+            gap: 15px; /* Increased gap */
+            margin-top: 15px;
             width: 100%;
             align-items: center;
         }
@@ -273,18 +262,6 @@ if($stmt = mysqli_prepare($link, $sql)) {
             box-shadow: 0 5px 15px rgba(255, 255, 255, 0.2);
         }
         
-        .certificate-btn.disabled {
-            background: #cbd5e1;
-            color: #64748b;
-            cursor: not-allowed;
-            opacity: 0.7;
-        }
-        
-        .certificate-btn.disabled:hover {
-            transform: none;
-            box-shadow: none;
-        }
-        
         .games-completed {
             text-align: center;
             margin: 20px 0;
@@ -343,14 +320,13 @@ if($stmt = mysqli_prepare($link, $sql)) {
             }
             
             .level-buttons {
-                flex-direction: row;
-                justify-content: center;
-                flex-wrap: wrap;
+                flex-direction: column;
+                align-items: center;
             }
             
             .play-btn {
-                max-width: 150px;
-                margin: 5px;
+                max-width: 200px;
+                margin: 8px 0;
             }
         }
         
@@ -417,6 +393,32 @@ if($stmt = mysqli_prepare($link, $sql)) {
             color: #059669;
             font-size: 0.9rem;
         }
+        
+        /* Password Game Button */
+        .password-game-btn {
+            display: inline-block;
+            padding: 16px 30px;
+            background: linear-gradient(to right, #1e40af, #1e3a8a);
+            color: white;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+            width: 100%;
+            max-width: 220px;
+            text-align: center;
+            margin: 8px;
+            font-size: 1rem;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .password-game-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 18px rgba(30, 64, 175, 0.3);
+        }
     </style>
 </head>
 <body>
@@ -427,7 +429,7 @@ if($stmt = mysqli_prepare($link, $sql)) {
             <div class="game-container">
                 <div class="game-header">
                     <h1>Cybersecurity Missions</h1>
-                    <p>Complete all missions to earn your cybersecurity awareness certificate.</p>
+                    <p>Complete missions and download your certificate anytime.</p>
                 </div>
                 
                 <div class="dashboard">
@@ -439,8 +441,8 @@ if($stmt = mysqli_prepare($link, $sql)) {
                                 <h2>Password Fortress</h2>
                                 <p>Learn what makes a strong password and avoid common security mistakes. Test your knowledge with 5 challenging questions.</p>
                                 
-                                <a href="password-game.php" class="play-btn">
-                                    <?php echo $password_score > 0 ? 'Play Again' : 'Start Mission'; ?>
+                                <a href="password-game.php" class="password-game-btn">
+                                    Start Mission
                                 </a>
                             </div>
                         </div>
@@ -455,17 +457,17 @@ if($stmt = mysqli_prepare($link, $sql)) {
                                 <div class="level-buttons">
                                     <!-- Level 1 -->
                                     <a href="phishing-game-lvl1.php" class="play-btn">
-                                        Level 1: <?php echo $phishing_lvl1_score > 0 ? 'Completed' : 'Beginner'; ?>
+                                        Level 1
                                     </a>
                                     
                                     <!-- Level 2 -->
                                     <a href="phishing-game-lvl2.php" class="play-btn">
-                                        Level 2: <?php echo $phishing_lvl2_score > 0 ? 'Completed' : 'Intermediate'; ?>
+                                        Level 2
                                     </a>
                                     
                                     <!-- Level 3 -->
                                     <a href="#" class="play-btn coming-soon">
-                                        Level 3: Coming Soon
+                                        Level 3
                                     </a>
                                 </div>
                             </div>
@@ -526,25 +528,14 @@ if($stmt = mysqli_prepare($link, $sql)) {
                             </div>
                         </div>
                         
-                        <?php if($can_download_certificate): ?>
-                            <div class="certificate-section">
-                                <h3>Certificate Ready!</h3>
-                                <p>Congratulations! You've completed all cybersecurity missions with a score of <?php echo $overall_score; ?>/155 (<?php echo round($percentage); ?>%).</p>
-                                <p>Download your certificate to showcase your cybersecurity awareness skills.</p>
-                                <a href="certificate.php" class="certificate-btn">
-                                    Download Certificate
-                                </a>
-                            </div>
-                        <?php else: ?>
-                            <div class="certificate-section" style="background: linear-gradient(135deg, #64748b, #475569);">
-                                <h3>Certificate Locked</h3>
-                                <p>Complete all missions to unlock your cybersecurity awareness certificate.</p>
-                                <p>You need to complete <?php echo ($total_games - $games_completed); ?> more game<?php echo ($total_games - $games_completed) == 1 ? '' : 's'; ?>.</p>
-                                <span class="certificate-btn disabled">
-                                    Complete All Missions
-                                </span>
-                            </div>
-                        <?php endif; ?>
+                        <!-- Certificate Section - Always accessible -->
+                        <div class="certificate-section">
+                            <h3>Your Certificate</h3>
+                            <p>Download your cybersecurity awareness certificate anytime to showcase your progress.</p>
+                            <a href="certificate.php" class="certificate-btn">
+                                Download Certificate
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>

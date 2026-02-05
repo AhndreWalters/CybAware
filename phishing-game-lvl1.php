@@ -617,7 +617,7 @@ if(isset($_GET['reset'])) {
     unset($_SESSION['phishing_question']);
     $score = 0;
     $current_question = 1;
-    header("location: phishing-game.php");
+    header("location: phishing-game-lvl1.php");
     exit;
 }
 
@@ -641,7 +641,7 @@ if($current_question > $total_questions && !$game_completed) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="shortcut icon" href="images/ui-icon-social-engineering.png" type="image/x-icon">
-    <title>Phishing Detective | CybAware</title>
+    <title>Phishing Detective - Level 1 | CybAware</title>
     <link rel="stylesheet" href="css/styles.css">
     <style>
         .game-interface {
@@ -1136,7 +1136,7 @@ if($current_question > $total_questions && !$game_completed) {
         <div class="main-content">
             <div class="game-interface">
                 <div class="game-header">
-                    <h1>Phishing Detective</h1>
+                    <h1>Phishing Detective - Level 1</h1>
                     <p>Analyze emails and identify phishing attempts</p>
                 </div>
                 
@@ -1166,12 +1166,12 @@ if($current_question > $total_questions && !$game_completed) {
                         <div class="completion-actions">
                             <a href="game.php" class="action-btn secondary">Back to Games</a>
                             <a href="certificate.php" class="action-btn">View Certificate</a>
-                            <a href="phishing-game.php?reset=1" class="action-btn">Play Again</a>
+                            <a href="phishing-game-lvl1.php?reset=1" class="action-btn">Play Again</a>
                         </div>
                     </div>
                 <?php else: ?>
                     <?php if($current_email): ?>
-                        <form method="POST" action="phishing-game.php" id="gameForm">
+                        <form method="POST" action="phishing-game-lvl1.php" id="gameForm">
                             <input type="hidden" name="question_id" value="<?php echo $current_question; ?>">
                             <input type="hidden" name="answer" id="selectedAnswer" value="">
                             
@@ -1242,7 +1242,7 @@ if($current_question > $total_questions && !$game_completed) {
                         <div class="completion-screen">
                             <p>Loading assessment...</p>
                             <div class="completion-actions">
-                                <a href="phishing-game.php?reset=1" class="action-btn">Restart Game</a>
+                                <a href="phishing-game-lvl1.php?reset=1" class="action-btn">Restart Game</a>
                             </div>
                         </div>
                     <?php endif; ?>
