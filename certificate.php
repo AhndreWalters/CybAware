@@ -10,10 +10,9 @@ require_once "config/database.php";
 
 $user_id = $_SESSION['id'];
 $password_score = 0;
-$phishing_score = 0;
-$password_total = 5;  // Password game has 5 questions
-$phishing_total = 10; // Phishing game now has 10 questions
-$total_games = 2;
+$phishing_lvl1_score = 0;
+$phishing_lvl2_score = 0;
+$phishing_lvl3_score = 0;
 $games_completed = 0;
 
 // Fetch scores from database
@@ -28,20 +27,26 @@ if($stmt = mysqli_prepare($link, $sql)) {
         if($game_type == 'password_fortress') {
             $password_score = $score;
             $games_completed++;
-        } elseif($game_type == 'phishing_detective') {
-            $phishing_score = $score;
+        } elseif($game_type == 'phishing_detective_lvl1') {
+            $phishing_lvl1_score = $score;
+            $games_completed++;
+        } elseif($game_type == 'phishing_detective_lvl2') {
+            $phishing_lvl2_score = $score;
+            $games_completed++;
+        } elseif($game_type == 'phishing_detective_lvl3') {
+            $phishing_lvl3_score = $score;
             $games_completed++;
         }
     }
     mysqli_stmt_close($stmt);
 }
 
-// Check if both games are completed (required for certificate)
-$both_games_completed = ($games_completed == $total_games);
-
 // Calculate overall statistics
-$overall_score = $password_score + $phishing_score;
-$max_total_score = $password_total + $phishing_total; // 5 + 10 = 15
+// Password Fortress: 5 questions (max 5)
+// Phishing Level 1: 10 questions (max 10)
+// Phishing Level 2: 140 points (14 clues × 10 points each)
+$overall_score = $password_score + $phishing_lvl1_score + $phishing_lvl2_score;
+$max_total_score = 5 + 10 + 140; // Total: 155 max score
 $overall_percentage = ($max_total_score > 0) ? ($overall_score / $max_total_score) * 100 : 0;
 
 // Calculate grade
@@ -256,109 +261,80 @@ $overall_grade = calculateGrade($overall_percentage);
                 <div class="watermark">CYBAWARE</div>
                 
                 <div class="certificate-content">
-                    <?php if($both_games_completed): ?>
-                        <!-- Overall Certificate (Both Games Completed) -->
-                        <h1 class="certificate-title">Cybersecurity Awareness Certificate</h1>
-                        <p class="certificate-subtitle">Awarded for completing all cybersecurity awareness missions</p>
-                        
-                        <div class="achievement-badge">🏆</div>
-                        
-                        <div class="user-name"><?php echo htmlspecialchars($_SESSION['full_name']); ?></div>
-                        
-                        <div class="game-details">
-                            <div class="detail-item">
-                                <div class="detail-value"><?php echo $overall_score; ?>/<?php echo $max_total_score; ?></div>
-                                <div class="detail-label">Total Score</div>
-                            </div>
-                            
-                            <div class="detail-item">
-                                <div class="detail-value"><?php echo round($overall_percentage); ?>%</div>
-                                <div class="detail-label">Performance</div>
-                            </div>
-                            
-                            <div class="detail-item">
-                                <div class="detail-value"><?php echo $overall_grade; ?></div>
-                                <div class="detail-label">Grade</div>
-                            </div>
+                    <!-- Certificate is always available -->
+                    <h1 class="certificate-title">Cybersecurity Awareness Certificate</h1>
+                    <p class="certificate-subtitle">Awarded for cybersecurity awareness training</p>
+                    
+                    <div class="achievement-badge">🏆</div>
+                    
+                    <div class="user-name"><?php echo htmlspecialchars($_SESSION['full_name']); ?></div>
+                    
+                    <div class="game-details">
+                        <div class="detail-item">
+                            <div class="detail-value"><?php echo $overall_score; ?>/<?php echo $max_total_score; ?></div>
+                            <div class="detail-label">Total Score</div>
                         </div>
                         
-                        <!-- Individual Mission Scores -->
-                        <div style="margin: 30px 0;">
-                            <h4 style="color: #64748b; margin-bottom: 20px;">Mission Breakdown</h4>
-                            <div class="progress-status">
-                                <div class="game-progress">
-                                    <div class="progress-circle complete">
-                                        <?php echo $password_score; ?>
-                                    </div>
-                                    <div class="mission-title">Password Fortress</div>
-                                    <div class="mission-score"><?php echo $password_score; ?>/<?php echo $password_total; ?></div>
+                        <div class="detail-item">
+                            <div class="detail-value"><?php echo round($overall_percentage); ?>%</div>
+                            <div class="detail-label">Performance</div>
+                        </div>
+                        
+                        <div class="detail-item">
+                            <div class="detail-value"><?php echo $overall_grade; ?></div>
+                            <div class="detail-label">Grade</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Individual Mission Scores -->
+                    <div style="margin: 30px 0;">
+                        <h4 style="color: #64748b; margin-bottom: 20px;">Mission Breakdown</h4>
+                        <div class="progress-status">
+                            <div class="game-progress">
+                                <div class="progress-circle <?php echo $password_score > 0 ? 'complete' : ''; ?>">
+                                    <?php echo $password_score; ?>
                                 </div>
-                                
-                                <div class="game-progress">
-                                    <div class="progress-circle complete">
-                                        <?php echo $phishing_score; ?>
-                                    </div>
-                                    <div class="mission-title">Phishing Detective</div>
-                                    <div class="mission-score"><?php echo $phishing_score; ?>/<?php echo $phishing_total; ?></div>
+                                <div class="mission-title">Password Fortress</div>
+                                <div class="mission-score"><?php echo $password_score; ?>/5</div>
+                            </div>
+                            
+                            <div class="game-progress">
+                                <div class="progress-circle <?php echo $phishing_lvl1_score > 0 ? 'complete' : ''; ?>">
+                                    <?php echo $phishing_lvl1_score; ?>
                                 </div>
-                            </div>
-                        </div>
-                        
-                        <div class="date-issued">
-                            Date Awarded: <?php echo date('F d, Y'); ?>
-                        </div>
-                        
-                        <div class="certificate-footer">
-                            <div class="signature">
-                                <div class="signature-line"></div>
-                                <div>Ahndre Walters</div>
-                                <div style="color: #64748b; font-size: 0.9rem;">Developer</div>
+                                <div class="mission-title">Phishing Level 1</div>
+                                <div class="mission-score"><?php echo $phishing_lvl1_score; ?>/10</div>
                             </div>
                             
-                            <div class="signature">
-                                <div class="signature-line"></div>
-                                <div>Joshua Evelyn</div>
-                                <div style="color: #64748b; font-size: 0.9rem;">Developer</div>
-                            </div>
-                        </div>
-                        
-                        <button class="print-button" onclick="window.print()">🖨️ Print Certificate</button>
-                        
-                    <?php else: ?>
-                        <!-- Certificate Locked (Missing Games) -->
-                        <div class="locked-message">
-                            <h3>🏆 Certificate Locked</h3>
-                            <p>Complete both cybersecurity missions to unlock your certificate.</p>
-                            
-                            <div class="progress-status">
-                                <div class="game-progress">
-                                    <div class="progress-circle <?php echo $password_score > 0 ? 'complete' : ''; ?>">
-                                        <?php echo $password_score > 0 ? '✓' : '1'; ?>
-                                    </div>
-                                    <div class="mission-title">Password Fortress</div>
-                                    <div class="mission-score">
-                                        <?php echo $password_score > 0 ? "{$password_score}/{$password_total}" : "Not Started"; ?>
-                                    </div>
+                            <div class="game-progress">
+                                <div class="progress-circle <?php echo $phishing_lvl2_score > 0 ? 'complete' : ''; ?>">
+                                    <?php echo $phishing_lvl2_score; ?>
                                 </div>
-                                
-                                <div class="game-progress">
-                                    <div class="progress-circle <?php echo $phishing_score > 0 ? 'complete' : ''; ?>">
-                                        <?php echo $phishing_score > 0 ? '✓' : '2'; ?>
-                                    </div>
-                                    <div class="mission-title">Phishing Detective</div>
-                                    <div class="mission-score">
-                                        <?php echo $phishing_score > 0 ? "{$phishing_score}/{$phishing_total}" : "Not Started"; ?>
-                                    </div>
-                                </div>
+                                <div class="mission-title">Phishing Level 2</div>
+                                <div class="mission-score"><?php echo $phishing_lvl2_score; ?>/140</div>
                             </div>
-                            
-                            <p style="margin-top: 20px; color: #64748b;">
-                                <strong>Progress:</strong> <?php echo $games_completed; ?> of <?php echo $total_games; ?> missions completed
-                            </p>
-                            
-                            <a href="game.php" class="btn btn-primary" style="margin-top: 20px;">Complete Missing Missions</a>
                         </div>
-                    <?php endif; ?>
+                    </div>
+                    
+                    <div class="date-issued">
+                        Date Issued: <?php echo date('F d, Y'); ?>
+                    </div>
+                    
+                    <div class="certificate-footer">
+                        <div class="signature">
+                            <div class="signature-line"></div>
+                            <div>Ahndre Walters</div>
+                            <div style="color: #64748b; font-size: 0.9rem;">Developer</div>
+                        </div>
+                        
+                        <div class="signature">
+                            <div class="signature-line"></div>
+                            <div>Joshua Evelyn</div>
+                            <div style="color: #64748b; font-size: 0.9rem;">Developer</div>
+                        </div>
+                    </div>
+                    
+                    <button class="print-button" onclick="window.print()">Print Certificate</button>
                 </div>
             </div>
             
