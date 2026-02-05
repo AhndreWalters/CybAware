@@ -16,7 +16,7 @@ $phishing_lvl1_score = 0;
 $phishing_lvl2_score = 0;
 $phishing_lvl3_score = 0;
 $games_completed = 0;
-$total_games = 4; // Now we have: Password Fortress + 3 Phishing levels
+$total_games = 4; // Password Fortress + 3 Phishing levels
 $can_download_certificate = false;
 
 // Fetch scores from database
@@ -44,16 +44,19 @@ if($stmt = mysqli_prepare($link, $sql)) {
     }
     mysqli_stmt_close($stmt);
     
-    // Calculate total phishing score (sum of all 3 levels)
-    $total_phishing_score = $phishing_lvl1_score + $phishing_lvl2_score + $phishing_lvl3_score;
-    $total_phishing_questions = 15; // 5 questions per level × 3 levels
-    
     // Check if user can download certificate (all 4 games completed)
     if($games_completed == $total_games) {
         $can_download_certificate = true;
-        $overall_score = $password_score + $total_phishing_score;
-        $max_score = 20; // 5 questions (password) + 15 questions (phishing 3×5)
-        $percentage = ($overall_score / $max_score) * 100;
+        // Calculate overall score based on actual max scores
+        $overall_score = $password_score + $phishing_lvl1_score + $phishing_lvl2_score + $phishing_lvl3_score;
+        
+        // Max scores based on your game designs:
+        // Password Fortress: 5 questions
+        // Phishing Level 1: 10 questions
+        // Phishing Level 2: 14 clues × 10 points = 140
+        // Phishing Level 3: Not implemented yet
+        $max_total_score = 5 + 10 + 140 + 0; // 155 total max score (excluding level 3)
+        $percentage = ($overall_score / $max_total_score) * 100;
     }
 }
 ?>
@@ -171,29 +174,13 @@ if($stmt = mysqli_prepare($link, $sql)) {
             transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(30, 64, 175, 0.3);
         }
-        
-        .play-btn.secondary {
-            background: linear-gradient(to right, #475569, #334155);
-        }
-        
-        .play-btn.secondary:hover {
-            box-shadow: 0 5px 15px rgba(71, 85, 105, 0.3);
-        }
-        
-        .play-btn.tertiary {
-            background: linear-gradient(to right, #7c3aed, #6d28d9);
-        }
-        
-        .play-btn.tertiary:hover {
-            box-shadow: 0 5px 15px rgba(124, 58, 237, 0.3);
-        }
-        
+
         .play-btn.coming-soon {
             background: linear-gradient(to right, #64748b, #475569);
             opacity: 0.7;
             cursor: not-allowed;
         }
-        
+
         .play-btn.coming-soon:hover {
             transform: none;
             box-shadow: none;
@@ -452,19 +439,6 @@ if($stmt = mysqli_prepare($link, $sql)) {
                                 <h2>Password Fortress</h2>
                                 <p>Learn what makes a strong password and avoid common security mistakes. Test your knowledge with 5 challenging questions.</p>
                                 
-                                <?php if($password_score > 0): ?>
-                                    <div style="margin-bottom: 20px; width: 100%;">
-                                        <div class="score-details">
-                                            <span class="score-label">Your Score:</span>
-                                            <span class="score-value"><?php echo $password_score; ?>/5</span>
-                                        </div>
-                                        <div class="score-progress">
-                                            <div class="score-fill" style="width: <?php echo ($password_score / 5) * 100; ?>%"></div>
-                                        </div>
-                                        <div class="score-percentage"><?php echo round(($password_score / 5) * 100); ?>% completed</div>
-                                    </div>
-                                <?php endif; ?>
-                                
                                 <a href="password-game.php" class="play-btn">
                                     <?php echo $password_score > 0 ? 'Play Again' : 'Start Mission'; ?>
                                 </a>
@@ -481,31 +455,19 @@ if($stmt = mysqli_prepare($link, $sql)) {
                                 <div class="level-buttons">
                                     <!-- Level 1 -->
                                     <a href="phishing-game-lvl1.php" class="play-btn">
-                                        <?php echo $phishing_lvl1_score > 0 ? 'Level 1: ' . $phishing_lvl1_score . '/5' : 'Level 1: Beginner'; ?>
+                                        Level 1: <?php echo $phishing_lvl1_score > 0 ? 'Completed' : 'Beginner'; ?>
                                     </a>
                                     
-                                    <!-- Level 2 - REMOVED REQUIREMENT -->
-                                    <a href="phishing-game-lvl2.php" class="play-btn secondary">
-                                        <?php echo $phishing_lvl2_score > 0 ? 'Level 2: ' . $phishing_lvl2_score . '/5' : 'Level 2: Intermediate'; ?>
+                                    <!-- Level 2 -->
+                                    <a href="phishing-game-lvl2.php" class="play-btn">
+                                        Level 2: <?php echo $phishing_lvl2_score > 0 ? 'Completed' : 'Intermediate'; ?>
                                     </a>
                                     
                                     <!-- Level 3 -->
-                                    <a href="#" class="play-btn tertiary coming-soon">
-                                        <?php echo 'Level 3: Coming Soon'; ?>
+                                    <a href="#" class="play-btn coming-soon">
+                                        Level 3: Coming Soon
                                     </a>
                                 </div>
-                                
-                                <?php if($phishing_lvl1_score > 0 || $phishing_lvl2_score > 0): ?>
-                                    <div style="margin-top: 20px; width: 100%;">
-                                        <div class="score-details">
-                                            <span class="score-label">Total Phishing Score:</span>
-                                            <span class="score-value"><?php echo $total_phishing_score; ?>/15</span>
-                                        </div>
-                                        <div class="score-progress">
-                                            <div class="score-fill" style="width: <?php echo ($total_phishing_score / 15) * 100; ?>%"></div>
-                                        </div>
-                                    </div>
-                                <?php endif; ?>
                             </div>
                         </div>
                     </div>
@@ -513,6 +475,7 @@ if($stmt = mysqli_prepare($link, $sql)) {
                     <div class="stats-section">
                         <h3 class="stats-header">Your Progress</h3>
                         
+                        <!-- Password Fortress Score -->
                         <div class="score-item">
                             <div class="score-label">Password Fortress Score</div>
                             <div class="score-value"><?php echo $password_score; ?>/5</div>
@@ -521,24 +484,25 @@ if($stmt = mysqli_prepare($link, $sql)) {
                             </div>
                         </div>
                         
+                        <!-- Phishing Levels Scores -->
                         <div class="phishing-levels">
                             <div class="level-container">
                                 <div class="level-header">
                                     <div class="level-name">Phishing Level 1</div>
-                                    <div class="level-score"><?php echo $phishing_lvl1_score; ?>/5</div>
+                                    <div class="level-score"><?php echo $phishing_lvl1_score; ?>/10</div>
                                 </div>
                                 <div class="score-progress">
-                                    <div class="score-fill" style="width: <?php echo ($phishing_lvl1_score / 5) * 100; ?>%"></div>
+                                    <div class="score-fill" style="width: <?php echo ($phishing_lvl1_score / 10) * 100; ?>%"></div>
                                 </div>
                             </div>
                             
                             <div class="level-container">
                                 <div class="level-header">
                                     <div class="level-name">Phishing Level 2</div>
-                                    <div class="level-score"><?php echo $phishing_lvl2_score; ?>/5</div>
+                                    <div class="level-score"><?php echo $phishing_lvl2_score; ?>/140</div>
                                 </div>
                                 <div class="score-progress">
-                                    <div class="score-fill" style="width: <?php echo ($phishing_lvl2_score / 5) * 100; ?>%"></div>
+                                    <div class="score-fill" style="width: <?php echo ($phishing_lvl2_score / 140) * 100; ?>%"></div>
                                 </div>
                             </div>
                             
@@ -553,6 +517,7 @@ if($stmt = mysqli_prepare($link, $sql)) {
                             </div>
                         </div>
                         
+                        <!-- Total Games Completed -->
                         <div class="score-item">
                             <div class="score-label">Total Games Completed</div>
                             <div class="score-value"><?php echo $games_completed; ?>/<?php echo $total_games; ?></div>
@@ -564,7 +529,7 @@ if($stmt = mysqli_prepare($link, $sql)) {
                         <?php if($can_download_certificate): ?>
                             <div class="certificate-section">
                                 <h3>Certificate Ready!</h3>
-                                <p>Congratulations! You've completed all cybersecurity missions with a score of <?php echo $overall_score; ?>/20 (<?php echo round($percentage); ?>%).</p>
+                                <p>Congratulations! You've completed all cybersecurity missions with a score of <?php echo $overall_score; ?>/155 (<?php echo round($percentage); ?>%).</p>
                                 <p>Download your certificate to showcase your cybersecurity awareness skills.</p>
                                 <a href="certificate.php" class="certificate-btn">
                                     Download Certificate
