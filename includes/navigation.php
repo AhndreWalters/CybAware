@@ -13,7 +13,6 @@ if (session_status() === PHP_SESSION_NONE) {
     </div>
     
     <ul class="nav-links" id="navLinks">
-        <li><a href="CybAware/level2.php">Test</a></li>
         <li><a href="about.php">About</a></li>
         <li><a href="game.php">Game</a></li>
         <li><a href="contact.php">Contact</a></li>
