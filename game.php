@@ -466,7 +466,7 @@ if($stmt = mysqli_prepare($link, $sql)) {
                                     </a>
                                     
                                     <!-- Level 3 -->
-                                    <a href="#" class="play-btn coming-soon">
+                                    <a href="phishing-game-lvl3.php" class="play-btn">
                                         Level 3
                                     </a>
                                 </div>
@@ -511,10 +511,10 @@ if($stmt = mysqli_prepare($link, $sql)) {
                             <div class="level-container">
                                 <div class="level-header">
                                     <div class="level-name">Phishing Level 3</div>
-                                    <div class="level-score">Coming Soon</div>
+                                    <div class="level-score"><?php echo $phishing_lvl3_score; ?>/10</div>
                                 </div>
                                 <div class="score-progress">
-                                    <div class="score-fill" style="width: 0%;"></div>
+                                    <div class="score-fill" style="width: <?php echo ($phishing_lvl3_score / 10) * 100; ?>%"></div>
                                 </div>
                             </div>
                         </div>

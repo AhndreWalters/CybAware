@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phish Detective - Level 3: No Clues</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="game-container">
+        <header class="game-header">
+            <div class="level-indicator">
+                <span class="level-badge">LEVEL 3</span>
+                <h1><i class="fas fa-fish"></i> PHISH DETECTIVE</h1>
+                <p class="subtitle">Expert Mode - Click on phishing signs in the email below</p>
+            </div>
+            
+            <div class="game-stats">
+                <div class="stat">
+                    <span class="stat-label">Errors Found:</span>
+                    <span id="found-count" class="stat-value">0</span> / 
+                    <span id="total-count" class="stat-value">7</span>
+                </div>
+                <div class="stat">
+                    <span class="stat-label">Accuracy:</span>
+                    <span id="accuracy" class="stat-value">100%</span>
+                </div>
+            </div>
+        </header>
+
+        <div class="instructions">
+            <p><i class="fas fa-exclamation-triangle"></i> <strong>Mission:</strong> This email contains <strong>7 phishing signs/errors</strong>. Click on each one you find. No visual clues in the email - trust your instincts!</p>
+            <p><i class="fas fa-mouse-pointer"></i> <strong>How to Play:</strong> Click directly on suspicious text in the email below. Correct clicks flash green and add a strikethrough, incorrect clicks flash red.</p>
+        </div>
+
+        <main class="game-content">
+            <section class="email-container">
+                <div class="email-header">
+                    <div class="email-meta">
+                        <div class="email-from">
+                            <strong>From:</strong> Rams Supermarket <span class="email-address">noreply@rams-supermarket-promo.com</span>
+                        </div>
+                        <div class="email-subject">
+                            <strong>Subject:</strong> Congratulations! You've won a prize from Rams Supermarket
+                        </div>
+                        <div class="email-date">
+                            <strong>Received:</strong> January 29, 2026, 2:14 PM
+                        </div>
+                    </div>
+                </div>
+
+                <div class="email-body" id="email-body">
+                    <!-- Email content will be inserted by JavaScript -->
+                </div>
+            </section>
+
+            <div class="game-controls">
+                <button id="hint-btn" class="hint-btn">
+                    <i class="fas fa-lightbulb"></i> I Need a Hint
+                </button>
+                <button id="reset-btn" class="reset-btn">
+                    <i class="fas fa-redo"></i> Reset Level
+                </button>
+                <button id="show-answers-btn" class="show-answers-btn">
+                    <i class="fas fa-eye"></i> Reveal All Errors
+                </button>
+            </div>
+
+            <section id="results-section" class="results-section hidden">
+                <div class="results-header">
+                    <h2><i class="fas fa-clipboard-check"></i> Analysis Complete!</h2>
+                    <p id="results-message"></p>
+                </div>
+                
+                <div class="results-details">
+                    <h3>Phishing Signs Found</h3>
+                    <div id="errors-list"></div>
+                </div>
+                
+                <div class="next-level">
+                    <button id="next-level-btn" class="next-btn hidden">
+                        <i class="fas fa-arrow-right"></i> Proceed to Level 4
+                    </button>
+                </div>
+            </section>
+        </main>
+
+        <footer class="game-footer">
+            <p>Phish Detective Training &copy; 2023 | Cybersecurity Awareness Game</p>
+        </footer>
+    </div>
+
+    <!-- Flash Overlay -->
+    <div id="flash-overlay" class="flash-overlay"></div>
+
+    <script src="script.js"></script>
+</body>
+</html>
