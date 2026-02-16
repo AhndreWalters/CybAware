@@ -1168,6 +1168,10 @@ if($current_question > $total_questions && !$game_completed) {
                             <a href="certificate.php" class="action-btn">View Certificate</a>
                             <a href="phishing-game-lvl1.php?reset=1" class="action-btn">Play Again</a>
                         </div>
+                        
+                        <div class="certificate-note">
+                            <strong>Certificate Status:</strong> Complete both Password Fortress and Phishing Detective missions to unlock your cybersecurity awareness certificate.
+                        </div>
                     </div>
                 <?php else: ?>
                     <?php if($current_email): ?>

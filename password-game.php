@@ -469,52 +469,50 @@ if($current_question > $total_questions && !$game_completed) {
             font-size: 16px;
         }
         
-        .completion-actions {
-            display: flex;
-            gap: 15px;
-            justify-content: center;
-            flex-wrap: wrap;
-        }
-        
-        .btn-action {
-            padding: 14px 28px;
-            background: #1e40af;
-            color: white;
-            border: none;
-            border-radius: 6px;
-            font-size: 15px;
-            font-weight: 600;
-            cursor: pointer;
-            text-decoration: none;
-            display: inline-block;
-            transition: all 0.2s ease;
-        }
-        
-        .btn-action:hover {
-            background: #1e3a8a;
-            transform: translateY(-1px);
-        }
-        
-        .btn-secondary {
-            background: white;
-            color: #374151;
-            border: 1px solid #d1d5db;
-        }
-        
-        .btn-secondary:hover {
-            background: #f9fafb;
-            border-color: #9ca3af;
-            transform: translateY(-1px);
-        }
-        
-        .btn-gray {
-            background: #64748b;
-            color: white;
-        }
-        
-        .btn-gray:hover {
-            background: #475569;
-        }
+.completion-actions {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    margin-top: 30px;
+    flex-wrap: wrap;
+    width: 100%;
+}
+
+.action-btn {
+    padding: 14px 35px;
+    background: #1e40af;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    transition: all 0.2s ease;
+    box-sizing: border-box;
+    min-width: 180px;
+    text-align: center;
+}
+
+.action-btn:hover {
+    background: #1e3a8a;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(30, 64, 175, 0.2);
+}
+
+.action-btn.secondary {
+    background: white;
+    color: #64748b;
+    border: 2px solid #e2e8f0;
+}
+
+.action-btn.secondary:hover {
+    background: #f8fafc;
+    border-color: #cbd5e1;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+}
         
         @media (max-width: 768px) {
             .game-interface {
@@ -587,29 +585,26 @@ if($current_question > $total_questions && !$game_completed) {
                 
                 <?php if($game_completed): ?>
                     <div class="completion-screen">
-                        <h2>🎉 Assessment Complete</h2>
-                        <p class="score-result">You scored <?php echo $score; ?> out of <?php echo $total_questions; ?> correctly.</p>
-                        
-                        <div class="performance-rating">
-                            <h4>Performance Analysis</h4>
-                            <?php 
-                            if($score == $total_questions) {
-                                echo "<p>Excellent performance. You demonstrate strong understanding of password security principles.</p>";
-                            } elseif($score >= 3) {
-                                echo "<p>Good performance. You understand basic password security concepts but should review some areas.</p>";
-                            } else {
-                                echo "<p>Needs improvement. Review password security fundamentals to enhance your knowledge.</p>";
-                            }
-                            ?>
+                        <h2>Assessment Complete</h2>
+                        <div class="score-result">
+                            You scored <?php echo $score; ?> out of <?php echo $total_questions; ?> correctly.
                         </div>
                         
+                        <?php
+                        $percentage = ($score / $total_questions) * 100;
+                        if($percentage >= 80) {
+                            echo '<p style="color: #059669; font-weight: 600; font-size: 1.1rem; margin-bottom: 20px;">Excellent! You demonstrate strong understanding of password security principles.</p>';
+                        } elseif($percentage >= 60) {
+                            echo '<p style="color: #d97706; font-weight: 600; font-size: 1.1rem; margin-bottom: 20px;">Good performance. You understand basic password security concepts but should review some areas.</p>';
+                        } else {
+                            echo '<p style="color: #dc2626; font-weight: 600; font-size: 1.1rem; margin-bottom: 20px;">Needs improvement. Review password security fundamentals to enhance your knowledge.</p>';
+                        }
+                        ?>
+                        
                         <div class="completion-actions">
-                            <a href="game.php" class="btn-action">
-                                Return to Game Dashboard
-                            </a>
-                            <a href="password-game.php?reset=1" class="btn-action btn-gray">
-                                Play Again
-                            </a>
+                            <a href="game.php" class="action-btn secondary">Back to Games</a>
+                            <a href="certificate.php" class="action-btn">View Certificate</a>
+                            <a href="password-game.php?reset=1" class="action-btn">Play Again</a>
                         </div>
                         
                         <div class="certificate-note">

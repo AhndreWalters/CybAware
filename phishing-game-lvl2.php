@@ -463,6 +463,63 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action'])) {
             background: #f8fafc;
             border-color: #cbd5e1;
         }
+
+        /* Completion Screen Action Buttons */
+        .completion-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+            flex-wrap: wrap;
+            width: 100%;
+        }
+
+        .action-btn {
+            padding: 14px 35px;
+            background: #1e40af;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.2s ease;
+            box-sizing: border-box;
+            min-width: 180px;
+            text-align: center;
+        }
+
+        .action-btn:hover {
+            background: #1e3a8a;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(30, 64, 175, 0.2);
+        }
+
+        .action-btn.secondary {
+            background: white;
+            color: #64748b;
+            border: 2px solid #e2e8f0;
+        }
+
+        .action-btn.secondary:hover {
+            background: #f8fafc;
+            border-color: #cbd5e1;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .certificate-note {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f0f9ff;
+            border: 1px solid #0ea5e9;
+            border-radius: 6px;
+            color: #0369a1;
+            font-size: 14px;
+            text-align: center;
+        }
         
         /* Responsive Design */
         @media (max-width: 768px) {
@@ -585,9 +642,8 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action'])) {
                 </div>
                 
                 <?php if($game_completed): ?>
-                    <!-- Completion Screen -->
                     <div class="completion-screen">
-                        <h2>Level Complete!</h2>
+                        <h2>Assessment Complete</h2>
                         <div class="score-result">
                             You scored <?php echo $current_score; ?> out of 140 points.
                         </div>
@@ -604,8 +660,13 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action'])) {
                         ?>
                         
                         <div class="completion-actions">
-                            <a href="game.php" class="nav-btn secondary">Back to Games</a>
-                            <a href="phishing-game-lvl2.php?reset=1" class="nav-btn">Play Again</a>
+                            <a href="game.php" class="action-btn secondary">Back to Games</a>
+                            <a href="certificate.php" class="action-btn">View Certificate</a>
+                            <a href="phishing-game-lvl2.php?reset=1" class="action-btn">Play Again</a>
+                        </div>
+                        
+                        <div class="certificate-note">
+                            <strong>Certificate Status:</strong> Complete both Password Fortress and Phishing Detective missions to unlock your cybersecurity awareness certificate.
                         </div>
                     </div>
                 <?php else: ?>
