@@ -9,11 +9,12 @@ if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){
 require_once "config/database.php";
 
 $user_id = $_SESSION['id'];
-$password_score = 0;
-$phishing_lvl1_score = 0;
-$phishing_lvl2_score = 0;
-$phishing_lvl3_score = 0;
-$games_completed = 0;
+$password_completed = false;
+$phishing_lvl1_completed = false;
+$phishing_lvl2_completed = false;
+$phishing_lvl3_completed = false;
+$total_completed = 0;
+$total_games = 4;
 
 // Fetch scores from database
 $sql = "SELECT game_type, score FROM game_scores WHERE user_id = ?";
@@ -25,40 +26,24 @@ if($stmt = mysqli_prepare($link, $sql)) {
     
     while(mysqli_stmt_fetch($stmt)) {
         if($game_type == 'password_fortress') {
-            $password_score = $score;
-            $games_completed++;
+            $password_completed = ($score > 0);
+            if($password_completed) $total_completed++;
         } elseif($game_type == 'phishing_detective_lvl1') {
-            $phishing_lvl1_score = $score;
-            $games_completed++;
+            $phishing_lvl1_completed = ($score > 0);
+            if($phishing_lvl1_completed) $total_completed++;
         } elseif($game_type == 'phishing_detective_lvl2') {
-            $phishing_lvl2_score = $score;
-            $games_completed++;
+            $phishing_lvl2_completed = ($score > 0);
+            if($phishing_lvl2_completed) $total_completed++;
         } elseif($game_type == 'phishing_detective_lvl3') {
-            $phishing_lvl3_score = $score;
-            $games_completed++;
+            $phishing_lvl3_completed = ($score > 0);
+            if($phishing_lvl3_completed) $total_completed++;
         }
     }
     mysqli_stmt_close($stmt);
 }
 
-// Calculate overall statistics
-// Password Fortress: 5 questions (max 5)
-// Phishing Level 1: 10 questions (max 10)
-// Phishing Level 2: 140 points (14 clues × 10 points each)
-$overall_score = $password_score + $phishing_lvl1_score + $phishing_lvl2_score;
-$max_total_score = 5 + 10 + 140; // Total: 155 max score
-$overall_percentage = ($max_total_score > 0) ? ($overall_score / $max_total_score) * 100 : 0;
-
-// Calculate grade
-function calculateGrade($percentage) {
-    if($percentage >= 80) return 'A';
-    elseif($percentage >= 70) return 'B';
-    elseif($percentage >= 60) return 'C';
-    elseif($percentage >= 50) return 'D';
-    else return 'F';
-}
-
-$overall_grade = calculateGrade($overall_percentage);
+$certificate_earned = ($total_completed == $total_games);
+$date = date('F d, Y');
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -66,189 +51,300 @@ $overall_grade = calculateGrade($overall_percentage);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="shortcut icon" href="images/ui-icon-social-engineering.png" type="image/x-icon">
-    <title>Certificate | CybAware</title>
+    <title>Certificate of Achievement | CybAware</title>
     <link rel="stylesheet" href="css/styles.css">
     <style>
+        /* Professional Certificate Design - Large Format Landscape */
         .certificate-container {
-            max-width: 800px;
+            max-width: 1400px;
             margin: 40px auto;
-            padding: 40px;
-            background: white;
-            border: 15px solid #1e40af;
-            text-align: center;
-            position: relative;
-        }
-        
-        .certificate-title {
-            font-size: 2.5rem;
-            color: #1e40af;
-            margin-bottom: 10px;
-        }
-        
-        .certificate-subtitle {
-            font-size: 1.2rem;
-            color: #64748b;
-            margin-bottom: 40px;
-        }
-        
-        .user-name {
-            font-size: 2rem;
-            color: #0f172a;
-            margin: 30px 0;
-            padding: 20px;
-            border-bottom: 2px solid #cbd5e1;
-            border-top: 2px solid #cbd5e1;
-        }
-        
-        .game-details {
-            display: flex;
-            justify-content: space-around;
-            margin: 40px 0;
-            flex-wrap: wrap;
-        }
-        
-        .detail-item {
-            padding: 20px;
-            flex: 1;
-            min-width: 150px;
-        }
-        
-        .detail-value {
-            font-size: 1.8rem;
-            color: #10b981;
-            font-weight: bold;
-        }
-        
-        .detail-label {
-            color: #64748b;
-            margin-top: 5px;
-            font-size: 0.9rem;
-        }
-        
-        .certificate-footer {
-            margin-top: 50px;
-            padding-top: 30px;
-            border-top: 1px solid #e2e8f0;
-            display: flex;
-            justify-content: center;
-            gap: 60px;
-        }
-        
-        .signature {
-            text-align: center;
-        }
-        
-        .signature-line {
-            width: 150px;
-            height: 1px;
-            background: #0f172a;
-            margin: 20px auto;
-        }
-        
-        .print-button {
-            margin-top: 30px;
-            padding: 15px 30px;
-            background: #1e40af;
-            color: white;
+            padding: 0;
+            background: transparent;
             border: none;
-            border-radius: 6px;
-            font-weight: 600;
-            cursor: pointer;
-            font-size: 1rem;
         }
         
-        .print-button:hover {
-            background: #1e3a8a;
+        .professional-certificate {
+            background: #fffdf8;
+            padding: 30px 50px;
+            position: relative;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+            border: 1px solid #d4b48c;
+            min-height: 900px;
+            display: flex;
+            flex-direction: column;
         }
         
-        @media print {
-            .print-button, .back-buttons {
-                display: none;
-            }
-        }
-        
-        .watermark {
+        /* Elegant Border with Margin */
+        .certificate-border {
             position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%) rotate(-45deg);
-            font-size: 100px;
-            color: rgba(30, 64, 175, 0.1);
-            font-weight: bold;
+            top: 20px;
+            left: 20px;
+            right: 20px;
+            bottom: 20px;
+            border: 2px solid #c5a572;
             pointer-events: none;
-            z-index: 1;
+        }
+        
+        /* Decorative Corners - Positioned inside margin */
+        .corner {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            border: 2px solid #9b7e4e;
+        }
+        
+        .corner-tl {
+            top: 30px;
+            left: 30px;
+            border-right: none;
+            border-bottom: none;
+        }
+        
+        .corner-tr {
+            top: 30px;
+            right: 30px;
+            border-left: none;
+            border-bottom: none;
+        }
+        
+        .corner-bl {
+            bottom: 30px;
+            left: 30px;
+            border-right: none;
+            border-top: none;
+        }
+        
+        .corner-br {
+            bottom: 30px;
+            right: 30px;
+            border-left: none;
+            border-top: none;
         }
         
         .certificate-content {
             position: relative;
             z-index: 2;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 100%;
+            padding: 10px 0;
         }
         
-        .date-issued {
-            color: #64748b;
-            margin-top: 30px;
-        }
-        
-        .back-buttons {
+        /* Header - Compact */
+        .certificate-header {
             text-align: center;
-            margin-top: 30px;
+            margin-bottom: 10px;
         }
         
-        .achievement-badge {
+        .cyber {
+            font-family: 'Times New Roman', serif;
             font-size: 3rem;
-            margin: 20px 0;
+            color: #2c3e50;
+            letter-spacing: 6px;
+            font-weight: 700;
+            margin-bottom: 3px;
+            text-transform: uppercase;
+            border-bottom: 2px solid #c5a572;
+            display: inline-block;
+            padding-bottom: 5px;
         }
         
-        .locked-message {
-            padding: 30px;
-            background: #f8fafc;
-            border-radius: 8px;
+        .certificate-type {
+            font-family: 'Times New Roman', serif;
+            font-size: 1.3rem;
+            color: #7d5d3a;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            margin-top: 5px;
+            font-style: italic;
+        }
+        
+        /* Awarded To Section - Compact */
+        .awarded-section {
             text-align: center;
+            margin: 5px 0;
         }
         
-        .locked-message h3 {
-            color: #64748b;
-            margin-bottom: 15px;
-        }
-        
-        .progress-status {
-            display: flex;
-            justify-content: center;
-            gap: 30px;
-            margin: 20px 0;
-        }
-        
-        .game-progress {
-            text-align: center;
-        }
-        
-        .progress-circle {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            background: #e2e8f0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 10px;
-            font-weight: bold;
-            font-size: 1.2rem;
-        }
-        
-        .progress-circle.complete {
-            background: #10b981;
-            color: white;
-        }
-        
-        .mission-title {
-            font-weight: 600;
-            color: #64748b;
+        .awarded-label {
+            font-family: 'Times New Roman', serif;
+            font-size: 1rem;
+            color: #7d5d3a;
+            text-transform: uppercase;
+            letter-spacing: 2px;
             margin-bottom: 5px;
         }
         
-        .mission-score {
-            font-size: 0.9rem;
-            color: #94a3b8;
+        .recipient-name {
+            font-family: 'Times New Roman', serif;
+            font-size: 2.2rem;
+            color: #1e3a8a;
+            font-weight: 700;
+            border-bottom: 2px solid #c5a572;
+            border-top: 2px solid #c5a572;
+            padding: 10px 30px;
+            display: inline-block;
+            min-width: 500px;
+            letter-spacing: 1px;
+            word-break: break-word;
+        }
+        
+        /* Achievement Text - Compact */
+        .achievement-text {
+            font-family: 'Times New Roman', serif;
+            font-size: 1.1rem;
+            color: #4a5568;
+            margin: 10px 0;
+            font-style: italic;
+            text-align: center;
+            line-height: 1.4;
+        }
+        
+        /* Footer with Centered Seal */
+        .certificate-footer {
+            margin-top: 5px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        /* Seal Row with Developer Names */
+        .seal-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+        
+        .signature-left {
+            flex: 1;
+            text-align: right;
+            padding-right: 20px;
+        }
+        
+        .signature-right {
+            flex: 1;
+            text-align: left;
+            padding-left: 20px;
+        }
+        
+        /* Gold Seal - Smaller */
+        .gold-seal {
+            width: 90px;
+            height: 90px;
+            background: <?php echo $certificate_earned ? 'linear-gradient(135deg, #d4af37, #996515)' : 'linear-gradient(135deg, #cccccc, #999999)'; ?>;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 5px 10px rgba(0,0,0,0.2);
+            border: 2px solid <?php echo $certificate_earned ? '#ffd700' : '#666666'; ?>;
+            margin: 0 auto;
+        }
+        
+        .seal-text {
+            color: white;
+            font-family: 'Times New Roman', serif;
+            font-size: 0.7rem;
+            text-align: center;
+            line-height: 1.2;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 0 3px;
+        }
+        
+        /* Developer Signatures - Smaller */
+        .signature-name {
+            font-family: 'Times New Roman', serif;
+            font-weight: 700;
+            color: #2c3e50;
+            font-size: 0.95rem;
+            margin-bottom: 2px;
+        }
+        
+        .signature-title {
+            font-family: 'Times New Roman', serif;
+            color: #7d5d3a;
+            font-size: 0.75rem;
+            font-style: italic;
+        }
+        
+        .signature-line {
+            width: 130px;
+            height: 1px;
+            background: #2c3e50;
+            margin: 5px 0 8px;
+        }
+        
+        .signature-left .signature-line {
+            margin-left: auto;
+        }
+        
+        .signature-right .signature-line {
+            margin-right: auto;
+        }
+        
+        /* Date Below Seal - Smaller */
+        .date-container {
+            text-align: center;
+            margin-top: 5px;
+        }
+        
+        .date-label {
+            font-family: 'Times New Roman', serif;
+            color: #7d5d3a;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 2px;
+        }
+        
+        .date-value {
+            font-family: 'Times New Roman', serif;
+            font-size: 1rem;
+            font-weight: 600;
+            color: #2c3e50;
+            border-bottom: 1px solid #c5a572;
+            padding-bottom: 3px;
+            display: inline-block;
+        }
+        
+        /* Print Styles */
+        @media print {
+            .professional-certificate {
+                box-shadow: none;
+                border: 1px solid #000;
+                min-height: auto;
+            }
+            
+            .back-buttons {
+                display: none;
+            }
+            
+            .gold-seal {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+        }
+        
+        /* Responsive */
+        @media (max-width: 1400px) {
+            .certificate-container {
+                max-width: 95%;
+            }
+            
+            .professional-certificate {
+                min-height: 800px;
+            }
+        }
+        
+        /* Back buttons - Original Style */
+        .back-buttons {
+            text-align: center;
+            margin-top: 30px;
         }
     </style>
 </head>
@@ -258,89 +354,79 @@ $overall_grade = calculateGrade($overall_percentage);
         
         <div class="main-content">
             <div class="certificate-container">
-                <div class="watermark">CYBAWARE</div>
-                
-                <div class="certificate-content">
-                    <!-- Certificate is always available -->
-                    <h1 class="certificate-title">Cybersecurity Awareness Certificate</h1>
-                    <p class="certificate-subtitle">Awarded for cybersecurity awareness training</p>
+                <div class="professional-certificate">
+                    <!-- Elegant Border with Margin -->
+                    <div class="certificate-border"></div>
                     
-                    <div class="achievement-badge">🏆</div>
+                    <!-- Decorative Corners -->
+                    <div class="corner corner-tl"></div>
+                    <div class="corner corner-tr"></div>
+                    <div class="corner corner-bl"></div>
+                    <div class="corner corner-br"></div>
                     
-                    <div class="user-name"><?php echo htmlspecialchars($_SESSION['full_name']); ?></div>
-                    
-                    <div class="game-details">
-                        <div class="detail-item">
-                            <div class="detail-value"><?php echo $overall_score; ?>/<?php echo $max_total_score; ?></div>
-                            <div class="detail-label">Total Score</div>
+                    <div class="certificate-content">
+                        <!-- Header -->
+                        <div class="certificate-header">
+                            <div class="cyber">CYBAWARE</div>
+                            <div class="certificate-type">Certificate of Achievement</div>
                         </div>
                         
-                        <div class="detail-item">
-                            <div class="detail-value"><?php echo round($overall_percentage); ?>%</div>
-                            <div class="detail-label">Performance</div>
+                        <!-- Awarded To -->
+                        <div class="awarded-section">
+                            <div class="awarded-label">Presented To</div>
+                            <div class="recipient-name"><?php echo htmlspecialchars($_SESSION['full_name']); ?></div>
                         </div>
                         
-                        <div class="detail-item">
-                            <div class="detail-value"><?php echo $overall_grade; ?></div>
-                            <div class="detail-label">Grade</div>
+                        <!-- Achievement Text -->
+                        <div class="achievement-text">
+                            in recognition of successfully completing the<br>
+                            Cybersecurity Awareness Training Program
                         </div>
-                    </div>
-                    
-                    <!-- Individual Mission Scores -->
-                    <div style="margin: 30px 0;">
-                        <h4 style="color: #64748b; margin-bottom: 20px;">Mission Breakdown</h4>
-                        <div class="progress-status">
-                            <div class="game-progress">
-                                <div class="progress-circle <?php echo $password_score > 0 ? 'complete' : ''; ?>">
-                                    <?php echo $password_score; ?>
+                        
+                        <!-- Footer with Centered Seal -->
+                        <div class="certificate-footer">
+                            <!-- Seal Row with Developer Names -->
+                            <div class="seal-row">
+                                <!-- Left Developer -->
+                                <div class="signature-left">
+                                    <div class="signature-name">Ahndre Walters</div>
+                                    <div class="signature-title">Lead Developer</div>
+                                    <div class="signature-line"></div>
                                 </div>
-                                <div class="mission-title">Password Fortress</div>
-                                <div class="mission-score"><?php echo $password_score; ?>/5</div>
+                                
+                                <!-- Centered Gold Seal -->
+                                <div class="gold-seal">
+                                    <div class="seal-text">
+                                        <?php if($certificate_earned): ?>
+                                            CybAware<br>Certified
+                                        <?php else: ?>
+                                            PENDING<br>COMPLETION
+                                        <?php endif; ?>
+                                    </div>
+                                </div>
+                                
+                                <!-- Right Developer -->
+                                <div class="signature-right">
+                                    <div class="signature-name">Joshua Evelyn</div>
+                                    <div class="signature-title">Lead Developer</div>
+                                    <div class="signature-line"></div>
+                                </div>
                             </div>
                             
-                            <div class="game-progress">
-                                <div class="progress-circle <?php echo $phishing_lvl1_score > 0 ? 'complete' : ''; ?>">
-                                    <?php echo $phishing_lvl1_score; ?>
-                                </div>
-                                <div class="mission-title">Phishing Level 1</div>
-                                <div class="mission-score"><?php echo $phishing_lvl1_score; ?>/10</div>
-                            </div>
-                            
-                            <div class="game-progress">
-                                <div class="progress-circle <?php echo $phishing_lvl2_score > 0 ? 'complete' : ''; ?>">
-                                    <?php echo $phishing_lvl2_score; ?>
-                                </div>
-                                <div class="mission-title">Phishing Level 2</div>
-                                <div class="mission-score"><?php echo $phishing_lvl2_score; ?>/140</div>
+                            <!-- Date Below Seal -->
+                            <div class="date-container">
+                                <div class="date-label">Issued On</div>
+                                <div class="date-value"><?php echo $date; ?></div>
                             </div>
                         </div>
                     </div>
-                    
-                    <div class="date-issued">
-                        Date Issued: <?php echo date('F d, Y'); ?>
-                    </div>
-                    
-                    <div class="certificate-footer">
-                        <div class="signature">
-                            <div class="signature-line"></div>
-                            <div>Ahndre Walters</div>
-                            <div style="color: #64748b; font-size: 0.9rem;">Developer</div>
-                        </div>
-                        
-                        <div class="signature">
-                            <div class="signature-line"></div>
-                            <div>Joshua Evelyn</div>
-                            <div style="color: #64748b; font-size: 0.9rem;">Developer</div>
-                        </div>
-                    </div>
-                    
-                    <button class="print-button" onclick="window.print()">Print Certificate</button>
                 </div>
-            </div>
-            
-            <div class="back-buttons">
-                <a href="game.php" class="btn btn-primary">Back to Games</a>
-                <a href="index.php" class="btn btn-secondary" style="margin-left: 10px;">Return Home</a>
+                
+                <!-- Original Back Buttons -->
+                <div class="back-buttons">
+                    <a href="game.php" class="btn btn-primary">Back to Games</a>
+                    <a href="index.php" class="btn btn-secondary" style="margin-left: 10px;">Return Home</a>
+                </div>
             </div>
         </div>
         
