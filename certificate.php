@@ -312,21 +312,139 @@ $date = date('F d, Y');
             display: inline-block;
         }
         
-        /* Print Styles */
+        /* Button Container - All buttons on same line */
+        .button-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+        
+        /* Print Button */
+        .print-btn {
+            padding: 15px 30px;
+            background: linear-gradient(135deg, #1e40af, #1e3a8a);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(30, 64, 175, 0.2);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            min-width: 150px;
+            justify-content: center;
+        }
+        
+        .print-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(30, 64, 175, 0.3);
+        }
+        
+        .print-btn:active {
+            transform: translateY(-1px);
+        }
+        
+        /* Back buttons - Original Style */
+        .back-btn {
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s;
+            min-width: 150px;
+            text-align: center;
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            box-sizing: border-box;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(to right, #1e40af, #1e3a8a);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(30, 64, 175, 0.3);
+        }
+        
+        .btn-secondary {
+            background-color: transparent;
+            color: #1e40af;
+            border: 2px solid #1e40af;
+        }
+        
+        .btn-secondary:hover {
+            background-color: rgba(30, 64, 175, 0.1);
+            transform: translateY(-2px);
+        }
+        
+        /* Print Styles - Only show certificate */
         @media print {
+            /* Hide everything by default */
+            body * {
+                visibility: hidden !important;
+            }
+            
+            /* Show only the certificate */
+            .professional-certificate,
+            .professional-certificate * {
+                visibility: visible !important;
+            }
+            
+            /* Position certificate for printing */
             .professional-certificate {
-                box-shadow: none;
-                border: 1px solid #000;
-                min-height: auto;
+                position: absolute !important;
+                left: 0 !important;
+                top: 0 !important;
+                width: 100% !important;
+                min-height: auto !important;
+                box-shadow: none !important;
+                border: 1px solid #000 !important;
+                margin: 0 !important;
+                padding: 30px 50px !important;
+                background: #fffdf8 !important;
             }
             
-            .back-buttons {
-                display: none;
+            /* Hide navigation, buttons, footer */
+            nav,
+            .button-container,
+            .back-buttons,
+            .print-btn,
+            .simple-footer,
+            .container > nav,
+            .main-content > *:not(.certificate-container),
+            .certificate-container > *:not(.professional-certificate) {
+                display: none !important;
             }
             
+            /* Ensure gold seal prints in color */
             .gold-seal {
-                -webkit-print-color-adjust: exact;
-                print-color-adjust: exact;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+            
+            /* Remove background from body */
+            body {
+                background: white !important;
+                margin: 0 !important;
+                padding: 20px !important;
+            }
+            
+            /* Ensure certificate container is visible */
+            .certificate-container {
+                max-width: 100% !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                visibility: visible !important;
             }
         }
         
@@ -341,10 +459,16 @@ $date = date('F d, Y');
             }
         }
         
-        /* Back buttons - Original Style */
-        .back-buttons {
-            text-align: center;
-            margin-top: 30px;
+        @media (max-width: 768px) {
+            .button-container {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .back-btn, .print-btn {
+                width: 100%;
+                max-width: 250px;
+            }
         }
     </style>
 </head>
@@ -422,10 +546,13 @@ $date = date('F d, Y');
                     </div>
                 </div>
                 
-                <!-- Original Back Buttons -->
-                <div class="back-buttons">
-                    <a href="game.php" class="btn btn-primary">Back to Games</a>
-                    <a href="index.php" class="btn btn-secondary" style="margin-left: 10px;">Return Home</a>
+                <!-- Button Container - All buttons on same line -->
+                <div class="button-container">
+                    <a href="game.php" class="back-btn btn-primary">Back to Games</a>
+                    <button onclick="window.print()" class="print-btn">
+                        <span></span> Print Certificate
+                    </button>
+                    <a href="index.php" class="back-btn btn-secondary">Return Home</a>
                 </div>
             </div>
         </div>
