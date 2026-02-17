@@ -608,7 +608,7 @@ if($current_question > $total_questions && !$game_completed) {
                         </div>
                         
                         <div class="certificate-note">
-                            <strong>Certificate Status:</strong> Complete both Password Fortress and Phishing Detective missions to unlock your cybersecurity awareness certificate.
+                            <strong>Progress:</strong> You've completed Password Fortress. Complete all three Phishing Detective levels to unlock your cybersecurity awareness certificate.
                         </div>
                     </div>
                 <?php else: ?>

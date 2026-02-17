@@ -666,13 +666,13 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action'])) {
                         </div>
                         
                         <div class="certificate-note">
-                            <strong>Certificate Status:</strong> Complete both Password Fortress and Phishing Detective missions to unlock your cybersecurity awareness certificate.
+                            <strong>Progress:</strong> You've completed Phishing Detective Level 2. Complete Level 3 and Password Fortress to unlock your cybersecurity awareness certificate.
                         </div>
                     </div>
                 <?php else: ?>
                     <!-- Game Information -->
                     <div class="game-info">
-                        <h3>⚠️ Expert Challenge:</h3>
+                        <h3>Expert Challenge:</h3>
                         <p><strong>Warning:</strong> Not all suspicious-looking elements are actual phishing clues. Some are normal text or legitimate elements.</p>
                         <p><strong>How to Play:</strong> Click <strong>ONLY</strong> on genuine phishing clues. Each correct clue is worth 10 points.</p>
                         <p><strong>Penalty:</strong> Clicking on incorrect elements reduces your score by 5 points each.</p>

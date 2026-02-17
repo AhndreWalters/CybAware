@@ -985,14 +985,23 @@ if($current_question > $total_questions && !$game_completed) {
             border-color: #cbd5e1;
         }
         
-        /* Container alignment fix */
         .game-interface > * {
             width: 100%;
             box-sizing: border-box;
             display: block;
         }
+
+        .certificate-note {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f0f9ff;
+            border: 1px solid #0ea5e9;
+            border-radius: 6px;
+            color: #0369a1;
+            font-size: 14px;
+            text-align: center;
+        }
         
-        /* Responsive styles for sender row */
         @media (max-width: 768px) {
             .game-interface {
                 padding: 15px;
@@ -1170,7 +1179,7 @@ if($current_question > $total_questions && !$game_completed) {
                         </div>
                         
                         <div class="certificate-note">
-                            <strong>Certificate Status:</strong> Complete both Password Fortress and Phishing Detective missions to unlock your cybersecurity awareness certificate.
+                            <strong>Progress:</strong> You've completed Phishing Detective Level 1. Complete Levels 2 and 3 and Password Fortress to unlock your cybersecurity awareness certificate.
                         </div>
                     </div>
                 <?php else: ?>

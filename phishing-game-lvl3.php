@@ -676,11 +676,15 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action'])) {
                             <a href="game.php" class="nav-btn secondary">Back to Games</a>
                             <a href="phishing-game-lvl3.php?reset=1" class="nav-btn">Play Again</a>
                         </div>
+
+                        <div class="certificate-note">
+                            <strong>Progress:</strong> You've completed Phishing Detective Level 3. Complete Password Fortress to unlock your cybersecurity awareness certificate.
+                        </div>
                     </div>
                 <?php else: ?>
                     <!-- Game Information -->
                     <div class="instructions">
-                        <h3>⚠️ Expert Challenge: No Visual Clues</h3>
+                        <h3>Expert Challenge: No Visual Clues</h3>
                         <p><strong>Mission:</strong> This email contains <strong>7 hidden phishing signs/errors</strong>. There are NO visual indicators - you must find them by reading carefully.</p>
                         <p><strong>How to Play:</strong> Click directly on suspicious text in the email. Correct clicks will show a green strikethrough. Wrong clicks show red.</p>
                     </div>
