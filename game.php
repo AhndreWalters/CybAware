@@ -445,11 +445,6 @@ if($stmt = mysqli_prepare($link, $sql)) {
                             <a href="password-game.php" class="password-game-btn">
                                 Start Mission
                             </a>
-                            
-                            <!-- New button for the Engineer Challenge -->
-                            <a href="password-game2.php" class="password-game-btn">
-                                Engineer Challenge
-                            </a>
                         </div>
                     </div>
 
