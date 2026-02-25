@@ -435,17 +435,23 @@ if($stmt = mysqli_prepare($link, $sql)) {
                 <div class="dashboard">
                     <div class="games-section">
                         <!-- Password Fortress Card -->
-                        <div class="game-card">
-                            <div class="game-content">
-                                <img src="images/ui-icon-password-security.png" alt="Password Security Icon">
-                                <h2>Password Fortress</h2>
-                                <p>Learn what makes a strong password and avoid common security mistakes. Test your knowledge with 5 challenging questions.</p>
-                                
-                                <a href="password-game.php" class="password-game-btn">
-                                    Start Mission
-                                </a>
-                            </div>
+                       <!-- Password Fortress Card -->
+                    <div class="game-card">
+                        <div class="game-content">
+                            <img src="images/ui-icon-password-security.png" alt="Password Security Icon">
+                            <h2>Password Fortress</h2>
+                            <p>Learn what makes a strong password and avoid common security mistakes. Test your knowledge with 5 challenging questions.</p>
+                            
+                            <a href="password-game.php" class="password-game-btn">
+                                Start Mission
+                            </a>
+                            
+                            <!-- New button for the Engineer Challenge -->
+                            <a href="password-game2.php" class="password-game-btn">
+                                Engineer Challenge
+                            </a>
                         </div>
+                    </div>
 
                         <!-- Phishing Detective Card with 3 Levels -->
                         <div class="game-card">
