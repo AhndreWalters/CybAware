@@ -166,34 +166,6 @@ const CHARS = [
         eyeCx: 22, eyeCy: 16, eyeMaxMove: 2, eyeR: 3, eyeColor: '#f0fdf4'
     },
     {
-        id: 'wizard', label: 'Wizard',
-        body: `
-            <circle cx="22" cy="26" r="11" fill="#fcd34d"/>
-            <path d="M10,24 Q22,2 34,24 Z" fill="#7c3aed"/>
-            <path d="M14,20 Q22,10 30,20" fill="#6d28d9" opacity="0.7"/>
-            <circle cx="22" cy="5" r="2.5" fill="#fbbf24"/>
-            <path d="M16,30 Q22,34 28,30" stroke="#d97706" stroke-width="1.3" fill="none" stroke-linecap="round"/>
-            <circle cx="18" cy="32.5" r="1" fill="#d97706"/>
-            <circle cx="26" cy="32.5" r="1" fill="#d97706"/>
-        `,
-        eyeBg: `<circle cx="22" cy="25" r="4.5" fill="white" stroke="#d97706" stroke-width="0.8"/>`,
-        eyeCx: 22, eyeCy: 25, eyeMaxMove: 1.8, eyeR: 2.4, eyeColor: '#7c3aed'
-    },
-    {
-        id: 'ghost', label: 'Ghost',
-        body: `
-            <defs>
-                <linearGradient id="gg" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stop-color="#e0e7ff"/>
-                    <stop offset="100%" stop-color="#a5b4fc"/>
-                </linearGradient>
-            </defs>
-            <path d="M10,39 L10,18 Q10,7 22,7 Q34,7 34,18 L34,39 Q30,35 26,39 Q24,37 22,39 Q20,37 18,39 Q14,35 10,39 Z" fill="url(#gg)" stroke="#c7d2fe" stroke-width="0.8"/>
-        `,
-        eyeBg: `<circle cx="22" cy="22" r="5" fill="#1e1b4b"/>`,
-        eyeCx: 22, eyeCy: 22, eyeMaxMove: 2, eyeR: 2.8, eyeColor: '#818cf8'
-    },
-    {
         id: 'ninja', label: 'Ninja',
         body: `
             <circle cx="22" cy="22" r="14" fill="#1e293b"/>
@@ -261,19 +233,6 @@ const CHARS = [
         `,
         eyeBg: `<circle cx="22" cy="21" r="4.5" fill="#431407"/>`,
         eyeCx: 22, eyeCy: 21, eyeMaxMove: 1.7, eyeR: 2.2, eyeColor: '#fb923c'
-    },
-    {
-        id: 'vampire', label: 'Vampire',
-        body: `
-            <circle cx="22" cy="22" r="12" fill="#e2e8f0"/>
-            <path d="M10,18 Q10,6 22,6 Q34,6 34,18" fill="#1e1b4b"/>
-            <path d="M12,18 Q14,12 22,12 Q30,12 32,18" fill="#312e81"/>
-            <path d="M17,30 Q22,34 27,30" stroke="#94a3b8" stroke-width="1.2" fill="none" stroke-linecap="round"/>
-            <path d="M20,32 L19,36 M24,32 L25,36" stroke="#dc2626" stroke-width="1.5" stroke-linecap="round"/>
-            <path d="M8,22 Q8,32 22,34 Q36,32 36,22" fill="#e2e8f0" opacity="0.3"/>
-        `,
-        eyeBg: `<circle cx="22" cy="22" r="4.5" fill="#1e1b4b"/>`,
-        eyeCx: 22, eyeCy: 22, eyeMaxMove: 2, eyeR: 2.4, eyeColor: '#dc2626'
     },
     {
         id: 'penguin', label: 'Penguin',
@@ -365,21 +324,6 @@ const CHARS = [
         eyeCx: 22, eyeCy: 21, eyeMaxMove: 2, eyeR: 2.2, eyeColor: '#38bdf8'
     },
     {
-        id: 'witch', label: 'Witch',
-        body: `
-            <circle cx="22" cy="26" r="11" fill="#a3a3a3"/>
-            <path d="M8,22 Q15,4 22,2 Q29,4 36,22 Z" fill="#1e1b4b"/>
-            <path d="M8,22 Q15,16 22,14 Q29,16 36,22" fill="#312e81"/>
-            <ellipse cx="22" cy="30" rx="7" ry="5" fill="#d4d4d4" opacity="0.5"/>
-            <path d="M16,30 Q22,35 28,30" stroke="#525252" stroke-width="1.3" fill="none" stroke-linecap="round"/>
-            <circle cx="19" cy="32" r="1" fill="#525252"/>
-            <circle cx="25" cy="32" r="1" fill="#525252"/>
-            <path d="M6,36 Q14,30 22,32 Q30,30 38,36" stroke="#78716c" stroke-width="1.5" fill="none" stroke-linecap="round"/>
-        `,
-        eyeBg: `<circle cx="22" cy="25" r="4.5" fill="white" stroke="#525252" stroke-width="0.8"/>`,
-        eyeCx: 22, eyeCy: 25, eyeMaxMove: 1.8, eyeR: 2.4, eyeColor: '#7c3aed'
-    },
-    {
         id: 'panda', label: 'Panda',
         body: `
             <circle cx="22" cy="23" r="13" fill="white" stroke="#e2e8f0" stroke-width="0.8"/>
@@ -404,22 +348,6 @@ const CHARS = [
         `,
         eyeBg: `<circle cx="22" cy="22" r="4.5" fill="white" stroke="#0891b2" stroke-width="0.8"/>`,
         eyeCx: 22, eyeCy: 22, eyeMaxMove: 1.8, eyeR: 2.3, eyeColor: '#0891b2'
-    },
-    {
-        id: 'devil', label: 'Devil',
-        body: `
-            <ellipse cx="22" cy="27" rx="11" ry="12" fill="#dc2626"/>
-            <circle cx="22" cy="20" r="10" fill="#ef4444"/>
-            <path d="M13,12 Q10,4 16,8" stroke="#dc2626" stroke-width="2" fill="none" stroke-linecap="round"/>
-            <circle cx="13" cy="8" r="2.5" fill="#b91c1c"/>
-            <path d="M31,12 Q34,4 28,8" stroke="#dc2626" stroke-width="2" fill="none" stroke-linecap="round"/>
-            <circle cx="31" cy="8" r="2.5" fill="#b91c1c"/>
-            <ellipse cx="22" cy="27" rx="6" ry="4" fill="#fca5a5" opacity="0.4"/>
-            <path d="M17,27 Q22,31 27,27" stroke="#b91c1c" stroke-width="1.3" fill="none" stroke-linecap="round"/>
-            <path d="M28,36 Q32,30 36,34 Q32,38 28,36Z" fill="#b91c1c"/>
-        `,
-        eyeBg: `<circle cx="22" cy="19" r="4.5" fill="#fef2f2" stroke="#b91c1c" stroke-width="0.8"/>`,
-        eyeCx: 22, eyeCy: 19, eyeMaxMove: 2, eyeR: 2.3, eyeColor: '#b91c1c'
     },
     {
         id: 'snowman', label: 'Snowman',
@@ -472,23 +400,83 @@ const CHARS = [
     {
         id: 'rabbit', label: '4orce Rabbit',
         body: `
-            <ellipse cx="22" cy="27" rx="11" ry="12" fill="#f1f5f9"/>
-            <circle cx="22" cy="22" r="10" fill="#f1f5f9"/>
-            <ellipse cx="16" cy="8" rx="3.5" ry="8" fill="#f1f5f9" stroke="#e2e8f0" stroke-width="0.8"/>
-            <ellipse cx="28" cy="8" rx="3.5" ry="8" fill="#f1f5f9" stroke="#e2e8f0" stroke-width="0.8"/>
-            <ellipse cx="16" cy="8" rx="2" ry="6" fill="#fda4af" opacity="0.7"/>
-            <ellipse cx="28" cy="8" rx="2" ry="6" fill="#fda4af" opacity="0.7"/>
-            <ellipse cx="22" cy="28" rx="7" ry="5" fill="#fce7f3" opacity="0.6"/>
-            <ellipse cx="22" cy="27" rx="2.5" ry="1.8" fill="#fda4af"/>
-            <path d="M17,29 Q22,33 27,29" stroke="#e2e8f0" stroke-width="1.2" fill="none" stroke-linecap="round"/>
-            <line x1="14" y1="25" x2="7" y2="24" stroke="#cbd5e1" stroke-width="1" stroke-linecap="round"/>
-            <line x1="14" y1="27" x2="7" y2="27" stroke="#cbd5e1" stroke-width="1" stroke-linecap="round"/>
-            <line x1="30" y1="25" x2="37" y2="24" stroke="#cbd5e1" stroke-width="1" stroke-linecap="round"/>
-            <line x1="30" y1="27" x2="37" y2="27" stroke="#cbd5e1" stroke-width="1" stroke-linecap="round"/>
+            <ellipse cx="22" cy="26" rx="11" ry="12" fill="#8b7355"/>
+            <circle cx="22" cy="21" r="10" fill="#9b8465"/>
+            <ellipse cx="15" cy="7" rx="3" ry="8" fill="#9b8465" stroke="#7a6548" stroke-width="0.8"/>
+            <ellipse cx="29" cy="7" rx="3" ry="8" fill="#9b8465" stroke="#7a6548" stroke-width="0.8"/>
+            <ellipse cx="15" cy="7" rx="1.8" ry="6" fill="#c0392b" opacity="0.6"/>
+            <ellipse cx="29" cy="7" rx="1.8" ry="6" fill="#c0392b" opacity="0.6"/>
+            <!-- Hoodie -->
+            <path d="M8,38 Q8,24 22,22 Q36,24 36,38 Z" fill="#3d6b3d"/>
+            <path d="M8,38 Q8,24 22,22 Q36,24 36,38 Z" fill="#2d5a2d" opacity="0.4"/>
+            <path d="M14,22 Q14,16 22,15 Q30,16 30,22 Q28,18 22,17 Q16,18 14,22Z" fill="#3d6b3d"/>
+            <!-- Hood shadow -->
+            <path d="M12,20 Q14,12 22,11 Q30,12 32,20 Q30,15 22,14 Q14,15 12,20Z" fill="#2d5a2d"/>
+            <!-- Dreads -->
+            <line x1="15" y1="19" x2="10" y2="30" stroke="#3d2b1a" stroke-width="2" stroke-linecap="round"/>
+            <line x1="17" y1="20" x2="13" y2="32" stroke="#4a3520" stroke-width="1.8" stroke-linecap="round"/>
+            <line x1="27" y1="20" x2="31" y2="32" stroke="#3d2b1a" stroke-width="2" stroke-linecap="round"/>
+            <line x1="29" y1="19" x2="34" y2="30" stroke="#4a3520" stroke-width="1.8" stroke-linecap="round"/>
+            <!-- Face -->
+            <ellipse cx="22" cy="22" rx="8" ry="7" fill="#9b8465"/>
+            <!-- Neck gaiter -->
+            <rect x="15" y="27" width="14" height="5" rx="2" fill="#1a1a1a"/>
+            <!-- Gold chain -->
+            <path d="M15,28 Q22,31 29,28" stroke="#fbbf24" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+            <circle cx="22" cy="31" r="1.5" fill="#f59e0b"/>
+            <!-- Carrot -->
+            <rect x="24" y="24" width="10" height="3" rx="1.5" fill="#f97316" transform="rotate(-15 24 24)"/>
+            <path d="M32,21 Q34,19 36,20 Q34,22 33,23" fill="#16a34a"/>
+            <!-- Mouth eating carrot -->
+            <path d="M20,25 Q22,27 24,25" stroke="#7a6548" stroke-width="1" fill="none" stroke-linecap="round"/>
         `,
-        eyeBg: `<circle cx="22" cy="21" r="4.5" fill="#fce7f3" stroke="#fda4af" stroke-width="0.8"/>`,
-        eyeCx: 22, eyeCy: 21, eyeMaxMove: 1.6, eyeR: 2.3, eyeColor: '#ec4899'
-    }
+        eyeBg: `<circle cx="22" cy="20" r="4.5" fill="#1a0a0a" stroke="#7a6548" stroke-width="0.8"/>`,
+        eyeCx: 22, eyeCy: 20, eyeMaxMove: 1.6, eyeR: 2.3, eyeColor: '#dc2626'
+    },
+    {
+        id: 'msjackson', label: 'Ms. Jackson',
+        body: `
+            <!-- Body / cardigan -->
+            <ellipse cx="22" cy="34" rx="12" ry="9" fill="#d6b8e8"/>
+            <rect x="11" y="27" width="22" height="12" rx="4" fill="#9b6fc7"/>
+            <!-- Neck -->
+            <rect x="19" y="24" width="6" height="5" rx="2" fill="#f5d5b8"/>
+            <!-- Pearl necklace -->
+            <path d="M16,28 Q22,31 28,28" stroke="white" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+            <circle cx="22" cy="30.5" r="1.2" fill="#f0e6ff"/>
+            <circle cx="18" cy="29" r="1.1" fill="#f0e6ff"/>
+            <circle cx="26" cy="29" r="1.1" fill="#f0e6ff"/>
+            <!-- Head -->
+            <circle cx="22" cy="18" r="11" fill="#f5d5b8"/>
+            <!-- White curly hair -->
+            <ellipse cx="22" cy="10" rx="11" ry="6" fill="white"/>
+            <circle cx="12" cy="13" r="4.5" fill="white"/>
+            <circle cx="32" cy="13" r="4.5" fill="white"/>
+            <circle cx="14" cy="10" r="3.5" fill="white"/>
+            <circle cx="30" cy="10" r="3.5" fill="white"/>
+            <circle cx="22" cy="8" r="4" fill="white"/>
+            <circle cx="17" cy="8" r="3.5" fill="white"/>
+            <circle cx="27" cy="8" r="3.5" fill="white"/>
+            <!-- Glasses -->
+            <rect x="13" y="17" width="7" height="5" rx="2.5" fill="none" stroke="#92400e" stroke-width="1.2"/>
+            <rect x="24" y="17" width="7" height="5" rx="2.5" fill="none" stroke="#92400e" stroke-width="1.2"/>
+            <line x1="20" y1="19" x2="24" y2="19" stroke="#92400e" stroke-width="1.2"/>
+            <line x1="13" y1="19" x2="10" y2="18" stroke="#92400e" stroke-width="1.2"/>
+            <line x1="31" y1="19" x2="34" y2="18" stroke="#92400e" stroke-width="1.2"/>
+            <!-- Nose -->
+            <ellipse cx="22" cy="22" rx="1.5" ry="1" fill="#e8b89a"/>
+            <!-- Smile -->
+            <path d="M18,25 Q22,28 26,25" stroke="#c0836a" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+            <!-- Rosy cheeks -->
+            <ellipse cx="15" cy="23" rx="3" ry="2" fill="#f9a8d4" opacity="0.35"/>
+            <ellipse cx="29" cy="23" rx="3" ry="2" fill="#f9a8d4" opacity="0.35"/>
+            <!-- Handbag hint -->
+            <rect x="30" y="30" width="6" height="5" rx="2" fill="#7c3aed"/>
+            <path d="M31,30 Q33,28 35,30" stroke="#6d28d9" stroke-width="1.2" fill="none"/>
+        `,
+        eyeBg: `<rect x="13.5" y="17.5" width="6" height="4" rx="2" fill="#dbeafe" opacity="0.5"/>`,
+        eyeCx: 16, eyeCy: 19, eyeMaxMove: 1.2, eyeR: 1.6, eyeColor: '#1e40af'
+    },
 ];
 
 const KEY = 'cyb_char';
