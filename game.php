@@ -361,14 +361,6 @@ if($stmt = mysqli_prepare($link, $sql)) {
                                 </div>
                             </div>
 
-                            <div class="score-item">
-                                <div class="score-label">Total Games Completed</div>
-                                <div class="score-value"><?php echo $games_completed; ?>/<?php echo $total_games; ?></div>
-                                <div class="score-progress">
-                                    <div class="score-fill" style="width: <?php echo ($games_completed / $total_games) * 100; ?>%"></div>
-                                </div>
-                            </div>
-
                             <a href="certificate.php" class="certificate-btn">Download Certificate</a>
                         </div>
                     </div>
