@@ -9,7 +9,7 @@
 </head>
 <body>
     <audio src="music/" loop autoplay></audio>
-    <audio src="music/the_mountain-technology-485572.mp3" loop autoplay></audio>
+    <audio src="music/eliveta-technology.mp3" loop autoplay></audio>
 
     <div class="container">
 

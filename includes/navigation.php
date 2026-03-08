@@ -73,6 +73,26 @@ if (session_status() === PHP_SESSION_NONE) {
     <div class="mobile-menu-btn" id="mobileMenuBtn">☰</div>
 </nav>
 
+<!-- Background Music -->
+<audio src="music/eliveta-technology.mp3" loop autoplay></audio>
+<script>
+const music = document.getElementById('bg-music');
+music.volume = 0.3;
+document.addEventListener('click', function startMusic() {
+    music.play().catch(() => {});
+    document.removeEventListener('click', startMusic);
+}, { once: true });
+
+// Resume from saved position
+music.addEventListener('canplay', () => {
+    const saved = parseFloat(sessionStorage.getItem('music_time') || 0);
+    if (saved) music.currentTime = saved;
+});
+setInterval(() => {
+    if (!music.paused) sessionStorage.setItem('music_time', music.currentTime);
+}, 1000);
+</script>
+
 <!-- Character Picker Modal -->
 <div id="char-picker" style="
     display: none;

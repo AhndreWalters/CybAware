@@ -8,7 +8,6 @@
     <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
-    <audio src="music/the_mountain-technology-485572.mp3" loop autoplay></audio>
     <div class="container">
         <?php include 'includes/navigation.php'; ?>
 

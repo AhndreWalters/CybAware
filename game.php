@@ -261,7 +261,6 @@ if($stmt = mysqli_prepare($link, $sql)) {
     </style>
 </head>
 <body>
-    <audio src="music/the_mountain-technology-485572.mp3" loop autoplay></audio>
     <div class="container">
         <?php include 'includes/navigation.php'; ?>
 
