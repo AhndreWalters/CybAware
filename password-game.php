@@ -123,7 +123,6 @@ function calculatePasswordStrength($password) {
     }
 }
 
-// Reset game if needed
 if(isset($_GET['reset'])) {
     unset($_SESSION['password_score']);
     unset($_SESSION['password_question']);
