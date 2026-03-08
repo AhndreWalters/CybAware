@@ -16,7 +16,7 @@
             <div class="hero-content">
                 <div class="hero">
                     <br>
-                    <img src="images/cybawarelogo.png" alt="CybAware Game Interface" style="width: 150px; animation: glitch 3s infinite;"><br><br>
+                    <img src="images/hacker.png" alt="CybAware Game Interface" style="width: 150px; animation: glitch 3s infinite;"><br><br>
 
                     <style>
                     @keyframes glitch {
