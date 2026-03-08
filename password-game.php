@@ -198,11 +198,11 @@ if($current_question > $total_questions && !$game_completed) {
         .progress-fill {
             height: 100%;
             background: #1e40af;
-            width: <?php 
+            width: <?php
                 if($game_completed) {
                     echo '100';
                 } else {
-                    echo (($current_question-1)/$total_questions)*100; 
+                    echo (($current_question-1)/$total_questions)*100;
                 }
             ?>%;
             transition: width 0.3s ease;
