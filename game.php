@@ -278,7 +278,7 @@ if($stmt = mysqli_prepare($link, $sql)) {
                         <div class="game-content">
                             <img src="images/password.png" alt="Password Security Icon">
                             <h2>Password Fortress</h2>
-                            <p>Learn what makes a strong password and avoid common security mistakes. Test your knowledge with 5 challenging questions.</p>
+                            <p>Learn what makes a strong password and avoid common security mistakes. Test your knowledge with 10 challenging questions.</p>
                             <a href="password-game.php" class="play-btn">Test Security</a>
                         </div>
                     </div>
@@ -305,16 +305,16 @@ if($stmt = mysqli_prepare($link, $sql)) {
                             <div class="phishing-levels">
                                 <div class="level-container">
                                     <div class="level-header">
-                                        <div class="level-name">Password Fortress</div>
-                                        <div class="level-score"><?php echo $password_score; ?>/5</div>
+                                        <div class="level-name">Password Fortress | Test Security</div>
+                                        <div class="level-score"><?php echo $password_score; ?>/10</div>
                                     </div>
                                     <div class="score-progress">
-                                        <div class="score-fill" style="width: <?php echo ($password_score / 5) * 100; ?>%"></div>
+                                        <div class="score-fill" style="width: <?php echo ($password_score / 10) * 100; ?>%"></div>
                                     </div>
                                 </div>
                                 <div class="level-container">
                                     <div class="level-header">
-                                        <div class="level-name">Phishing Level 1</div>
+                                        <div class="level-name">Phishing Detective | Read Emails</div>
                                         <div class="level-score"><?php echo $phishing_lvl1_score; ?>/10</div>
                                     </div>
                                     <div class="score-progress">
@@ -323,7 +323,7 @@ if($stmt = mysqli_prepare($link, $sql)) {
                                 </div>
                                 <div class="level-container">
                                     <div class="level-header">
-                                        <div class="level-name">Phishing Level 2</div>
+                                        <div class="level-name">Phishing Detective | Hunt Errors</div>
                                         <div class="level-score"><?php echo $phishing_lvl3_score; ?>/10</div>
                                     </div>
                                     <div class="score-progress">

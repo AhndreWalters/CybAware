@@ -16,7 +16,22 @@
             <div class="hero-content">
                 <div class="hero">
                     <br>
-                    <img src="images/cybawarelogo.png" alt="CybAware Game Interface" style="width: 150px;"><br><br>
+                    <img src="images/cybawarelogo.png" alt="CybAware Game Interface" style="width: 150px; animation: glitch 3s infinite;"><br><br>
+
+                    <style>
+                    @keyframes glitch {
+                    0%, 90%, 100% { transform: translate(0); filter: none; opacity: 1; }
+                    91% { transform: translate(-3px, 1px); filter: hue-rotate(90deg) saturate(2); opacity: 0.8; }
+                    92% { transform: translate(3px, -1px); filter: hue-rotate(180deg) saturate(3) brightness(1.5); opacity: 0.9; }
+                    93% { transform: translate(0); filter: none; opacity: 1; }
+                    94% { transform: translate(2px, 2px) skewX(-5deg); filter: hue-rotate(270deg) saturate(2); opacity: 0.7; }
+                    95% { transform: translate(-2px, -1px); filter: brightness(2) saturate(0); opacity: 0.85; }
+                    96% { transform: translate(0) skewX(3deg); filter: hue-rotate(45deg); opacity: 1; }
+                    97% { transform: translate(-4px, 0); filter: saturate(4) hue-rotate(120deg); opacity: 0.6; }
+                    98% { transform: translate(2px, 1px); filter: none; opacity: 0.9; }
+                    99% { transform: translate(0) skewX(-2deg); filter: brightness(1.8); opacity: 1; }
+                    }
+                    </style>
                     <h1>Upgrade Your <span style="color: white; position: relative; display: inline-block;">Cybersecurity<svg style="position: absolute; bottom: -6px; left: 0; width: 100%; height: 8px;" viewBox="0 0 100 8" preserveAspectRatio="none"><path d="M0,5 Q50,-2 100,5" stroke="#4ade80" stroke-width="2.5" fill="none" stroke-linecap="round"/>/></svg></span> Skills</h1>
                     <div class="tagline">Digital Safety Through Gaming</div>
                     <p class="description">

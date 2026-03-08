@@ -14,7 +14,6 @@ $score = isset($_SESSION['phishing_score']) ? $_SESSION['phishing_score'] : 0;
 $current_question = isset($_SESSION['phishing_question']) ? $_SESSION['phishing_question'] : 1;
 $total_questions = 10;
 $feedback = "";
-$feedback_type = "";
 $game_completed = false;
 
 // Game data - Realistic looking emails
@@ -26,43 +25,26 @@ $emails = [
         'body' => '<div style="font-family: Arial, Helvetica, sans-serif; color: #202124; line-height: 1.5; font-size: 14px; max-width: 600px; margin: 0 auto;">
                     <div style="border-bottom: 1px solid #dadce0; padding-bottom: 20px; margin-bottom: 20px;">
                         <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse: collapse;">
-                            <tr>
-                                <td style="padding: 0;">
-                                    <img src="https://www.paypalobjects.com/webstatic/icon/pp258.png" alt="PayPal" style="height: 32px; margin-bottom: 15px;">
-                                </td>
-                            </tr>
+                            <tr><td style="padding: 0;"><img src="https://www.paypalobjects.com/webstatic/icon/pp258.png" alt="PayPal" style="height: 32px; margin-bottom: 15px;"></td></tr>
                         </table>
                         <h1 style="font-size: 20px; font-weight: 400; color: #001c64; margin: 0 0 20px 0;">Account Verification Required</h1>
                     </div>
-                    
                     <p style="margin: 0 0 20px 0;">Dear PayPal Member,</p>
-                    
                     <p style="margin: 0 0 20px 0;">Our security system has detected unusual activity on your account. To protect your account from unauthorized access, we require immediate verification of your identity.</p>
-                    
                     <div style="background-color: #f8f9fa; border: 1px solid #dadce0; border-radius: 4px; padding: 20px; margin: 0 0 20px 0;">
                         <p style="margin: 0 0 15px 0; font-weight: 600; color: #d93025;">Action Required Within 24 Hours:</p>
                         <p style="margin: 0 0 15px 0;">Please click the link below to verify your PayPal account:</p>
-                        <p style="margin: 0;">
-                            <a href="http://secure-paypal-verify.com/login" style="color: #1a73e8; text-decoration: none; word-break: break-all; display: inline-block; padding: 10px 15px; background-color: #e8f0fe; border-radius: 4px; border: 1px solid #d2e3fc;">http://secure-paypal-verify.com/login</a>
-                        </p>
+                        <p style="margin: 0;"><a href="#" style="color: #1a73e8; text-decoration: none; word-break: break-all; display: inline-block; padding: 10px 15px; background-color: #e8f0fe; border-radius: 4px; border: 1px solid #d2e3fc;">http://secure-paypal-verify.com/login</a></p>
                     </div>
-                    
                     <p style="margin: 0 0 20px 0;">If you do not complete this verification process, your account will be temporarily suspended until we can confirm your identity.</p>
-                    
-                    <p style="margin: 0 0 20px 0;">Thank you for your prompt attention to this security matter.</p>
-                    
-                    <p style="margin: 0 0 20px 0;">
-                        Sincerely,<br>
-                        <strong>PayPal Security Team</strong>
-                    </p>
-                    
+                    <p style="margin: 0 0 20px 0;">Sincerely,<br><strong>PayPal Security Team</strong></p>
                     <div style="border-top: 1px solid #dadce0; padding-top: 20px; margin-top: 30px; font-size: 12px; color: #5f6368;">
                         <p style="margin: 0 0 10px 0;">This is an automated message from PayPal Security. Please do not reply to this email.</p>
                         <p style="margin: 0;">© 2025 PayPal. All rights reserved.</p>
                     </div>
                 </div>',
         'answer' => 'phishing',
-        'hint' => 'Check the domain: "paypal-support.com" is not PayPal\'s official domain (paypal.com)'
+        'hint' => 'Check the sender domain: "paypal-support.com" is NOT PayPal\'s official domain (paypal.com). Legitimate PayPal emails always come from @paypal.com.'
     ],
     2 => [
         'sender' => 'no-reply@amazon.com',
@@ -70,60 +52,30 @@ $emails = [
         'subject' => 'Your order #113-6920517-7262665 has shipped',
         'body' => '<div style="font-family: Arial, Helvetica, sans-serif; color: #111; line-height: 1.5; font-size: 14px; max-width: 600px; margin: 0 auto;">
                     <div style="border-bottom: 1px solid #ddd; padding-bottom: 15px; margin-bottom: 20px;">
-                        <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse: collapse;">
-                            <tr>
-                                <td style="padding: 0;">
-                                    <span style="color: #ff9900; font-size: 24px; font-weight: bold; display: inline-block; margin-bottom: 10px;">amazon</span>
-                                </td>
-                            </tr>
-                        </table>
+                        <span style="color: #ff9900; font-size: 24px; font-weight: bold; display: inline-block; margin-bottom: 10px;">amazon</span>
                         <h1 style="font-size: 18px; font-weight: 400; color: #111; margin: 0;">Your order has shipped</h1>
                     </div>
-                    
                     <p style="margin: 0 0 20px 0;">Hello,</p>
-                    
                     <p style="margin: 0 0 20px 0;">Good news! Your Amazon order has shipped.</p>
-                    
                     <div style="background-color: #f3f3f3; border: 1px solid #ddd; border-radius: 4px; padding: 15px; margin: 0 0 20px 0;">
                         <p style="margin: 0 0 10px 0; font-weight: 600; color: #111;">Order Details:</p>
                         <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse: collapse; font-size: 13px;">
-                            <tr>
-                                <td style="padding: 5px 0; color: #555;">Order #:</td>
-                                <td style="padding: 5px 0; font-weight: 600;">113-6920517-7262665</td>
-                            </tr>
-                            <tr>
-                                <td style="padding: 5px 0; color: #555;">Items:</td>
-                                <td style="padding: 5px 0;">1 of "Wireless Bluetooth Headphones"</td>
-                            </tr>
-                            <tr>
-                                <td style="padding: 5px 0; color: #555;">Shipping Method:</td>
-                                <td style="padding: 5px 0;">Standard Shipping</td>
-                            </tr>
-                            <tr>
-                                <td style="padding: 5px 0; color: #555;">Estimated Delivery:</td>
-                                <td style="padding: 5px 0;">3-5 business days</td>
-                            </tr>
+                            <tr><td style="padding: 5px 0; color: #555;">Order #:</td><td style="padding: 5px 0; font-weight: 600;">113-6920517-7262665</td></tr>
+                            <tr><td style="padding: 5px 0; color: #555;">Items:</td><td style="padding: 5px 0;">1 of "Wireless Bluetooth Headphones"</td></tr>
+                            <tr><td style="padding: 5px 0; color: #555;">Shipping Method:</td><td style="padding: 5px 0;">Standard Shipping</td></tr>
+                            <tr><td style="padding: 5px 0; color: #555;">Estimated Delivery:</td><td style="padding: 5px 0;">3-5 business days</td></tr>
                         </table>
                     </div>
-                    
-                    <p style="margin: 0 0 20px 0;">
-                        <a href="https://www.amazon.com/track-package" style="color: #0066c0; text-decoration: none; font-weight: 600;">Track your package</a>
-                    </p>
-                    
-                    <p style="margin: 0 0 20px 0;">If you have any questions about your order, visit our <a href="https://www.amazon.com/contact-us" style="color: #0066c0; text-decoration: none;">Customer Service</a> page.</p>
-                    
-                    <p style="margin: 0 0 20px 0;">
-                        Thank you for shopping with Amazon!<br>
-                        <strong>The Amazon Team</strong>
-                    </p>
-                    
+                    <p style="margin: 0 0 20px 0;"><a href="#" style="color: #0066c0; text-decoration: none; font-weight: 600;">Track your package</a></p>
+                    <p style="margin: 0 0 20px 0;">If you have any questions about your order, visit our <a href="#" style="color: #0066c0; text-decoration: none;">Customer Service</a> page.</p>
+                    <p style="margin: 0 0 20px 0;">Thank you for shopping with Amazon!<br><strong>The Amazon Team</strong></p>
                     <div style="border-top: 1px solid #ddd; padding-top: 15px; margin-top: 30px; font-size: 12px; color: #555;">
                         <p style="margin: 0 0 10px 0;">Please note: This email was sent from a notification-only address that cannot accept incoming email. Please do not reply to this message.</p>
                         <p style="margin: 0;">© 1996-2025, Amazon.com, Inc. or its affiliates</p>
                     </div>
                 </div>',
         'answer' => 'legitimate',
-        'hint' => 'This uses Amazon\'s official domain and has realistic order details without urgent demands.'
+        'hint' => 'This is a legitimate email. It comes from Amazon\'s official domain (@amazon.com), includes realistic order details, has no urgent threats, and links only to amazon.com.'
     ],
     3 => [
         'sender' => 'netflix@account-update.com',
@@ -131,45 +83,27 @@ $emails = [
         'subject' => 'Payment Failed - Update Your Payment Method',
         'body' => '<div style="font-family: Arial, Helvetica, sans-serif; color: #333; line-height: 1.5; font-size: 14px; max-width: 600px; margin: 0 auto;">
                     <div style="border-bottom: 1px solid #e50914; padding-bottom: 15px; margin-bottom: 20px;">
-                        <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse: collapse;">
-                            <tr>
-                                <td style="padding: 0;">
-                                    <span style="color: #e50914; font-size: 28px; font-weight: bold; display: inline-block; margin-bottom: 10px;">NETFLIX</span>
-                                </td>
-                            </tr>
-                        </table>
+                        <span style="color: #e50914; font-size: 28px; font-weight: bold; display: inline-block; margin-bottom: 10px;">NETFLIX</span>
                         <h1 style="font-size: 18px; font-weight: 400; color: #333; margin: 0;">Payment Update Required</h1>
                     </div>
-                    
                     <p style="margin: 0 0 20px 0;">Dear Netflix Subscriber,</p>
-                    
                     <p style="margin: 0 0 20px 0;">We were unable to process your most recent payment of <strong>$15.99</strong> for your Netflix subscription.</p>
-                    
                     <div style="background-color: #fff3cd; border: 1px solid #ffc107; border-radius: 4px; padding: 20px; margin: 0 0 20px 0;">
                         <p style="margin: 0 0 15px 0; font-weight: 600; color: #856404;">Important Notice:</p>
                         <p style="margin: 0 0 15px 0;">Your account will be suspended in <strong>48 hours</strong> if we do not receive payment.</p>
-                        <p style="margin: 0;">
-                            To update your payment information, please click here:<br>
-                            <a href="http://netflix-billing-update.com/payment" style="color: #e50914; text-decoration: none; font-weight: 600; display: inline-block; margin-top: 10px; padding: 10px 20px; background-color: #e50914; color: white; border-radius: 4px;">Update Payment Method</a>
+                        <p style="margin: 0;">To update your payment information, please click here:<br>
+                            <a href="#" style="color: white; text-decoration: none; font-weight: 600; display: inline-block; margin-top: 10px; padding: 10px 20px; background-color: #e50914; color: white; border-radius: 4px;">Update Payment Method</a>
                         </p>
                     </div>
-                    
                     <p style="margin: 0 0 20px 0;">If you believe this is an error, please contact our billing department immediately.</p>
-                    
-                    <p style="margin: 0 0 20px 0;">
-                        Thank you for being a Netflix member.<br>
-                        <strong>Netflix Billing Team</strong>
-                    </p>
-                    
+                    <p style="margin: 0 0 20px 0;">Thank you for being a Netflix member.<br><strong>Netflix Billing Team</strong></p>
                     <div style="border-top: 1px solid #ddd; padding-top: 15px; margin-top: 30px; font-size: 12px; color: #666;">
-                        <p style="margin: 0 0 10px 0;">Netflix, Inc.<br>
-                        100 Winchester Circle<br>
-                        Los Gatos, CA 95032</p>
+                        <p style="margin: 0 0 10px 0;">Netflix, Inc.<br>100 Winchester Circle<br>Los Gatos, CA 95032</p>
                         <p style="margin: 0;">This email was sent from an unmonitored mailbox.</p>
                     </div>
                 </div>',
         'answer' => 'phishing',
-        'hint' => 'Urgent language with threats, and the domain is "account-update.com" not "netflix.com"'
+        'hint' => 'Two red flags: the sender domain is "account-update.com" — NOT "netflix.com". Real Netflix emails always come from @netflix.com. The 48-hour suspension threat is also a classic pressure tactic.'
     ],
     4 => [
         'sender' => 'security@twitter.com',
@@ -177,66 +111,32 @@ $emails = [
         'subject' => 'New login to your account from Chrome on Windows',
         'body' => '<div style="font-family: Arial, Helvetica, sans-serif; color: #0f1419; line-height: 1.5; font-size: 14px; max-width: 600px; margin: 0 auto;">
                     <div style="border-bottom: 1px solid #cfd9de; padding-bottom: 15px; margin-bottom: 20px;">
-                        <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse: collapse;">
-                            <tr>
-                                <td style="padding: 0;">
-                                    <span style="color: #1da1f2; font-size: 24px; font-weight: bold; display: inline-block; margin-bottom: 10px;">Twitter</span>
-                                </td>
-                            </tr>
-                        </table>
+                        <span style="color: #1da1f2; font-size: 24px; font-weight: bold; display: inline-block; margin-bottom: 10px;">Twitter</span>
                         <h1 style="font-size: 18px; font-weight: 400; color: #0f1419; margin: 0;">New login detected</h1>
                     </div>
-                    
                     <p style="margin: 0 0 20px 0;">Hi there,</p>
-                    
                     <p style="margin: 0 0 20px 0;">We noticed a new login to your Twitter account. If this was you, you can ignore this message. No further action is required.</p>
-                    
                     <div style="background-color: #f7f9f9; border: 1px solid #cfd9de; border-radius: 4px; padding: 15px; margin: 0 0 20px 0;">
                         <p style="margin: 0 0 10px 0; font-weight: 600; color: #0f1419;">Login Details:</p>
                         <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse: collapse; font-size: 13px;">
-                            <tr>
-                                <td style="padding: 5px 0; color: #536471; width: 120px;">Date:</td>
-                                <td style="padding: 5px 0;">' . date('F j, Y') . '</td>
-                            </tr>
-                            <tr>
-                                <td style="padding: 5px 0; color: #536471;">Time:</td>
-                                <td style="padding: 5px 0;">' . date('g:i A') . ' PST</td>
-                            </tr>
-                            <tr>
-                                <td style="padding: 5px 0; color: #536471;">Browser:</td>
-                                <td style="padding: 5px 0;">Chrome</td>
-                            </tr>
-                            <tr>
-                                <td style="padding: 5px 0; color: #536471;">Operating System:</td>
-                                <td style="padding: 5px 0;">Windows</td>
-                            </tr>
-                            <tr>
-                                <td style="padding: 5px 0; color: #536471;">Location:</td>
-                                <td style="padding: 5px 0;">New York, USA (Approximate)</td>
-                            </tr>
+                            <tr><td style="padding: 5px 0; color: #536471; width: 120px;">Date:</td><td style="padding: 5px 0;">' . date('F j, Y') . '</td></tr>
+                            <tr><td style="padding: 5px 0; color: #536471;">Time:</td><td style="padding: 5px 0;">' . date('g:i A') . ' PST</td></tr>
+                            <tr><td style="padding: 5px 0; color: #536471;">Browser:</td><td style="padding: 5px 0;">Chrome</td></tr>
+                            <tr><td style="padding: 5px 0; color: #536471;">Operating System:</td><td style="padding: 5px 0;">Windows</td></tr>
+                            <tr><td style="padding: 5px 0; color: #536471;">Location:</td><td style="padding: 5px 0;">New York, USA (Approximate)</td></tr>
                         </table>
                     </div>
-                    
                     <p style="margin: 0 0 20px 0;">If you don\'t recognize this activity, please review your account immediately:</p>
-                    
-                    <p style="margin: 0 0 20px 0;">
-                        <a href="https://twitter.com/settings/security" style="color: #1da1f2; text-decoration: none; font-weight: 600; display: inline-block; padding: 10px 20px; border: 1px solid #1da1f2; border-radius: 9999px;">Review Your Account Security</a>
-                    </p>
-                    
+                    <p style="margin: 0 0 20px 0;"><a href="#" style="color: #1da1f2; text-decoration: none; font-weight: 600; display: inline-block; padding: 10px 20px; border: 1px solid #1da1f2; border-radius: 9999px;">Review Your Account Security</a></p>
                     <p style="margin: 0 0 20px 0;">For your security, this email was sent to all email addresses associated with your Twitter account.</p>
-                    
-                    <p style="margin: 0 0 20px 0;">
-                        Thanks,<br>
-                        <strong>The Twitter Team</strong>
-                    </p>
-                    
+                    <p style="margin: 0 0 20px 0;">Thanks,<br><strong>The Twitter Team</strong></p>
                     <div style="border-top: 1px solid #cfd9de; padding-top: 15px; margin-top: 30px; font-size: 12px; color: #536471;">
                         <p style="margin: 0 0 10px 0;">This is an automated message. Please do not reply to this email.</p>
                         <p style="margin: 0;">© 2025 Twitter, Inc.</p>
                     </div>
                 </div>',
         'answer' => 'legitimate',
-        'hint' => 'Official Twitter domain, provides specific login details without urgent demands'
+        'hint' => 'This is a legitimate email. It comes from Twitter\'s official @twitter.com domain, provides specific login details, and doesn\'t pressure you into clicking anything urgently.'
     ],
     5 => [
         'sender' => 'service@microsoft-security.net',
@@ -244,52 +144,31 @@ $emails = [
         'subject' => 'URGENT: Your Windows License is About to Expire',
         'body' => '<div style="font-family: Arial, Helvetica, sans-serif; color: #323130; line-height: 1.5; font-size: 14px; max-width: 600px; margin: 0 auto;">
                     <div style="border-bottom: 1px solid #d83b01; padding-bottom: 15px; margin-bottom: 20px;">
-                        <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse: collapse;">
-                            <tr>
-                                <td style="padding: 0;">
-                                    <span style="color: #0078d4; font-size: 24px; font-weight: bold; display: inline-block; margin-bottom: 10px;">Microsoft</span>
-                                </td>
-                            </tr>
-                        </table>
+                        <span style="color: #0078d4; font-size: 24px; font-weight: bold; display: inline-block; margin-bottom: 10px;">Microsoft</span>
                         <h1 style="font-size: 20px; font-weight: 600; color: #d83b01; margin: 0;">URGENT: Windows License Expiration Notice</h1>
                     </div>
-                    
                     <p style="margin: 0 0 20px 0; font-weight: 600;">ATTENTION: Windows User,</p>
-                    
                     <p style="margin: 0 0 20px 0;">Our records indicate that your Microsoft Windows license will <strong>expire in 3 days</strong>.</p>
-                    
                     <div style="background-color: #fde7e9; border: 1px solid #d83b01; border-radius: 4px; padding: 20px; margin: 0 0 20px 0;">
-                        <p style="margin: 0 0 15px 0; font-weight: 700; color: #a4262c;">IMMEDIATE ACTION REQUIRED:</p>
-                        
+                        <p style="margin: 0 0 15px 0; font-weight: 700; color: #a4262c; text-transform: uppercase;">Immediate Action Required:</p>
                         <p style="margin: 0 0 15px 0; font-weight: 600;">Failure to renew your license will result in:</p>
-                        
                         <ul style="margin: 0 0 15px 0; padding-left: 20px;">
                             <li style="margin: 0 0 8px 0;">System lockout after expiration</li>
                             <li style="margin: 0 0 8px 0;">Data encryption for security purposes</li>
                             <li style="margin: 0 0 8px 0;">Permanent loss of access to your files</li>
                             <li style="margin: 0 0 8px 0;">Inability to receive critical security updates</li>
                         </ul>
-                        
-                        <p style="margin: 0;">
-                            <a href="http://microsoft-license-renewal.com/activate" style="color: #ffffff; text-decoration: none; font-weight: 700; display: inline-block; padding: 12px 24px; background-color: #d83b01; border-radius: 4px; text-transform: uppercase;">CLICK HERE TO RENEW YOUR LICENSE NOW</a>
-                        </p>
+                        <p style="margin: 0;"><a href="#" style="color: white; text-decoration: none; font-weight: 700; display: inline-block; padding: 12px 24px; background-color: #d83b01; border-radius: 4px; text-transform: uppercase;">CLICK HERE TO RENEW YOUR LICENSE NOW</a></p>
                     </div>
-                    
                     <p style="margin: 0 0 20px 0; font-weight: 600; color: #a4262c;">This is your FINAL NOTICE before system restrictions are applied.</p>
-                    
-                    <p style="margin: 0 0 20px 0;">
-                        <strong>Microsoft Windows Activation Team</strong><br>
-                        One Microsoft Way<br>
-                        Redmond, WA 98052
-                    </p>
-                    
+                    <p style="margin: 0 0 20px 0;"><strong>Microsoft Windows Activation Team</strong><br>One Microsoft Way<br>Redmond, WA 98052</p>
                     <div style="border-top: 1px solid #edebe9; padding-top: 15px; margin-top: 30px; font-size: 11px; color: #605e5c;">
                         <p style="margin: 0 0 10px 0;">This email was sent from an unmonitored mailbox. Please do not reply.</p>
                         <p style="margin: 0;">© 2025 Microsoft Corporation. All rights reserved.</p>
                     </div>
                 </div>',
         'answer' => 'phishing',
-        'hint' => 'Excessive urgency, threats of data loss, and suspicious domain "microsoft-security.net"'
+        'hint' => 'Multiple red flags: the domain is "microsoft-security.net" — Microsoft always uses @microsoft.com. Windows licenses don\'t expire this way, and threats of "permanent data loss" are classic scare tactics.'
     ],
     6 => [
         'sender' => 'appleid@id-apple.com',
@@ -297,21 +176,12 @@ $emails = [
         'subject' => 'Your Apple ID has been locked',
         'body' => '<div style="font-family: Arial, Helvetica, sans-serif; color: #1d1d1f; line-height: 1.5; font-size: 14px; max-width: 600px; margin: 0 auto;">
                 <div style="border-bottom: 1px solid #d2d2d7; padding-bottom: 20px; margin-bottom: 20px;">
-                    <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse: collapse;">
-                        <tr>
-                            <td style="padding: 0;">
-                                <span style="color: #000; font-size: 24px; font-weight: 600; display: inline-block; margin-bottom: 10px;">Apple</span>
-                            </td>
-                        </tr>
-                    </table>
+                    <span style="color: #000; font-size: 24px; font-weight: 600; display: inline-block; margin-bottom: 10px;">Apple</span>
                     <h1 style="font-size: 20px; font-weight: 400; color: #1d1d1f; margin: 0 0 10px 0;">Apple ID Locked</h1>
                     <p style="font-size: 13px; color: #86868b; margin: 0;">Account Security Alert</p>
                 </div>
-                
                 <p style="margin: 0 0 20px 0;">Dear Apple User,</p>
-                
                 <p style="margin: 0 0 20px 0;">We detected multiple failed login attempts to your Apple ID from an unrecognized device. To protect your account, we have temporarily locked your Apple ID.</p>
-                
                 <div style="background-color: #f5f5f7; border: 1px solid #d2d2d7; border-radius: 8px; padding: 20px; margin: 0 0 20px 0;">
                     <p style="margin: 0 0 15px 0; font-weight: 600; color: #1d1d1f;">To unlock your account:</p>
                     <ol style="margin: 0 0 15px 0; padding-left: 20px;">
@@ -319,25 +189,17 @@ $emails = [
                         <li style="margin: 0 0 8px 0;">Verify your identity with security questions</li>
                         <li style="margin: 0 0 8px 0;">Reset your password</li>
                     </ol>
-                    <p style="margin: 0;">
-                        <a href="http://appleid-verify-security.com/unlock" style="color: #06c; text-decoration: none; font-weight: 500; display: inline-block; padding: 10px 20px; background-color: #0071e3; color: white; border-radius: 980px;">Unlock Apple ID Now</a>
-                    </p>
+                    <p style="margin: 0;"><a href="#" style="color: white; text-decoration: none; font-weight: 500; display: inline-block; padding: 10px 20px; background-color: #0071e3; color: white; border-radius: 980px;">Unlock Apple ID Now</a></p>
                 </div>
-                
                 <p style="margin: 0 0 20px 0; font-size: 13px; color: #86868b;">If you did not attempt to access your account, please secure it immediately.</p>
-                
-                <p style="margin: 0 0 20px 0;">
-                    Sincerely,<br>
-                    <strong>Apple Support</strong>
-                </p>
-                
+                <p style="margin: 0 0 20px 0;">Sincerely,<br><strong>Apple Support</strong></p>
                 <div style="border-top: 1px solid #d2d2d7; padding-top: 20px; margin-top: 30px; font-size: 12px; color: #86868b;">
                     <p style="margin: 0 0 10px 0;">Apple Inc. | One Apple Park Way, Cupertino, CA 95014</p>
                     <p style="margin: 0;">This is an automated message. Please do not reply.</p>
                 </div>
             </div>',
         'answer' => 'phishing',
-        'hint' => 'Apple uses "apple.com" domains, not "id-apple.com". Legitimate Apple emails never ask you to click links to unlock accounts.'
+        'hint' => 'The sender domain is "id-apple.com" — Apple only ever emails from @apple.com. The reversed domain order (id-apple instead of apple-id) is a classic phishing trick to fool people at a glance.'
     ],
     7 => [
         'sender' => 'accounts.google.com',
@@ -345,25 +207,11 @@ $emails = [
         'subject' => 'Security checkup required',
         'body' => '<div style="font-family: Arial, Helvetica, sans-serif; color: #202124; line-height: 1.5; font-size: 14px; max-width: 600px; margin: 0 auto;">
                 <div style="border-bottom: 1px solid #dadce0; padding-bottom: 20px; margin-bottom: 20px;">
-                    <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse: collapse;">
-                        <tr>
-                            <td style="padding: 0;">
-                                <span style="color: #4285f4; font-size: 24px; font-weight: 500; display: inline-block; margin-bottom: 10px;">G</span>
-                                <span style="color: #ea4335; font-size: 24px; font-weight: 500;">o</span>
-                                <span style="color: #fbbc05; font-size: 24px; font-weight: 500;">o</span>
-                                <span style="color: #4285f4; font-size: 24px; font-weight: 500;">g</span>
-                                <span style="color: #34a853; font-size: 24px; font-weight: 500;">l</span>
-                                <span style="color: #ea4335; font-size: 24px; font-weight: 500;">e</span>
-                            </td>
-                        </tr>
-                    </table>
-                    <h1 style="font-size: 20px; font-weight: 400; color: #202124; margin: 0;">Security checkup</h1>
+                    <span style="color: #4285f4; font-size: 24px; font-weight: 500; display: inline-block; margin-bottom: 10px;">G</span><span style="color: #ea4335; font-size: 24px; font-weight: 500;">o</span><span style="color: #fbbc05; font-size: 24px; font-weight: 500;">o</span><span style="color: #4285f4; font-size: 24px; font-weight: 500;">g</span><span style="color: #34a853; font-size: 24px; font-weight: 500;">l</span><span style="color: #ea4335; font-size: 24px; font-weight: 500;">e</span>
+                    <h1 style="font-size: 20px; font-weight: 400; color: #202124; margin: 10px 0 0 0;">Security checkup</h1>
                 </div>
-                
                 <p style="margin: 0 0 20px 0;">Hi,</p>
-                
                 <p style="margin: 0 0 20px 0;">We noticed some unusual activity in your Google Account. To keep your account secure, please review your recent security events.</p>
-                
                 <div style="background-color: #f8f9fa; border: 1px solid #dadce0; border-radius: 8px; padding: 20px; margin: 0 0 20px 0;">
                     <p style="margin: 0 0 15px 0; font-weight: 500; color: #202124;">Recent activity to review:</p>
                     <ul style="margin: 0 0 15px 0; padding-left: 20px;">
@@ -372,25 +220,16 @@ $emails = [
                         <li style="margin: 0 0 8px 0;">Recovery email updated</li>
                     </ul>
                 </div>
-                
-                <p style="margin: 0 0 20px 0;">
-                    <a href="https://myaccount.google.com/security-checkup" style="color: #1a73e8; text-decoration: none; font-weight: 500;">Review your security settings</a>
-                </p>
-                
+                <p style="margin: 0 0 20px 0;"><a href="#" style="color: #1a73e8; text-decoration: none; font-weight: 500;">Review your security settings</a></p>
                 <p style="margin: 0 0 20px 0;">If this wasn\'t you, your account may have been compromised. You should change your password immediately.</p>
-                
-                <p style="margin: 0 0 20px 0;">
-                    Thanks,<br>
-                    <strong>The Google Accounts team</strong>
-                </p>
-                
+                <p style="margin: 0 0 20px 0;">Thanks,<br><strong>The Google Accounts team</strong></p>
                 <div style="border-top: 1px solid #dadce0; padding-top: 20px; margin-top: 30px; font-size: 12px; color: #5f6368;">
                     <p style="margin: 0 0 10px 0;">You received this email to let you know about important changes to your Google Account and services.</p>
                     <p style="margin: 0;">© 2025 Google LLC, 1600 Amphitheatre Parkway, Mountain View, CA 94043</p>
                 </div>
             </div>',
         'answer' => 'legitimate',
-        'hint' => 'Legitimate Google email with proper domain, links to official Google site, and no urgent demands for immediate action.'
+        'hint' => 'This is a legitimate email. It comes from Google\'s official domain, links only to myaccount.google.com, and doesn\'t demand immediate action or threaten account deletion.'
     ],
     8 => [
         'sender' => 'support@linkedin-professional.com',
@@ -398,43 +237,26 @@ $emails = [
         'subject' => 'Someone viewed your profile',
         'body' => '<div style="font-family: Arial, Helvetica, sans-serif; color: #000000; line-height: 1.5; font-size: 14px; max-width: 600px; margin: 0 auto;">
                 <div style="border-bottom: 1px solid #0077b5; padding-bottom: 20px; margin-bottom: 20px;">
-                    <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse: collapse;">
-                        <tr>
-                            <td style="padding: 0;">
-                                <span style="color: #0077b5; font-size: 24px; font-weight: bold; display: inline-block; margin-bottom: 10px;">in</span>
-                            </td>
-                        </tr>
-                    </table>
+                    <span style="color: #0077b5; font-size: 24px; font-weight: bold; display: inline-block; margin-bottom: 10px;">in</span>
                     <h1 style="font-size: 20px; font-weight: 600; color: #000000; margin: 0;">See who\'s viewed your profile</h1>
                 </div>
-                
                 <p style="margin: 0 0 20px 0;">Hi Member,</p>
-                
                 <p style="margin: 0 0 20px 0;">Your profile was viewed 15 times in the last 7 days. Upgrade to LinkedIn Premium to see everyone who\'s viewed your profile and get insights that can help you grow your network.</p>
-                
                 <div style="background-color: #f3f6f8; border: 1px solid #0077b5; border-radius: 4px; padding: 20px; margin: 0 0 20px 0; text-align: center;">
                     <p style="margin: 0 0 15px 0; font-weight: 600; color: #0077b5;">Limited Time Offer: 50% OFF Premium</p>
                     <p style="margin: 0 0 15px 0; font-size: 18px; font-weight: bold;">Only $14.99/month</p>
-                    <p style="margin: 0;">
-                        <a href="http://linkedin-premium-offer.com/upgrade" style="color: #ffffff; text-decoration: none; font-weight: 600; display: inline-block; padding: 12px 30px; background-color: #0077b5; border-radius: 24px; text-transform: uppercase;">Claim Your Discount Now</a>
-                    </p>
+                    <p style="margin: 0;"><a href="#" style="color: white; text-decoration: none; font-weight: 600; display: inline-block; padding: 12px 30px; background-color: #0077b5; border-radius: 24px; text-transform: uppercase;">Claim Your Discount Now</a></p>
                     <p style="margin: 15px 0 0 0; font-size: 12px; color: #666;">Offer expires in 48 hours</p>
                 </div>
-                
                 <p style="margin: 0 0 20px 0;">Premium members get 5x more profile views and are 40% more likely to receive opportunities.</p>
-                
-                <p style="margin: 0 0 20px 0;">
-                    Best,<br>
-                    <strong>The LinkedIn Team</strong>
-                </p>
-                
+                <p style="margin: 0 0 20px 0;">Best,<br><strong>The LinkedIn Team</strong></p>
                 <div style="border-top: 1px solid #e0e0e0; padding-top: 20px; margin-top: 30px; font-size: 12px; color: #666;">
                     <p style="margin: 0 0 10px 0;">This message was sent to LinkedIn member</p>
                     <p style="margin: 0;">© 2025 LinkedIn Corporation, 1000 W Maude Ave, Sunnyvale, CA 94085</p>
                 </div>
             </div>',
         'answer' => 'phishing',
-        'hint' => 'LinkedIn uses "linkedin.com" domains. Fake domains like "linkedin-professional.com" with urgent limited-time offers are classic phishing tactics.'
+        'hint' => 'The domain is "linkedin-professional.com" — LinkedIn only emails from @linkedin.com. The "48 hours only" urgency combined with a fake domain is a textbook phishing combination.'
     ],
     9 => [
         'sender' => 'noreply@github.com',
@@ -442,65 +264,31 @@ $emails = [
         'subject' => 'New sign-in to your GitHub account',
         'body' => '<div style="font-family: Arial, Helvetica, sans-serif; color: #24292e; line-height: 1.5; font-size: 14px; max-width: 600px; margin: 0 auto;">
                 <div style="border-bottom: 1px solid #e1e4e8; padding-bottom: 20px; margin-bottom: 20px;">
-                    <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse: collapse;">
-                        <tr>
-                            <td style="padding: 0;">
-                                <span style="color: #24292e; font-size: 24px; font-weight: 600; display: inline-block; margin-bottom: 10px;">GitHub</span>
-                            </td>
-                        </tr>
-                    </table>
+                    <span style="color: #24292e; font-size: 24px; font-weight: 600; display: inline-block; margin-bottom: 10px;">GitHub</span>
                     <h1 style="font-size: 20px; font-weight: 400; color: #24292e; margin: 0;">New sign-in to your account</h1>
                 </div>
-                
                 <p style="margin: 0 0 20px 0;">Hello,</p>
-                
                 <p style="margin: 0 0 20px 0;">We noticed a new sign-in to your GitHub account.</p>
-                
                 <div style="background-color: #f6f8fa; border: 1px solid #e1e4e8; border-radius: 6px; padding: 20px; margin: 0 0 20px 0;">
                     <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse: collapse; font-size: 13px;">
-                        <tr>
-                            <td style="padding: 8px 0; color: #586069; width: 100px;">Date:</td>
-                            <td style="padding: 8px 0; font-weight: 600;">' . date('F j, Y') . '</td>
-                        </tr>
-                        <tr>
-                            <td style="padding: 8px 0; color: #586069;">Time:</td>
-                            <td style="padding: 8px 0;">' . date('g:i A') . ' UTC</td>
-                        </tr>
-                        <tr>
-                            <td style="padding: 8px 0; color: #586069;">IP Address:</td>
-                            <td style="padding: 8px 0;">192.168.1.105</td>
-                        </tr>
-                        <tr>
-                            <td style="padding: 8px 0; color: #586069;">Location:</td>
-                            <td style="padding: 8px 0;">San Francisco, CA, US</td>
-                        </tr>
-                        <tr>
-                            <td style="padding: 8px 0; color: #586069;">Device:</td>
-                            <td style="padding: 8px 0;">Chrome on Windows</td>
-                        </tr>
+                        <tr><td style="padding: 8px 0; color: #586069; width: 100px;">Date:</td><td style="padding: 8px 0; font-weight: 600;">' . date('F j, Y') . '</td></tr>
+                        <tr><td style="padding: 8px 0; color: #586069;">Time:</td><td style="padding: 8px 0;">' . date('g:i A') . ' UTC</td></tr>
+                        <tr><td style="padding: 8px 0; color: #586069;">IP Address:</td><td style="padding: 8px 0;">192.168.1.105</td></tr>
+                        <tr><td style="padding: 8px 0; color: #586069;">Location:</td><td style="padding: 8px 0;">San Francisco, CA, US</td></tr>
+                        <tr><td style="padding: 8px 0; color: #586069;">Device:</td><td style="padding: 8px 0;">Chrome on Windows</td></tr>
                     </table>
                 </div>
-                
                 <p style="margin: 0 0 20px 0;">If this was you, you can disregard this email. There\'s no need to take any action.</p>
-                
                 <p style="margin: 0 0 20px 0;">If you don\'t recognize this activity, please secure your account:</p>
-                
-                <p style="margin: 0 0 20px 0;">
-                    <a href="https://github.com/settings/security" style="color: #0366d6; text-decoration: none; font-weight: 500;">Review account security</a>
-                </p>
-                
-                <p style="margin: 0 0 20px 0;">
-                    Thanks,<br>
-                    <strong>GitHub Security</strong>
-                </p>
-                
+                <p style="margin: 0 0 20px 0;"><a href="#" style="color: #0366d6; text-decoration: none; font-weight: 500;">Review account security</a></p>
+                <p style="margin: 0 0 20px 0;">Thanks,<br><strong>GitHub Security</strong></p>
                 <div style="border-top: 1px solid #e1e4e8; padding-top: 20px; margin-top: 30px; font-size: 12px; color: #586069;">
                     <p style="margin: 0 0 10px 0;">This email was automatically sent by GitHub Security to keep you informed about your account.</p>
                     <p style="margin: 0;">© 2025 GitHub, Inc. | 88 Colin P Kelly Jr St, San Francisco, CA 94107</p>
                 </div>
             </div>',
         'answer' => 'legitimate',
-        'hint' => 'Proper GitHub domain, detailed sign-in information without urgent demands, and links to official GitHub security settings.'
+        'hint' => 'This is a legitimate email. Sent from GitHub\'s official @github.com domain, it provides detailed sign-in info, gives you the option to ignore it, and links only to github.com/settings.'
     ],
     10 => [
         'sender' => 'banking@wellsfargo-security.com',
@@ -508,62 +296,33 @@ $emails = [
         'subject' => 'SUSPICIOUS TRANSACTION ALERT - Immediate Action Required',
         'body' => '<div style="font-family: Arial, Helvetica, sans-serif; color: #333; line-height: 1.5; font-size: 14px; max-width: 600px; margin: 0 auto;">
                 <div style="background-color: #c00; color: white; padding: 20px; border-radius: 4px 4px 0 0; margin-bottom: 20px;">
-                    <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse: collapse;">
-                        <tr>
-                            <td style="padding: 0;">
-                                <span style="font-size: 24px; font-weight: bold; display: inline-block; margin-bottom: 10px;">WELLS FARGO</span>
-                            </td>
-                        </tr>
-                    </table>
+                    <span style="font-size: 24px; font-weight: bold; display: inline-block; margin-bottom: 10px;">WELLS FARGO</span>
                     <h1 style="font-size: 22px; font-weight: 700; color: white; margin: 0;">URGENT: Fraud Alert</h1>
                 </div>
-                
                 <p style="margin: 0 0 20px 0; font-weight: 600;">ATTENTION VALUED CUSTOMER,</p>
-                
                 <p style="margin: 0 0 20px 0;">Our fraud detection system has identified a suspicious transaction on your Wells Fargo account ending in ••••4321.</p>
-                
                 <div style="background-color: #fff3f3; border: 2px solid #c00; border-radius: 4px; padding: 20px; margin: 0 0 20px 0;">
                     <p style="margin: 0 0 15px 0; font-weight: 700; color: #c00; text-transform: uppercase;">Transaction Details:</p>
                     <table width="100%" cellpadding="0" cellspacing="0" style="border-collapse: collapse; font-size: 13px;">
-                        <tr>
-                            <td style="padding: 8px 0; color: #333; width: 120px;">Amount:</td>
-                            <td style="padding: 8px 0; font-weight: 700; color: #c00;">$2,450.00</td>
-                        </tr>
-                        <tr>
-                            <td style="padding: 8px 0; color: #333;">Merchant:</td>
-                            <td style="padding: 8px 0;">Electronics Plus Inc.</td>
-                        </tr>
-                        <tr>
-                            <td style="padding: 8px 0; color: #333;">Location:</td>
-                            <td style="padding: 8px 0;">Miami, FL</td>
-                        </tr>
-                        <tr>
-                            <td style="padding: 8px 0; color: #333;">Time:</td>
-                            <td style="padding: 8px 0;">' . date('g:i A') . ' EST</td>
-                        </tr>
+                        <tr><td style="padding: 8px 0; color: #333; width: 120px;">Amount:</td><td style="padding: 8px 0; font-weight: 700; color: #c00;">$2,450.00</td></tr>
+                        <tr><td style="padding: 8px 0; color: #333;">Merchant:</td><td style="padding: 8px 0;">Electronics Plus Inc.</td></tr>
+                        <tr><td style="padding: 8px 0; color: #333;">Location:</td><td style="padding: 8px 0;">Miami, FL</td></tr>
+                        <tr><td style="padding: 8px 0; color: #333;">Time:</td><td style="padding: 8px 0;">' . date('g:i A') . ' EST</td></tr>
                     </table>
-                    
                     <p style="margin: 20px 0 15px 0; font-weight: 700; color: #c00;">THIS TRANSACTION WILL BE PROCESSED IN 1 HOUR UNLESS CONFIRMED BY YOU.</p>
-                    
                     <div style="text-align: center; margin: 20px 0 0 0;">
-                        <a href="http://wellsfargo-security-verify.com/confirm" style="color: white; text-decoration: none; font-weight: 700; display: inline-block; padding: 15px 40px; background-color: #c00; border-radius: 4px; font-size: 16px; text-transform: uppercase;">VERIFY TRANSACTION NOW</a>
+                        <a href="#" style="color: white; text-decoration: none; font-weight: 700; display: inline-block; padding: 15px 40px; background-color: #c00; border-radius: 4px; font-size: 16px; text-transform: uppercase;">VERIFY TRANSACTION NOW</a>
                     </div>
                 </div>
-                
                 <p style="margin: 0 0 20px 0; font-weight: 600;">If you did not authorize this transaction, your account will be immediately locked to prevent further unauthorized activity.</p>
-                
-                <p style="margin: 0 0 20px 0;">
-                    Sincerely,<br>
-                    <strong>Wells Fargo Fraud Prevention Department</strong>
-                </p>
-                
+                <p style="margin: 0 0 20px 0;">Sincerely,<br><strong>Wells Fargo Fraud Prevention Department</strong></p>
                 <div style="border-top: 1px solid #ccc; padding-top: 20px; margin-top: 30px; font-size: 11px; color: #666;">
                     <p style="margin: 0 0 10px 0;">Wells Fargo Bank, N.A. | 420 Montgomery Street, San Francisco, CA 94104</p>
                     <p style="margin: 0;">This is an automated security alert. Do not reply to this email.</p>
                 </div>
             </div>',
         'answer' => 'phishing',
-        'hint' => 'Extreme urgency, threats of account lockout, fake domain "wellsfargo-security.com" instead of official "wellsfargo.com", and pressure to click links immediately.'
+        'hint' => 'The domain "wellsfargo-security.com" is fake — real Wells Fargo emails come from @wellsfargo.com only. The extreme 1-hour countdown pressure and threat of account lockout are designed to stop you thinking clearly.'
     ]
 ];
 
@@ -575,14 +334,22 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
         
         if(isset($emails[$question_id])) {
             $correct_answer = $emails[$question_id]['answer'];
+            $hint = $emails[$question_id]['hint'];
             
             if($user_answer === $correct_answer) {
                 $score++;
                 $_SESSION['phishing_score'] = $score;
-                // No feedback shown
+                $feedback = "<div class='feedback correct'><span style='color: #10b981;'>Correct</span></div>";
             } else {
-                // No feedback shown
+                $feedback = "<div class='feedback incorrect'><span style='color: #dc2626;'>Incorrect</span></div>";
             }
+            
+            // Always show hint after answering
+            $feedback .= "<div class='hint-box'><strong>Hint:</strong> " . htmlspecialchars($hint) . "</div>";
+            
+            // Store feedback in session so it shows on the NEXT question's page load
+            $_SESSION['phishing_feedback'] = $feedback;
+            $_SESSION['phishing_answered_question'] = $question_id;
             
             $current_question = $question_id + 1;
             $_SESSION['phishing_question'] = $current_question;
@@ -591,7 +358,6 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
             if($current_question > $total_questions) {
                 $game_completed = true;
                 
-                // Save score to database
                 $user_id = $_SESSION['id'];
                 $sql = "INSERT INTO game_scores (user_id, game_type, score, total_questions, completed_at)
                     VALUES (?, 'phishing_detective_lvl1', ?, ?, NOW())
@@ -603,34 +369,41 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
                     mysqli_stmt_close($stmt);
                 }
                 
-                // Clear session data
                 unset($_SESSION['phishing_score']);
                 unset($_SESSION['phishing_question']);
+                unset($_SESSION['phishing_feedback']);
+                unset($_SESSION['phishing_answered_question']);
             }
         }
     }
+}
+
+// Load feedback from session if it was set on the previous submit
+if(empty($feedback) && isset($_SESSION['phishing_feedback'])) {
+    $feedback = $_SESSION['phishing_feedback'];
+    unset($_SESSION['phishing_feedback']);
+    unset($_SESSION['phishing_answered_question']);
 }
 
 // Reset game if needed
 if(isset($_GET['reset'])) {
     unset($_SESSION['phishing_score']);
     unset($_SESSION['phishing_question']);
+    unset($_SESSION['phishing_feedback']);
+    unset($_SESSION['phishing_answered_question']);
     $score = 0;
     $current_question = 1;
     header("location: phishing-game-lvl1.php");
     exit;
 }
 
-// Get current question display number
 $display_question = min($current_question, $total_questions);
 
-// Get current email only if game is not completed and question exists
 $current_email = null;
 if(!$game_completed && isset($emails[$current_question])) {
     $current_email = $emails[$current_question];
 }
 
-// If current question exceeds total but game not marked completed, fix it
 if($current_question > $total_questions && !$game_completed) {
     $game_completed = true;
 }
@@ -640,8 +413,8 @@ if($current_question > $total_questions && !$game_completed) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="shortcut icon" href="images/ui-icon-social-engineering.png" type="image/x-icon">
-    <title>Phishing Detective - Level 1 | CybAware</title>
+    <link rel="shortcut icon" href="images/phishing.png" type="image/x-icon">
+    <title>Phishing Detective - Read Emails | CybAware</title>
     <link rel="stylesheet" href="css/styles.css">
     <style>
         .game-interface {
@@ -668,18 +441,66 @@ if($current_question > $total_questions && !$game_completed) {
             font-size: 1.1rem;
         }
         
-        .score-display {
-            text-align: center;
-            font-size: 1.2rem;
-            color: #1e40af;
-            font-weight: 600;
-            background: #eff6ff;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
+        /* ── Progress bar (matching password game) ── */
+        .progress-container {
+            margin-bottom: 25px;
             width: 100%;
             box-sizing: border-box;
-            border: 1px solid #dbeafe;
+        }
+
+        .progress-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 14px;
+            color: #6b7280;
+        }
+
+        .progress-bar {
+            height: 6px;
+            background: #e5e7eb;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #1e40af;
+            transition: width 0.3s ease;
+        }
+
+        /* ── Feedback boxes (matching password game) ── */
+        .feedback {
+            padding: 16px;
+            border-radius: 6px;
+            margin: 0 0 16px 0;
+            font-size: 15px;
+            font-weight: 500;
+            text-align: center;
+            border: 1px solid transparent;
+        }
+
+        .feedback.correct {
+            background: #f0fdf4;
+            color: #065f46;
+            border-color: #10b981;
+        }
+
+        .feedback.incorrect {
+            background: #fef2f2;
+            color: #991b1b;
+            border-color: #ef4444;
+        }
+
+        /* ── Hint box (matching password game) ── */
+        .hint-box {
+            background: #fef3c7;
+            border: 1px solid #f59e0b;
+            border-radius: 6px;
+            padding: 14px;
+            margin: 0 0 20px 0;
+            font-size: 14px;
+            color: #92400e;
         }
         
         .email-container {
@@ -757,9 +578,7 @@ if($current_question > $total_questions && !$game_completed) {
             flex-shrink: 0;
         }
         
-        .sender-details {
-            flex: 1;
-        }
+        .sender-details { flex: 1; }
         
         .sender-name-email {
             display: flex;
@@ -851,37 +670,13 @@ if($current_question > $total_questions && !$game_completed) {
             box-shadow: 0 4px 12px rgba(0,0,0,0.15);
         }
         
-        .phishing-btn {
-            color: #dc2626;
-            border-color: #fecaca;
-        }
+        .phishing-btn { color: #dc2626; border-color: #fecaca; }
+        .phishing-btn:hover { background: #fee2e2; border-color: #dc2626; }
+        .phishing-btn.selected { background: #dc2626; color: white; border-color: #dc2626; }
         
-        .phishing-btn:hover {
-            background: #fee2e2;
-            border-color: #dc2626;
-        }
-        
-        .phishing-btn.selected {
-            background: #dc2626;
-            color: white;
-            border-color: #dc2626;
-        }
-        
-        .legit-btn {
-            color: #059669;
-            border-color: #a7f3d0;
-        }
-        
-        .legit-btn:hover {
-            background: #d1fae5;
-            border-color: #059669;
-        }
-        
-        .legit-btn.selected {
-            background: #059669;
-            color: white;
-            border-color: #059669;
-        }
+        .legit-btn { color: #059669; border-color: #a7f3d0; }
+        .legit-btn:hover { background: #d1fae5; border-color: #059669; }
+        .legit-btn.selected { background: #059669; color: white; border-color: #059669; }
         
         .game-controls {
             text-align: center;
@@ -900,7 +695,6 @@ if($current_question > $total_questions && !$game_completed) {
             cursor: pointer;
             transition: all 0.2s ease;
             min-width: 250px;
-            width: auto;
             display: inline-block;
             box-shadow: 0 4px 6px rgba(30, 64, 175, 0.2);
         }
@@ -929,11 +723,7 @@ if($current_question > $total_questions && !$game_completed) {
             border: 1px solid #e2e8f0;
         }
         
-        .completion-screen h2 {
-            color: #1e40af;
-            font-size: 2rem;
-            margin-bottom: 15px;
-        }
+        .completion-screen h2 { color: #1e40af; font-size: 2rem; margin-bottom: 15px; }
         
         .score-result {
             font-size: 1.3rem;
@@ -984,12 +774,6 @@ if($current_question > $total_questions && !$game_completed) {
             background: #f8fafc;
             border-color: #cbd5e1;
         }
-        
-        .game-interface > * {
-            width: 100%;
-            box-sizing: border-box;
-            display: block;
-        }
 
         .certificate-note {
             margin-top: 20px;
@@ -1002,139 +786,35 @@ if($current_question > $total_questions && !$game_completed) {
             text-align: center;
         }
         
-        @media (max-width: 768px) {
-            .game-interface {
-                padding: 15px;
-            }
-            
-            .email-sender-row {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 15px;
-            }
-            
-            .sender-info-container {
-                min-width: 100%;
-                margin-bottom: 5px;
-            }
-            
-            .email-time {
-                margin-left: 0;
-                text-align: left;
-                min-width: auto;
-            }
-            
-            .sender-name-email {
-                flex-direction: column;
-                gap: 5px;
-            }
-            
-            .email-subject-row {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 5px;
-            }
-            
-            .email-subject-label {
-                min-width: auto;
-            }
-            
-            .email-to-row {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 5px;
-            }
-            
-            .email-to-label {
-                min-width: auto;
-            }
-            
-            .options-container {
-                flex-direction: column;
-                align-items: center;
-            }
-            
-            .option-btn {
-                width: 100%;
-                max-width: 100%;
-                margin-bottom: 10px;
-            }
-            
-            .email-body {
-                padding: 20px;
-                font-size: 13px;
-            }
-            
-            .completion-actions {
-                flex-direction: column;
-                align-items: center;
-            }
-            
-            .action-btn {
-                width: 100%;
-                max-width: 300px;
-                text-align: center;
-                margin-bottom: 10px;
-            }
-            
-            .submit-btn {
-                width: 100%;
-                max-width: 100%;
-            }
-            
-            .game-header h1 {
-                font-size: 1.6rem;
-            }
-            
-            .email-header {
-                padding: 20px;
-            }
-        }
-        
-        @media (max-width: 480px) {
-            .game-header h1 {
-                font-size: 1.4rem;
-            }
-            
-            .email-subject-value {
-                font-size: 1rem;
-            }
-            
-            .option-btn {
-                padding: 16px;
-                font-size: 1rem;
-            }
-            
-            .sender-name-email {
-                flex-direction: column;
-                gap: 3px;
-            }
-            
-            .sender-display-name {
-                font-size: 0.95rem;
-            }
-            
-            .sender-email-address {
-                font-size: 0.85rem;
-            }
-        }
-        
-        /* Ensure consistent alignment */
         .game-interface {
             display: flex;
             flex-direction: column;
             align-items: center;
         }
+
+        .game-interface > * {
+            width: 100%;
+            box-sizing: border-box;
+        }
         
-        /* Make all boxes equal width */
-        .score-display,
-        .email-container,
-        .options-container,
-        .game-controls,
-        .completion-screen {
-            max-width: 800px;
-            margin-left: auto;
-            margin-right: auto;
+        @media (max-width: 768px) {
+            .game-interface { padding: 15px; }
+            .email-sender-row { flex-direction: column; align-items: flex-start; gap: 15px; }
+            .sender-info-container { min-width: 100%; margin-bottom: 5px; }
+            .email-time { margin-left: 0; text-align: left; min-width: auto; }
+            .sender-name-email { flex-direction: column; gap: 5px; }
+            .email-subject-row { flex-direction: column; align-items: flex-start; gap: 5px; }
+            .email-subject-label { min-width: auto; }
+            .email-to-row { flex-direction: column; align-items: flex-start; gap: 5px; }
+            .email-to-label { min-width: auto; }
+            .options-container { flex-direction: column; align-items: center; }
+            .option-btn { width: 100%; max-width: 100%; margin-bottom: 10px; }
+            .email-body { padding: 20px; font-size: 13px; }
+            .completion-actions { flex-direction: column; align-items: center; }
+            .action-btn { width: 100%; max-width: 300px; text-align: center; margin-bottom: 10px; }
+            .submit-btn { width: 100%; max-width: 100%; }
+            .game-header h1 { font-size: 1.6rem; }
+            .email-header { padding: 20px; }
         }
     </style>
 </head>
@@ -1145,14 +825,28 @@ if($current_question > $total_questions && !$game_completed) {
         <div class="main-content">
             <div class="game-interface">
                 <div class="game-header">
-                    <h1>Phishing Detective - Level 1</h1>
+                    <h1>Phishing Detective | Read Emails</h1>
                     <p>Analyze emails and identify phishing attempts</p>
                 </div>
                 
-                <div class="score-display">
-                    Score: <?php echo $score; ?>/<?php echo $total_questions; ?> 
-                    | Question: <?php echo $display_question; ?>/<?php echo $total_questions; ?>
+                <div class="progress-container">
+                    <div class="progress-info">
+                        <span>Question <?php echo min($current_question, $total_questions); ?> of <?php echo $total_questions; ?></span>
+                        <span>Score: <?php echo $score; ?>/<?php echo $total_questions; ?></span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: <?php echo $game_completed ? '100' : (($current_question - 1) / $total_questions * 100); ?>%;"></div>
+                    </div>
                 </div>
+
+                <?php
+                // Only show the correct/incorrect feedback box here (not the hint)
+                if(!empty($feedback)) {
+                    // Extract just the feedback div (not the hint-box) to show at top
+                    preg_match('/<div class=\'feedback[^\']*\'.*?<\/div>/s', $feedback, $topFeedback);
+                    if(!empty($topFeedback)) echo $topFeedback[0];
+                }
+                ?>
                 
                 <?php if($game_completed): ?>
                     <div class="completion-screen">
@@ -1190,20 +884,14 @@ if($current_question > $total_questions && !$game_completed) {
                             
                             <div class="email-container">
                                 <div class="email-header">
-                                    <!-- Subject Row -->
                                     <div class="email-subject-row">
                                         <div class="email-subject-label">Subject:</div>
                                         <div class="email-subject-value"><?php echo htmlspecialchars($current_email['subject']); ?></div>
                                     </div>
-                                    
-                                    <!-- Sender Row with Name, Email, and Time on same line -->
                                     <div class="email-sender-row">
                                         <div class="sender-info-container">
                                             <div class="sender-avatar">
-                                                <?php 
-                                                // Get first letter of sender name for avatar
-                                                echo strtoupper(substr($current_email['sender_name'], 0, 1));
-                                                ?>
+                                                <?php echo strtoupper(substr($current_email['sender_name'], 0, 1)); ?>
                                             </div>
                                             <div class="sender-details">
                                                 <div class="sender-name-email">
@@ -1212,35 +900,35 @@ if($current_question > $total_questions && !$game_completed) {
                                                 </div>
                                             </div>
                                         </div>
-                                        
-                                        <!-- Time on same line, aligned to right -->
                                         <div class="email-time">
-                                            <?php 
-                                            // Display current date and time
-                                            echo date('l, F j, Y') . ' at ' . date('g:i A');
-                                            ?>
+                                            <?php echo date('l, F j, Y') . ' at ' . date('g:i A'); ?>
                                         </div>
                                     </div>
-                                    
-                                    <!-- To Row -->
                                     <div class="email-to-row">
                                         <div class="email-to-label">To:</div>
                                         <div class="email-to-value">
-                                            <span>Me (<?php echo htmlspecialchars($_SESSION['email'] ?? 'you@example.com'); ?>)</span>
+                                            Me (<?php echo htmlspecialchars($_SESSION['email'] ?? 'you@example.com'); ?>)
                                         </div>
                                     </div>
                                 </div>
-                                
                                 <div class="email-body">
                                     <?php echo $current_email['body']; ?>
                                 </div>
                             </div>
+
+                            <?php
+                            // Show only the hint-box portion of feedback here (below email, above buttons)
+                            if(!empty($feedback)) {
+                                preg_match('/<div class=\'hint-box\'.*?<\/div>/s', $feedback, $hintMatch);
+                                if(!empty($hintMatch)) echo $hintMatch[0];
+                            }
+                            ?>
                             
                             <div class="options-container">
-                                <button type="button" class="option-btn legit-btn" onclick="selectAnswer('legitimate')">
+                                <button type="button" class="option-btn legit-btn" onclick="selectAnswer('legitimate', this)">
                                     Legitimate Email
                                 </button>
-                                <button type="button" class="option-btn phishing-btn" onclick="selectAnswer('phishing')">
+                                <button type="button" class="option-btn phishing-btn" onclick="selectAnswer('phishing', this)">
                                     Phishing Attempt
                                 </button>
                             </div>
@@ -1269,26 +957,14 @@ if($current_question > $total_questions && !$game_completed) {
     <script>
         let selectedAnswer = null;
         
-        function selectAnswer(answer) {
-            // Remove selected class from all buttons
-            document.querySelectorAll('.option-btn').forEach(btn => {
-                btn.classList.remove('selected');
-            });
-            
-            // Add selected class to clicked button
-            const clickedBtn = event.currentTarget;
-            clickedBtn.classList.add('selected');
-            
-            // Set hidden input value
+        function selectAnswer(answer, btn) {
+            document.querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected'));
+            btn.classList.add('selected');
             document.getElementById('selectedAnswer').value = answer;
-            
-            // Enable submit button
             document.getElementById('submitBtn').disabled = false;
-            
             selectedAnswer = answer;
         }
         
-        // Prevent form submission without selection
         document.getElementById('gameForm')?.addEventListener('submit', function(e) {
             if(!selectedAnswer) {
                 e.preventDefault();
@@ -1298,22 +974,16 @@ if($current_question > $total_questions && !$game_completed) {
             return true;
         });
         
-        // Add keyboard navigation
+        // Keyboard shortcuts
         document.addEventListener('keydown', function(e) {
-            if(e.key === '1' || e.key === 'l') {
-                const legitBtn = document.querySelector('.legit-btn');
-                if(legitBtn) {
-                    selectAnswer('legitimate');
-                    legitBtn.click();
-                }
-            } else if(e.key === '2' || e.key === 'p') {
-                const phishingBtn = document.querySelector('.phishing-btn');
-                if(phishingBtn) {
-                    selectAnswer('phishing');
-                    phishingBtn.click();
-                }
+            const legitBtn = document.querySelector('.legit-btn');
+            const phishingBtn = document.querySelector('.phishing-btn');
+            if((e.key === '1' || e.key === 'l') && legitBtn) {
+                selectAnswer('legitimate', legitBtn);
+            } else if((e.key === '2' || e.key === 'p') && phishingBtn) {
+                selectAnswer('phishing', phishingBtn);
             } else if(e.key === 'Enter' && selectedAnswer) {
-                document.getElementById('submitBtn').click();
+                document.getElementById('submitBtn')?.click();
             }
         });
     </script>

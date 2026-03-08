@@ -9,58 +9,46 @@ if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){
 
 require_once "config/database.php";
 
-// Get user's current score for level 3
 $user_id = $_SESSION['id'];
 $current_score = 0;
 $clues_found = 0;
 $game_completed = false;
 
-// Check if user has played this level before
 $sql = "SELECT score, total_questions FROM game_scores WHERE user_id = ? AND game_type = 'phishing_detective_lvl3'";
 if($stmt = mysqli_prepare($link, $sql)) {
     mysqli_stmt_bind_param($stmt, "i", $user_id);
     mysqli_stmt_execute($stmt);
     mysqli_stmt_store_result($stmt);
-    
     if(mysqli_stmt_num_rows($stmt) == 1) {
         mysqli_stmt_bind_result($stmt, $db_score, $db_total_questions);
         mysqli_stmt_fetch($stmt);
         $current_score = $db_score;
-        $clues_found = min(7, floor($db_score / 10)); // 10 points per clue
+        $clues_found = min(10, $db_score);
         $game_completed = ($current_score > 0);
     }
     mysqli_stmt_close($stmt);
 }
 
-// Handle reset request
 if(isset($_GET['reset'])) {
-    // Delete the score from database to reset the game
     $delete_sql = "DELETE FROM game_scores WHERE user_id = ? AND game_type = 'phishing_detective_lvl3'";
     if($stmt = mysqli_prepare($link, $delete_sql)) {
         mysqli_stmt_bind_param($stmt, "i", $user_id);
         mysqli_stmt_execute($stmt);
         mysqli_stmt_close($stmt);
     }
-    
-    // Redirect to reset the game
     header("location: phishing-game-lvl3.php");
     exit;
 }
 
-// Handle form submission for saving progress
 if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action'])) {
     $action = $_POST['action'];
-    
     if($action == 'save_progress') {
         $new_score = isset($_POST['score']) ? (int)$_POST['score'] : 0;
-        $completed = ($new_score >= 70) ? 1 : 0;
+        $completed = ($new_score >= 10) ? 1 : 0;
+        $new_clues = min(10, $new_score);
         
-        // Calculate clues found based on score (10 points per clue)
-        $new_clues = min(7, floor($new_score / 10));
-        
-        // Save to game_scores table
         $upsert_sql = "INSERT INTO game_scores (user_id, game_type, score, total_questions, completed_at) 
-                      VALUES (?, 'phishing_detective_lvl3', ?, 7, NOW())
+                      VALUES (?, 'phishing_detective_lvl3', ?, 10, NOW())
                       ON DUPLICATE KEY UPDATE score = VALUES(score), completed_at = NOW()";
         
         if($stmt = mysqli_prepare($link, $upsert_sql)) {
@@ -83,11 +71,10 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action'])) {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="shortcut icon" href="images/ui-icon-social-engineering.png" type="image/x-icon">
-    <title>Phishing Detective - Level 3 | CybAware</title>
+    <link rel="shortcut icon" href="images/phishing.png" type="image/x-icon">
+    <title>Phishing Detective - Hunt Errors | CybAware</title>
     <link rel="stylesheet" href="css/styles.css">
     <style>
-        /* Level 3 Styles */
         .game-interface {
             max-width: 900px;
             margin: 0 auto;
@@ -111,46 +98,39 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action'])) {
             color: #64748b;
             font-size: 1.1rem;
         }
-        
-        .score-display {
-            text-align: center;
-            font-size: 1.2rem;
-            color: #1e40af;
-            font-weight: 600;
-            background: #eff6ff;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
+
+        .progress-container {
+            margin-bottom: 25px;
             width: 100%;
             box-sizing: border-box;
-            border: 1px solid #dbeafe;
         }
-        
-        .instructions {
-            background: #fffbeb;
-            border: 1px solid #fcd34d;
-            border-radius: 8px;
-            padding: 20px;
-            margin-bottom: 20px;
-            color: #92400e;
+
+        .progress-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 14px;
+            color: #6b7280;
         }
-        
-        .instructions h3 {
-            color: #d97706;
-            margin-bottom: 10px;
-            font-size: 1.2rem;
+
+        .progress-bar {
+            height: 6px;
+            background: #e5e7eb;
+            border-radius: 3px;
+            overflow: hidden;
         }
-        
-        .instructions p {
-            margin-bottom: 10px;
-            font-size: 0.95rem;
+
+        .progress-fill {
+            height: 100%;
+            background: #1e40af;
+            transition: width 0.3s ease;
         }
         
         .email-container {
             background: white;
             border-radius: 8px;
             padding: 0;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
             border: 1px solid #e2e8f0;
             overflow: hidden;
@@ -221,9 +201,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action'])) {
             flex-shrink: 0;
         }
         
-        .sender-details {
-            flex: 1;
-        }
+        .sender-details { flex: 1; }
         
         .sender-name-email {
             display: flex;
@@ -233,16 +211,8 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action'])) {
             margin-bottom: 3px;
         }
         
-        .sender-display-name {
-            font-weight: 600;
-            color: #1f2937;
-            font-size: 1rem;
-        }
-        
-        .sender-email-address {
-            color: #6b7280;
-            font-size: 0.9rem;
-        }
+        .sender-display-name { font-weight: 600; color: #1f2937; font-size: 1rem; }
+        .sender-email-address { color: #6b7280; font-size: 0.9rem; }
         
         .email-time {
             color: #6b7280;
@@ -268,10 +238,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action'])) {
             margin-right: 15px;
         }
         
-        .email-to-value {
-            color: #6b7280;
-            font-size: 0.9rem;
-        }
+        .email-to-value { color: #6b7280; font-size: 0.9rem; }
         
         .email-body {
             padding: 30px;
@@ -289,38 +256,19 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action'])) {
             cursor: default;
         }
         
-        /* Email paragraph spacing - more realistic */
-        .email-body p {
-            margin-bottom: 16px;
-            color: #333;
-        }
+        .email-body p { margin-bottom: 16px; color: #333; }
+        .email-body strong { color: #1a2980; font-weight: 600; }
         
-        .email-body strong {
-            color: #1a2980;
-            font-weight: 600;
-        }
-        
-        .email-body ul {
-            margin-left: 30px;
-            margin-bottom: 20px;
-            color: #333;
-        }
-        
-        .email-body li {
-            margin-bottom: 10px;
-            line-height: 1.5;
-        }
-        
-        /* Phishing clues - NO VISUAL INDICATORS */
+        /* Clue styles — no visual hint until clicked */
         .clue {
-            cursor: default; /* Normal text cursor */
-            color: inherit; /* Normal text color */
-            text-decoration: none; /* No underline */
-            border: none; /* No border */
-            background: transparent; /* No background */
-            display: inline; /* Normal inline display */
-            font-style: inherit; /* Normal font style */
-            font-weight: inherit; /* Normal font weight */
+            cursor: default;
+            color: inherit;
+            text-decoration: none;
+            border: none;
+            background: transparent;
+            display: inline;
+            font-style: inherit;
+            font-weight: inherit;
         }
         
         .clue.found {
@@ -328,7 +276,6 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action'])) {
             text-decoration-color: #10b981;
             text-decoration-thickness: 2px;
             color: #059669;
-            position: relative;
         }
         
         .clue.found::after {
@@ -336,20 +283,34 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action'])) {
             color: #059669;
             font-weight: bold;
         }
-        
-        .clue.incorrect.found {
-            text-decoration: line-through;
-            text-decoration-color: #dc2626;
-            color: #b91c1c;
+
+        /* Yellow hints box */
+        .hints-box {
+            background: #fef3c7;
+            border: 1px solid #f59e0b;
+            border-radius: 6px;
+            padding: 16px 20px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .hints-box-title {
+            font-weight: 600;
+            color: #92400e;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+
+        .hint-entry {
+            color: #92400e;
+            font-size: 14px;
+            margin-bottom: 6px;
+        }
+
+        .hint-entry strong {
+            color: #78350f;
         }
         
-        .clue.incorrect.found::after {
-            content: ' ✗';
-            color: #dc2626;
-            font-weight: bold;
-        }
-        
-        /* Submit Button */
         .submit-section {
             text-align: center;
             margin-top: 20px;
@@ -367,7 +328,6 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action'])) {
             cursor: pointer;
             transition: all 0.2s ease;
             min-width: 250px;
-            width: auto;
             display: inline-block;
             box-shadow: 0 4px 6px rgba(30, 64, 175, 0.2);
         }
@@ -385,7 +345,6 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action'])) {
             box-shadow: none;
         }
         
-        /* Completion Screen */
         .completion-screen {
             text-align: center;
             padding: 40px;
@@ -397,11 +356,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action'])) {
             border: 1px solid #e2e8f0;
         }
         
-        .completion-screen h2 {
-            color: #1e40af;
-            font-size: 2rem;
-            margin-bottom: 15px;
-        }
+        .completion-screen h2 { color: #1e40af; font-size: 2rem; margin-bottom: 15px; }
         
         .score-result {
             font-size: 1.3rem;
@@ -410,16 +365,6 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action'])) {
             font-weight: 600;
         }
         
-        .completion-actions {
-            display: flex;
-            gap: 15px;
-            justify-content: center;
-            margin-top: 30px;
-            flex-wrap: wrap;
-            width: 100%;
-        }
-
-        /* Completion Screen Action Buttons */
         .completion-actions {
             display: flex;
             gap: 15px;
@@ -476,67 +421,24 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action'])) {
             text-align: center;
         }
         
-        .nav-btn {
-            padding: 14px 35px;
-            background: #1e40af;
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            text-decoration: none;
-            display: inline-block;
-            transition: all 0.2s ease;
-            box-sizing: border-box;
-            min-width: 180px;
-            text-align: center;
-        }
-        
-        .nav-btn:hover {
-            background: #1e3a8a;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(30, 64, 175, 0.2);
-        }
-        
-        .nav-btn.secondary {
-            background: white;
-            color: #64748b;
-            border: 2px solid #e2e8f0;
-        }
-        
-        .nav-btn.secondary:hover {
-            background: #f8fafc;
-            border-color: #cbd5e1;
-        }
-        
-        /* Flash Effects */
         #flash-overlay {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
             pointer-events: none;
             opacity: 0;
             z-index: 9999;
             transition: opacity 0.3s ease;
         }
         
-        .flash-green {
-            background-color: rgba(16, 185, 129, 0.3);
-        }
+        .flash-green { background-color: rgba(16, 185, 129, 0.3); }
+        .flash-red   { background-color: rgba(220, 38, 38, 0.3); }
         
-        .flash-red {
-            background-color: rgba(220, 38, 38, 0.3);
-        }
-        
-        /* Results Section */
         .results-section {
             background: #f8fafc;
             border-radius: 8px;
             padding: 25px;
-            margin-top: 20px;
+            margin-bottom: 20px;
             border: 1px solid #e2e8f0;
         }
         
@@ -548,13 +450,8 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action'])) {
             border-left: 4px solid;
         }
         
-        .error-item.found {
-            border-left-color: #10b981;
-        }
-        
-        .error-item.not-found {
-            border-left-color: #dc2626;
-        }
+        .error-item.found     { border-left-color: #10b981; }
+        .error-item.not-found { border-left-color: #dc2626; }
         
         .error-header {
             display: flex;
@@ -563,10 +460,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action'])) {
             margin-bottom: 10px;
         }
         
-        .error-type {
-            font-weight: 600;
-            color: #374151;
-        }
+        .error-type { font-weight: 600; color: #374151; }
         
         .error-status {
             padding: 3px 10px;
@@ -575,129 +469,32 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action'])) {
             font-weight: 600;
         }
         
-        .status-found {
-            background: #d1fae5;
-            color: #065f46;
-        }
+        .status-found  { background: #d1fae5; color: #065f46; }
+        .status-missed { background: #fee2e2; color: #991b1b; }
         
-        .status-missed {
-            background: #fee2e2;
-            color: #991b1b;
-        }
-        
-        .error-explanation {
-            color: #6b7280;
-            font-size: 0.9rem;
-            margin-top: 8px;
-        }
-        
-        /* Responsive Design */
         @media (max-width: 768px) {
-            .game-interface {
-                padding: 15px;
-            }
-            
-            .email-sender-row {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 15px;
-            }
-            
-            .sender-info-container {
-                min-width: 100%;
-                margin-bottom: 5px;
-            }
-            
-            .email-time {
-                margin-left: 0;
-                text-align: left;
-                min-width: auto;
-            }
-            
-            .sender-name-email {
-                flex-direction: column;
-                gap: 5px;
-            }
-            
-            .email-subject-row {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 5px;
-            }
-            
-            .email-subject-label {
-                min-width: auto;
-            }
-            
-            .email-to-row {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 5px;
-            }
-            
-            .email-to-label {
-                min-width: auto;
-            }
-            
-            .email-body {
-                padding: 20px;
-                font-size: 13px;
-            }
-            
-            .completion-actions {
-                flex-direction: column;
-                align-items: center;
-            }
-
-            .action-btn, .submit-btn {
-                width: 100%;
-                max-width: 300px;
-                text-align: center;
-                margin-bottom: 10px;
-            }
-            
-            .nav-btn, .submit-btn {
-                width: 100%;
-                max-width: 300px;
-                text-align: center;
-                margin-bottom: 10px;
-            }
-            
-            .submit-btn {
-                width: 100%;
-                max-width: 100%;
-            }
-            
-            .game-header h1 {
-                font-size: 1.6rem;
-            }
-            
-            .email-header {
-                padding: 20px;
-            }
+            .game-interface { padding: 15px; }
+            .email-sender-row { flex-direction: column; align-items: flex-start; gap: 15px; }
+            .sender-info-container { min-width: 100%; margin-bottom: 5px; }
+            .email-time { margin-left: 0; text-align: left; min-width: auto; }
+            .sender-name-email { flex-direction: column; gap: 5px; }
+            .email-subject-row { flex-direction: column; align-items: flex-start; gap: 5px; }
+            .email-subject-label { min-width: auto; }
+            .email-to-row { flex-direction: column; align-items: flex-start; gap: 5px; }
+            .email-to-label { min-width: auto; }
+            .email-body { padding: 20px; font-size: 13px; }
+            .completion-actions { flex-direction: column; align-items: center; }
+            .action-btn, .submit-btn { width: 100%; max-width: 300px; text-align: center; margin-bottom: 10px; }
+            .submit-btn { width: 100%; max-width: 100%; }
+            .game-header h1 { font-size: 1.6rem; }
+            .email-header { padding: 20px; }
         }
         
         @media (max-width: 480px) {
-            .game-header h1 {
-                font-size: 1.4rem;
-            }
-            
-            .email-subject-value {
-                font-size: 1rem;
-            }
-            
-            .sender-name-email {
-                flex-direction: column;
-                gap: 3px;
-            }
-            
-            .sender-display-name {
-                font-size: 0.95rem;
-            }
-            
-            .sender-email-address {
-                font-size: 0.85rem;
-            }
+            .game-header h1 { font-size: 1.4rem; }
+            .email-subject-value { font-size: 1rem; }
+            .sender-display-name { font-size: 0.95rem; }
+            .sender-email-address { font-size: 0.85rem; }
         }
     </style>
 </head>
@@ -708,25 +505,29 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action'])) {
         <div class="main-content">
             <div class="game-interface">
                 <div class="game-header">
-                    <h1>Phishing Detective - Level 3</h1>
-                    <p>Expert Mode: No visual clues - Trust your instincts!</p>
+                    <h1>Phishing Detective | Hunt Errors</h1>
+                    <p>This email contains 10 hidden phishing signs/errors. There are NO visual indicators — you must find them by reading carefully. Click directly on suspicious text. Correct clicks show a green strikethrough. Wrong clicks show red.</p>
                 </div>
                 
-                <div class="score-display">
-                    Score: <?php echo $current_score; ?>/70 
-                    | Errors Found: <?php echo $clues_found; ?>/7
+                <div class="progress-container">
+                    <div class="progress-info">
+                        <span>Errors Found: <?php echo $clues_found; ?> of 10</span>
+                        <span>Score: <?php echo $current_score; ?>/10</span>
+                    </div>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progress-fill" style="width: <?php echo $game_completed ? '100' : (($clues_found / 10) * 100); ?>%;"></div>
+                    </div>
                 </div>
                 
                 <?php if($game_completed): ?>
-                    <!-- Completion Screen -->
                     <div class="completion-screen">
                         <h2>Assessment Complete</h2>
                         <div class="score-result">
-                            You scored <?php echo $current_score; ?> out of 70 points.
+                            You scored <?php echo $current_score; ?> out of 10 points.
                         </div>
                         
                         <?php
-                        $percentage = ($current_score / 70) * 100;
+                        $percentage = ($current_score / 10) * 100;
                         if($percentage >= 80) {
                             echo '<p style="color: #059669; font-weight: 600; font-size: 1.1rem; margin-bottom: 20px;">Outstanding! You have expert-level phishing detection skills.</p>';
                         } elseif($percentage >= 60) {
@@ -747,23 +548,12 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action'])) {
                         </div>
                     </div>
                 <?php else: ?>
-                    <!-- Game Information -->
-                    <div class="instructions">
-                        <h3>Expert Challenge: No Visual Clues</h3>
-                        <p><strong>Mission:</strong> This email contains <strong>7 hidden phishing signs/errors</strong>. There are NO visual indicators - you must find them by reading carefully.</p>
-                        <p><strong>How to Play:</strong> Click directly on suspicious text in the email. Correct clicks will show a green strikethrough. Wrong clicks show red.</p>
-                    </div>
-                    
-                    <!-- Email Content -->
                     <div class="email-container">
                         <div class="email-header">
-                            <!-- Subject Row -->
                             <div class="email-subject-row">
                                 <div class="email-subject-label">Subject:</div>
                                 <div class="email-subject-value">Congratulations! You've won a prize from Rams Supermarket</div>
                             </div>
-                            
-                            <!-- Sender Row -->
                             <div class="email-sender-row">
                                 <div class="sender-info-container">
                                     <div class="sender-avatar">R</div>
@@ -774,13 +564,10 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action'])) {
                                         </div>
                                     </div>
                                 </div>
-                                
                                 <div class="email-time">
                                     <?php echo date('F j, Y') . ' at ' . date('g:i A'); ?>
                                 </div>
                             </div>
-                            
-                            <!-- To Row -->
                             <div class="email-to-row">
                                 <div class="email-to-label">To:</div>
                                 <div class="email-to-value">
@@ -791,47 +578,43 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action'])) {
                         
                         <div class="email-body">
                             <p>Dear Valued Customer,</p>
-                            
-                            <p>We have some <span class="clue" data-id="1" data-info="Spelling error: 'exsiting' should be 'exciting'">exsiting</span> news to share!</p>
-                            
-                            <p>You have been selected as a winner in our recent lucky draw. We are thrilled to reward you as a token of our <span class="clue" data-id="2" data-info="Spelling error: 'appreciashion' should be 'appreciation'">appreciashion</span> for shopping with us at Rams Supermarket.</p>
-                            
-                            <p><strong>Prize Details</strong></p>
-                            
-                            <p>You have won: Free <span class="clue" data-id="3" data-info="Character substitution: 'F00D' uses zeros instead of O's">F00D</span></p>
-                            
-                            <p>To claim your prize, please note the following:</p>
-                            
-                            <ul>
-                                <li><strong>Location:</strong> Please visit the Customer Service desk at any Rams Supermarket branch.</li>
-                                
-                                <li><strong>Verification:</strong> Bring a valid form of <span class="clue" data-id="4" data-info="Character substitution: 'ident!fication' uses exclamation mark instead of 'i'">ident!fication</span> (ID) and a copy of this notification.</li>
-                                
-                                <li><strong>Claim Date:</strong> Please ensure you collect your prize by <span class="clue" data-id="5" data-info="Date error: February 29, 2026 doesn't exist - 2026 is not a leap year">February 29, 2026</span></li>
-                            </ul>
-                            
-                            <p><strong>Important Security Notice</strong></p>
-                            
-                            <p><span class="clue" data-id="6" data-info="Reverse psychology trick: Legitimate companies never ask for banking info or passwords to give prizes">Please be advised that Rams Supermarket will ask for your banking information, passwords, and any form of payment to release a prize.</span> If you have any concerns, please visit us in-store to speak with a representative.</p>
-                            
-                            <p>Congratulations once again! <span class="clue" data-id="7" data-info="Grammar error: 'continued supporting' should be 'continued support', 'looking forward' should be 'look forward'">We appreciate your continued supporting and looking forward to seeing you soon.</span></p>
-                            
+
+                            <p>We have some <span class="clue" data-id="1" data-category="Spelling Error" data-info="'exsiting' is misspelled — the correct word is 'exciting'.">exsiting</span> news to share with you today!</p>
+
+                            <p>You have been selected as a winner in our recent lucky draw. We are <span class="clue" data-id="2" data-category="Spelling Error" data-info="'extreamly' is misspelled — the correct word is 'extremely'.">extreamly</span> thrilled to reward you as a token of our <span class="clue" data-id="3" data-category="Spelling Error" data-info="'appreciashion' is misspelled — the correct word is 'appreciation'.">appreciashion</span> for your continued loyalty to Rams Supermarket.</p>
+
+                            <p>You have won a voucher for Free <span class="clue" data-id="4" data-category="Character Substitution" data-info="'F00D' uses the digit zero (0) instead of the letter O — a common phishing trick used to bypass spam filters.">F00D</span> to the value of $500. To claim your prize, please bring a valid form of <span class="clue" data-id="5" data-category="Character Substitution" data-info="'ident!fication' replaces the letter 'i' with an exclamation mark (!) — another character substitution trick.">ident!fication</span> along with a printed copy of this notification to the Customer Service desk at any Rams Supermarket branch.</p>
+
+                            <p>Please ensure you collect your prize before <span class="clue" data-id="6" data-category="Date Error" data-info="February 29, 2026 does not exist — 2026 is not a leap year. This is a fabricated deadline designed to create urgency.">February 29, 2026</span>, as uncollected prizes will be forfeited after this date.</p>
+
+                            <p><span class="clue" data-id="7" data-category="Contradictory Security Notice" data-info="Legitimate companies NEVER ask for banking details, passwords, or payment to release a prize. This sentence is a reverse psychology trick designed to lower your guard.">Please be advised that Rams Supermarket will ask for your banking information, passwords, and any form of payment to release a prize.</span> If you have any concerns, we encourage you to visit us in-store to speak with a representative directly.</p>
+
+                            <p>To receive your prize, <span class="clue" data-id="8" data-category="Suspicious Link" data-info="'rams-supermarket-prize-claim.com' is not an official Rams Supermarket domain. Phishing emails use lookalike domains to steal personal information.">click here: www.rams-supermarket-prize-claim.com/claim-now</span> and enter your personal details to verify your identity.</p>
+
+                            <p>This offer is only <span class="clue" data-id="9" data-category="Spelling Error" data-info="'availble' is misspelled — the correct word is 'available'.">availble</span> to selected customers and cannot be <span class="clue" data-id="10" data-category="Spelling Error" data-info="'transfered' is misspelled — the correct spelling is 'transferred' (double r).">transfered</span> to another person.</p>
+
+                            <p>Congratulations once again! <span class="clue" data-id="11" data-category="Grammar Error" data-info="'continued supporting' should be 'continued support', and 'looking forward' should be 'look forward' — both are grammar errors in a single sentence.">We appreciate your continued supporting and looking forward to seeing you soon.</span></p>
+
                             <p>Best regards,</p>
-                            
-                            <p><strong>The Management Team</strong><br>
-                            Rams Supermarket</p>
+
+                            <p><strong>The Management Team</strong><br>Rams Supermarket</p>
                         </div>
                     </div>
-                    
-                    <!-- Results Section (Hidden initially) -->
+
+                    <!-- Yellow hints box — appears below email, above submit, once first clue is found -->
+                    <div id="hints-box" class="hints-box">
+                        <div class="hints-box-title">Clues Found:</div>
+                        <div id="hints-list"></div>
+                    </div>
+
+                    <!-- Full results — appears when all clues are found -->
                     <div id="results-section" class="results-section" style="display: none;">
                         <h3 style="color: #1e40af; margin-bottom: 15px;">📋 Analysis Complete!</h3>
                         <div id="results-message" style="margin-bottom: 20px;"></div>
-                        <h4 style="color: #374151; margin-bottom: 15px;">Phishing Signs Found</h4>
+                        <h4 style="color: #374151; margin-bottom: 15px;">Phishing Signs Breakdown</h4>
                         <div id="errors-list"></div>
                     </div>
                     
-                    <!-- Submit Section -->
                     <div class="submit-section">
                         <button id="submit-btn" class="submit-btn" <?php echo $clues_found == 0 ? 'disabled' : ''; ?>>
                             Submit Score
@@ -844,257 +627,184 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action'])) {
         <?php include 'includes/footer.php'; ?>
     </div>
     
-    <!-- Flash Overlay -->
     <div id="flash-overlay"></div>
     
     <script>
-        // Game Configuration
+        // 10 clues — IDs 1–10 (clue 11 in HTML maps to id 11 but we only score 10 unique IDs)
         const clues = [
-            { id: 1, text: "exsiting", info: "Spelling error: 'exsiting' should be 'exciting'", category: "Spelling Error", points: 10 },
-            { id: 2, text: "appreciashion", info: "Spelling error: 'appreciashion' should be 'appreciation'", category: "Spelling Error", points: 10 },
-            { id: 3, text: "F00D", info: "Character substitution: 'F00D' uses zeros instead of O's", category: "Character Substitution", points: 10 },
-            { id: 4, text: "ident!fication", info: "Character substitution: 'ident!fication' uses exclamation mark instead of 'i'", category: "Character Substitution", points: 10 },
-            { id: 5, text: "February 29, 2026", info: "Date error: February 29, 2026 doesn't exist - 2026 is not a leap year", category: "Date Error", points: 10 },
-            { id: 6, text: "Please be advised that Rams Supermarket will ask for your banking information, passwords, and any form of payment to release a prize.", info: "Reverse psychology trick: Legitimate companies never ask for banking info or passwords to give prizes", category: "Contradictory Security Notice", points: 10 },
-            { id: 7, text: "We appreciate your continued supporting and looking forward to seeing you soon.", info: "Grammar error: 'continued supporting' should be 'continued support', 'looking forward' should be 'look forward'", category: "Grammar Error", points: 10 }
+            { id: 1,  category: "Spelling Error",                info: "'exsiting' is misspelled — the correct word is 'exciting'." },
+            { id: 2,  category: "Spelling Error",                info: "'extreamly' is misspelled — the correct word is 'extremely'." },
+            { id: 3,  category: "Spelling Error",                info: "'appreciashion' is misspelled — the correct word is 'appreciation'." },
+            { id: 4,  category: "Character Substitution",        info: "'F00D' uses the digit zero (0) instead of the letter O — used to bypass spam filters." },
+            { id: 5,  category: "Character Substitution",        info: "'ident!fication' replaces the letter 'i' with an exclamation mark (!)." },
+            { id: 6,  category: "Date Error",                    info: "February 29, 2026 does not exist — 2026 is not a leap year." },
+            { id: 7,  category: "Contradictory Security Notice", info: "Legitimate companies NEVER ask for banking info, passwords, or payment to release a prize." },
+            { id: 8,  category: "Suspicious Link",               info: "'rams-supermarket-prize-claim.com' is not an official Rams Supermarket domain." },
+            { id: 9,  category: "Spelling Error",                info: "'availble' is misspelled — the correct word is 'available'." },
+            { id: 10, category: "Spelling Error",                info: "'transfered' is misspelled — the correct spelling is 'transferred' (double r)." },
+            { id: 11, category: "Grammar Error",                 info: "'continued supporting' should be 'continued support', and 'looking forward' should be 'look forward'." }
         ];
+
+        // We score 10 points per unique clue; IDs 1–11 but only 10 count
+        const scorableIds = new Set([1,2,3,4,5,6,7,8,9,10]);
+        const totalClues = 10;
+        const maxScore = 10;
         
-        // Game State
         let score = <?php echo $current_score; ?>;
         let foundClues = new Set(<?php echo $clues_found > 0 ? json_encode(range(1, $clues_found)) : '[]'; ?>);
-        const totalClues = 7;
-        const maxScore = 70;
         
-        // DOM Elements
-        const submitBtn = document.getElementById('submit-btn');
-        const resultsSection = document.getElementById('results-section');
-        const resultsMessage = document.getElementById('results-message');
-        const errorsList = document.getElementById('errors-list');
-        const flashOverlay = document.getElementById('flash-overlay');
-        const emailBody = document.querySelector('.email-body');
+        const submitBtn     = document.getElementById('submit-btn');
+        const resultsSection= document.getElementById('results-section');
+        const resultsMessage= document.getElementById('results-message');
+        const errorsList    = document.getElementById('errors-list');
+        const flashOverlay  = document.getElementById('flash-overlay');
+        const emailBody     = document.querySelector('.email-body');
+        const progressFill  = document.getElementById('progress-fill');
+        const hintsBox      = document.getElementById('hints-box');
+        const hintsList     = document.getElementById('hints-list');
         
-        // Initialize Game
         function initGame() {
-            // Mark already found clues from PHP session
             document.querySelectorAll('.clue').forEach(clueEl => {
-                const clueId = parseInt(clueEl.getAttribute('data-id'));
-                if (foundClues.has(clueId)) {
-                    clueEl.classList.add('found');
-                }
-            });
-            
-            // Add click listeners to clues
-            document.querySelectorAll('.clue').forEach(clueEl => {
+                const id = parseInt(clueEl.getAttribute('data-id'));
+                if (foundClues.has(id)) clueEl.classList.add('found');
                 clueEl.addEventListener('click', handleClueClick);
-                
-                // NO hover effects - keep normal text appearance
-                clueEl.addEventListener('mouseenter', function() {
-                    // No hover effect - keep normal cursor
-                });
-                
-                clueEl.addEventListener('mouseleave', function() {
-                    // No hover effect
-                });
             });
             
-            // Add click listener to email body for incorrect clicks
             emailBody.addEventListener('click', (event) => {
-                const clickedElement = event.target;
-                const isClue = clickedElement.classList.contains('clue');
-                const isFoundClue = clickedElement.classList.contains('found');
-                
-                if (!isClue || (isClue && !isFoundClue)) {
-                    // Clicked on non-clue area or non-found clue
+                const el = event.target;
+                if (!el.classList.contains('clue') || el.classList.contains('found')) {
                     flashScreen('red');
                 }
             });
             
-            // Button event listeners
             submitBtn.addEventListener('click', submitScore);
-            
-            // Update submit button
             updateSubmitButton();
         }
         
-        // Handle clue click
         function handleClueClick(event) {
             event.stopPropagation();
             const clueEl = event.currentTarget;
             const clueId = parseInt(clueEl.getAttribute('data-id'));
             
-            // If already found, do nothing
-            if (foundClues.has(clueId)) {
-                return;
-            }
+            if (foundClues.has(clueId)) return;
             
-            // Mark as found
             foundClues.add(clueId);
-            clueEl.classList.add('found');
+            document.querySelectorAll(`.clue[data-id="${clueId}"]`).forEach(el => el.classList.add('found'));
             
-            // Update score (10 points per clue)
-            score += 10;
+            // Only add to score for the 10 scorable IDs
+            if (scorableIds.has(clueId)) score += 1;
             
-            // Flash green for correct click
             flashScreen('green');
-            
-            // Update submit button
             updateSubmitButton();
+            updateProgressBar();
+            addHint(clueId);
             
-            // Update score display
-            updateScoreDisplay();
-            
-            // Check if all clues found
-            if (foundClues.size === totalClues) {
-                // Show results section
+            // Count how many scorable IDs have been found
+            const scorableFound = [...foundClues].filter(id => scorableIds.has(id)).length;
+            if (scorableFound === totalClues) {
                 showResults();
-                
-                // Celebration effect for all clues found
                 celebrateAllCluesFound();
             }
         }
         
-        // Flash screen with color
+        function addHint(clueId) {
+            const clue = clues.find(c => c.id === clueId);
+            if (!clue) return;
+            const entry = document.createElement('div');
+            entry.className = 'hint-entry';
+            entry.innerHTML = `<strong>${clue.category}:</strong> ${clue.info}`;
+            hintsList.appendChild(entry);
+            hintsBox.style.display = 'block';
+        }
+        
         function flashScreen(color) {
             flashOverlay.className = '';
             flashOverlay.classList.add(`flash-${color}`);
             flashOverlay.style.opacity = '0.5';
-            
             setTimeout(() => {
                 flashOverlay.style.opacity = '0';
-                setTimeout(() => {
-                    flashOverlay.className = '';
-                }, 300);
+                setTimeout(() => { flashOverlay.className = ''; }, 300);
             }, 300);
         }
         
-        // Update submit button text and state
         function updateSubmitButton() {
-            if (submitBtn) {
-                submitBtn.disabled = foundClues.size === 0;
-            }
+            if (submitBtn) submitBtn.disabled = foundClues.size === 0;
         }
         
-        // Update score display
-        function updateScoreDisplay() {
-            const scoreDisplay = document.querySelector('.score-display');
-            if (scoreDisplay) {
-                scoreDisplay.innerHTML = `
-                    Score: ${score}/70 
-                    | Errors Found: ${foundClues.size}/7
+        function updateProgressBar() {
+            const scorableFound = [...foundClues].filter(id => scorableIds.has(id)).length;
+            if (progressFill) progressFill.style.width = (scorableFound / totalClues * 100) + '%';
+            const progressInfo = document.querySelector('.progress-info');
+            if (progressInfo) {
+                progressInfo.innerHTML = `
+                    <span>Errors Found: ${scorableFound} of ${totalClues}</span>
+                    <span>Score: ${score}/10</span>
                 `;
             }
         }
         
-        // Show results when all clues found
         function showResults() {
             resultsSection.style.display = 'block';
             resultsSection.scrollIntoView({ behavior: 'smooth' });
             
-            // Set results message
-            let message = '';
-            let grade = '';
-            
-            if (score === maxScore) {
-                message = `Perfect score! You found all ${totalClues} phishing signs. Excellent detective work!`;
-                grade = 'A+';
-            } else if (score >= 60) {
-                message = `Excellent! You found ${foundClues.size} out of ${totalClues} phishing signs.`;
-                grade = 'A';
-            } else if (score >= 50) {
-                message = `Good job! You found ${foundClues.size} out of ${totalClues} phishing signs.`;
-                grade = 'B';
-            } else if (score >= 40) {
-                message = `You found ${foundClues.size} out of ${totalClues} phishing signs.`;
-                grade = 'C';
-            } else {
-                message = `You found ${foundClues.size} out of ${totalClues} phishing signs. Practice makes perfect!`;
-                grade = 'D';
-            }
+            let message, grade;
+            if (score >= 10)     { message = `Perfect score! You found all ${totalClues} phishing signs.`; grade = 'A+'; }
+            else if (score >= 8) { message = `Excellent! You found ${score} out of ${totalClues} phishing signs.`; grade = 'A'; }
+            else if (score >= 6) { message = `Good job! You found ${score} out of ${totalClues} phishing signs.`; grade = 'B'; }
+            else if (score >= 4) { message = `You found ${score} out of ${totalClues} phishing signs.`; grade = 'C'; }
+            else                 { message = `You found ${score} out of ${totalClues} phishing signs. Keep practicing!`; grade = 'D'; }
             
             resultsMessage.innerHTML = `<strong>Grade: ${grade}</strong><br>${message}`;
             
-            // Display all errors with status
             errorsList.innerHTML = '';
-            clues.forEach(clue => {
-                const errorItem = document.createElement('div');
-                errorItem.className = `error-item ${foundClues.has(clue.id) ? 'found' : 'not-found'}`;
-                
-                errorItem.innerHTML = `
+            // Only show the 10 scorable clues in the breakdown
+            clues.filter(c => scorableIds.has(c.id)).forEach(clue => {
+                const item = document.createElement('div');
+                item.className = `error-item ${foundClues.has(clue.id) ? 'found' : 'not-found'}`;
+                item.innerHTML = `
                     <div class="error-header">
                         <div class="error-type">${clue.category}</div>
                         <div class="error-status ${foundClues.has(clue.id) ? 'status-found' : 'status-missed'}">
                             ${foundClues.has(clue.id) ? 'FOUND' : 'MISSED'}
                         </div>
                     </div>
-                    <div>
-                        <p><strong>Phishing Sign:</strong> "${clue.text}"</p>
-                        <p><strong>What it should be:</strong> ${clue.info}</p>
-                        <p class="error-explanation">${clue.info}</p>
-                    </div>
+                    <p style="margin:0; font-size:0.9rem; color:#374151;"><strong>Explanation:</strong> ${clue.info}</p>
                 `;
-                
-                errorsList.appendChild(errorItem);
+                errorsList.appendChild(item);
             });
         }
         
-        // Celebration effect for all clues found
         function celebrateAllCluesFound() {
-            // Add celebration animation to all found clues
-            document.querySelectorAll('.clue.found').forEach(clue => {
-                clue.style.animation = 'bounce 0.5s ease-in-out 3';
-            });
-            
-            // Show celebration message
-            const celebrationMsg = document.createElement('div');
-            celebrationMsg.style.cssText = `
-                position: fixed;
-                top: 50%;
-                left: 50%;
+            const msg = document.createElement('div');
+            msg.style.cssText = `
+                position: fixed; top: 50%; left: 50%;
                 transform: translate(-50%, -50%);
-                background: #10b981;
-                color: white;
-                padding: 20px 30px;
-                border-radius: 10px;
-                font-weight: bold;
-                font-size: 1.2rem;
-                z-index: 10000;
-                box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+                background: #10b981; color: white;
+                padding: 20px 30px; border-radius: 10px;
+                font-weight: bold; font-size: 1.2rem;
+                z-index: 10000; box-shadow: 0 5px 15px rgba(0,0,0,0.3);
                 animation: popIn 0.5s ease-out;
             `;
-            celebrationMsg.textContent = '🎉 All clues found! Submit your score!';
-            document.body.appendChild(celebrationMsg);
-            
-            // Remove message after 3 seconds
+            msg.textContent = 'All clues found! Submit your score!';
+            document.body.appendChild(msg);
             setTimeout(() => {
-                celebrationMsg.style.animation = 'fadeOut 0.5s ease-in-out forwards';
-                setTimeout(() => celebrationMsg.remove(), 500);
+                msg.style.animation = 'fadeOut 0.5s ease-in-out forwards';
+                setTimeout(() => msg.remove(), 500);
             }, 3000);
         }
         
-        // Submit score to server
         async function submitScore() {
-            if (foundClues.size === 0) {
-                alert('Please find at least one clue before submitting!');
-                return;
-            }
-            
-            // Disable button and show loading
+            if (foundClues.size === 0) { alert('Please find at least one clue before submitting!'); return; }
             submitBtn.disabled = true;
-            submitBtn.innerHTML = '⏳ Saving...';
-            
+            submitBtn.innerHTML = 'Saving...';
             try {
                 const response = await fetch('phishing-game-lvl3.php', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                    },
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                     body: `action=save_progress&score=${score}`
                 });
-                
                 const result = await response.json();
-                
                 if (result.success) {
-                    // Reload page to show completion screen
                     window.location.href = 'phishing-game-lvl3.php';
                 } else {
                     alert('Error saving score. Please try again.');
@@ -1108,33 +818,17 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action'])) {
             }
         }
         
-        // Add CSS animations
         const style = document.createElement('style');
         style.textContent = `
-            @keyframes bounce {
-                0%, 100% { transform: translateY(0); }
-                50% { transform: translateY(-10px); }
-            }
-            
-            @keyframes fadeIn {
-                from { opacity: 0; }
-                to { opacity: 1; }
-            }
-            
-            @keyframes fadeOut {
-                from { opacity: 1; }
-                to { opacity: 0; }
-            }
-            
+            @keyframes fadeOut { from { opacity: 1; } to { opacity: 0; } }
             @keyframes popIn {
-                0% { transform: translate(-50%, -50%) scale(0); opacity: 0; }
-                70% { transform: translate(-50%, -50%) scale(1.1); }
+                0%   { transform: translate(-50%, -50%) scale(0); opacity: 0; }
+                70%  { transform: translate(-50%, -50%) scale(1.1); }
                 100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
             }
         `;
         document.head.appendChild(style);
         
-        // Initialize game when page loads
         document.addEventListener('DOMContentLoaded', initGame);
     </script>
 </body>
