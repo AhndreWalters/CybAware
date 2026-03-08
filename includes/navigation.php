@@ -118,284 +118,141 @@ if (session_status() === PHP_SESSION_NONE) {
 /* ── Character definitions ── */
 const CHARS = [
     {
-        id: 'robot', label: 'Robot',
+        id: 'robot', label: 'Neon Bot',
         body: `
-            <rect x="14" y="15" width="16" height="13" rx="3" fill="#cbd5e1" stroke="#94a3b8" stroke-width="1.2"/>
-            <rect x="10" y="18" width="24" height="18" rx="3" fill="#94a3b8" stroke="#64748b" stroke-width="1.2"/>
-            <rect x="20" y="10" width="4" height="6" rx="1" fill="#94a3b8"/>
+            <rect x="14" y="15" width="16" height="13" rx="3" fill="#a78bfa" stroke="#7c3aed" stroke-width="1.2"/>
+            <rect x="10" y="18" width="24" height="18" rx="3" fill="#7c3aed" stroke="#6d28d9" stroke-width="1.2"/>
+            <rect x="20" y="10" width="4" height="6" rx="1" fill="#a78bfa"/>
             <circle cx="22" cy="9" r="2.5" fill="#4ade80"/>
-            <rect x="6" y="22" width="4" height="9" rx="2" fill="#94a3b8"/>
-            <rect x="34" y="22" width="4" height="9" rx="2" fill="#94a3b8"/>
-            <rect x="14" y="32" width="5" height="8" rx="2" fill="#94a3b8"/>
-            <rect x="25" y="32" width="5" height="8" rx="2" fill="#94a3b8"/>
-            <rect x="16" y="30" width="12" height="3" rx="1" fill="#64748b"/>
+            <rect x="6" y="22" width="4" height="9" rx="2" fill="#7c3aed"/>
+            <rect x="34" y="22" width="4" height="9" rx="2" fill="#7c3aed"/>
+            <rect x="14" y="32" width="5" height="8" rx="2" fill="#a78bfa"/>
+            <rect x="25" y="32" width="5" height="8" rx="2" fill="#a78bfa"/>
+            <rect x="16" y="30" width="12" height="3" rx="1" fill="#4ade80"/>
+            <rect x="14" y="26" width="4" height="2" rx="1" fill="#f472b6"/>
+            <rect x="26" y="26" width="4" height="2" rx="1" fill="#f472b6"/>
         `,
-        eyeBg: `<ellipse cx="22" cy="21" rx="4.5" ry="4.5" fill="white" stroke="#64748b" stroke-width="1"/>`,
-        eyeCx: 22, eyeCy: 21, eyeMaxMove: 1.8, eyeR: 2.6, eyeColor: '#1e40af'
+        eyeBg: `<ellipse cx="22" cy="21" rx="4.5" ry="4.5" fill="#f0fdf4" stroke="#4ade80" stroke-width="1.2"/>`,
+        eyeCx: 22, eyeCy: 21, eyeMaxMove: 1.8, eyeR: 2.6, eyeColor: '#7c3aed'
     },
     {
-        id: 'cat', label: 'Cat',
+        id: 'alien', label: 'Cosmic Zork',
         body: `
-            <ellipse cx="22" cy="30" rx="11" ry="10" fill="#f59e0b"/>
-            <circle cx="22" cy="20" r="10" fill="#f59e0b"/>
-            <polygon points="13,13 10,5 17,11" fill="#f59e0b" stroke="#d97706" stroke-width="0.8"/>
-            <polygon points="31,13 34,5 27,11" fill="#f59e0b" stroke="#d97706" stroke-width="0.8"/>
-            <ellipse cx="22" cy="30" rx="7" ry="7" fill="#fde68a" opacity="0.5"/>
-            <path d="M18,27 Q22,30 26,27" stroke="#d97706" stroke-width="1.2" fill="none" stroke-linecap="round"/>
-            <line x1="13" y1="24" x2="7" y2="23" stroke="#92400e" stroke-width="1" opacity="0.5"/>
-            <line x1="13" y1="26" x2="7" y2="26" stroke="#92400e" stroke-width="1" opacity="0.5"/>
-            <line x1="31" y1="24" x2="37" y2="23" stroke="#92400e" stroke-width="1" opacity="0.5"/>
-            <line x1="31" y1="26" x2="37" y2="26" stroke="#92400e" stroke-width="1" opacity="0.5"/>
+            <ellipse cx="22" cy="26" rx="10" ry="12" fill="#818cf8"/>
+            <ellipse cx="22" cy="18" rx="13" ry="12" fill="#a5b4fc"/>
+            <ellipse cx="22" cy="28" rx="6" ry="4" fill="#e0e7ff" opacity="0.6"/>
+            <line x1="14" y1="31" x2="9" y2="38" stroke="#818cf8" stroke-width="2.5" stroke-linecap="round"/>
+            <line x1="30" y1="31" x2="35" y2="38" stroke="#818cf8" stroke-width="2.5" stroke-linecap="round"/>
+            <circle cx="9" cy="39" r="2.5" fill="#f472b6"/>
+            <circle cx="35" cy="39" r="2.5" fill="#f472b6"/>
+            <path d="M17,27 Q22,31 27,27" stroke="#4338ca" stroke-width="1.4" fill="none" stroke-linecap="round"/>
+            <circle cx="16" cy="26" r="1.2" fill="#fbbf24"/>
+            <circle cx="28" cy="26" r="1.2" fill="#fbbf24"/>
         `,
-        eyeBg: `<ellipse cx="22" cy="19" rx="4" ry="5" fill="#1e1b4b"/>`,
-        eyeCx: 22, eyeCy: 19, eyeMaxMove: 1.5, eyeR: 2, eyeColor: '#4ade80'
-    },
-    {
-        id: 'alien', label: 'Alien',
-        body: `
-            <ellipse cx="22" cy="26" rx="10" ry="12" fill="#4ade80"/>
-            <ellipse cx="22" cy="18" rx="13" ry="12" fill="#4ade80"/>
-            <ellipse cx="22" cy="28" rx="6" ry="4" fill="#86efac" opacity="0.45"/>
-            <line x1="14" y1="31" x2="9" y2="38" stroke="#4ade80" stroke-width="2.5" stroke-linecap="round"/>
-            <line x1="30" y1="31" x2="35" y2="38" stroke="#4ade80" stroke-width="2.5" stroke-linecap="round"/>
-            <circle cx="9" cy="39" r="2" fill="#4ade80"/>
-            <circle cx="35" cy="39" r="2" fill="#4ade80"/>
-            <path d="M17,27 Q22,31 27,27" stroke="#16a34a" stroke-width="1.2" fill="none" stroke-linecap="round"/>
-        `,
-        eyeBg: `<ellipse cx="22" cy="16" rx="6.5" ry="5.5" fill="#000" stroke="#16a34a" stroke-width="1"/>`,
+        eyeBg: `<ellipse cx="22" cy="16" rx="6.5" ry="5.5" fill="#1e1b4b" stroke="#f472b6" stroke-width="1.2"/>`,
         eyeCx: 22, eyeCy: 16, eyeMaxMove: 2, eyeR: 3, eyeColor: '#f0fdf4'
     },
     {
-        id: 'ninja', label: 'Ninja',
+        id: 'astronaut', label: 'Star Ranger',
         body: `
-            <circle cx="22" cy="22" r="14" fill="#1e293b"/>
-            <path d="M8,22 Q8,15 22,15 Q36,15 36,22" fill="#0f172a"/>
-            <rect x="8" y="21" width="28" height="7" rx="1" fill="#334155"/>
-            <circle cx="22" cy="22" r="13" fill="none" stroke="#475569" stroke-width="1" opacity="0.4"/>
-            <path d="M8,28 Q8,36 22,36 Q36,36 36,28" fill="#1e293b"/>
+            <circle cx="22" cy="22" r="13" fill="#38bdf8"/>
+            <circle cx="22" cy="22" r="10" fill="#0c4a6e"/>
+            <rect x="9" y="19" width="5" height="7" rx="2" fill="#f472b6"/>
+            <rect x="30" y="19" width="5" height="7" rx="2" fill="#f472b6"/>
+            <path d="M15,34 Q22,39 29,34" stroke="#fbbf24" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+            <path d="M14,22 Q22,14 30,22" fill="#38bdf8" opacity="0.5"/>
+            <circle cx="22" cy="22" r="3" fill="#fbbf24" opacity="0.2"/>
+            <circle cx="16" cy="18" r="1" fill="#4ade80"/>
+            <circle cx="28" cy="18" r="1" fill="#f472b6"/>
         `,
-        eyeBg: `<rect x="15" y="20" width="14" height="5" rx="2" fill="none"/>`,
-        eyeCx: 22, eyeCy: 22, eyeMaxMove: 2.5, eyeR: 2.8, eyeColor: '#f43f5e'
+        eyeBg: `<circle cx="22" cy="22" r="5.5" fill="#082f49"/>`,
+        eyeCx: 22, eyeCy: 22, eyeMaxMove: 2, eyeR: 2.8, eyeColor: '#fbbf24'
     },
     {
-        id: 'bear', label: 'Bear',
+        id: 'zombie', label: 'Rotting Rex',
         body: `
-            <circle cx="15" cy="15" r="6" fill="#92400e"/>
-            <circle cx="29" cy="15" r="6" fill="#92400e"/>
-            <circle cx="22" cy="26" r="13" fill="#b45309"/>
-            <ellipse cx="22" cy="30" rx="7" ry="5" fill="#d97706" opacity="0.55"/>
-            <path d="M17,31 Q22,35 27,31" stroke="#92400e" stroke-width="1.5" fill="none" stroke-linecap="round"/>
-            <ellipse cx="22" cy="32" rx="2.5" ry="1.5" fill="#92400e"/>
-        `,
-        eyeBg: `<circle cx="22" cy="23" r="4.5" fill="#1c1917"/>`,
-        eyeCx: 22, eyeCy: 23, eyeMaxMove: 1.6, eyeR: 2.3, eyeColor: '#fbbf24'
-    },
-    {
-        id: 'astronaut', label: 'Space',
-        body: `
-            <circle cx="22" cy="22" r="13" fill="#cbd5e1"/>
-            <circle cx="22" cy="22" r="10" fill="#1e293b"/>
-            <rect x="9" y="19" width="5" height="7" rx="2" fill="#94a3b8"/>
-            <rect x="30" y="19" width="5" height="7" rx="2" fill="#94a3b8"/>
-            <path d="M15,34 Q22,39 29,34" stroke="#94a3b8" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-            <path d="M14,22 Q22,14 30,22" fill="#1d4ed8" opacity="0.35"/>
-        `,
-        eyeBg: `<circle cx="22" cy="22" r="5.5" fill="#0f172a"/>`,
-        eyeCx: 22, eyeCy: 22, eyeMaxMove: 2, eyeR: 2.8, eyeColor: '#38bdf8'
-    },
-    {
-        id: 'dragon', label: 'Dragon',
-        body: `
-            <ellipse cx="22" cy="27" rx="11" ry="12" fill="#dc2626"/>
-            <circle cx="22" cy="18" r="10" fill="#ef4444"/>
-            <polygon points="14,10 10,2 18,8" fill="#dc2626" stroke="#b91c1c" stroke-width="0.8"/>
-            <polygon points="30,10 34,2 26,8" fill="#dc2626" stroke="#b91c1c" stroke-width="0.8"/>
-            <ellipse cx="22" cy="26" rx="6" ry="4" fill="#fca5a5" opacity="0.5"/>
-            <path d="M17,28 Q22,32 27,28" stroke="#b91c1c" stroke-width="1.3" fill="none" stroke-linecap="round"/>
-            <path d="M18,31 L16,35 M22,32 L22,36 M26,31 L28,35" stroke="#b91c1c" stroke-width="1.2" stroke-linecap="round"/>
-        `,
-        eyeBg: `<ellipse cx="22" cy="17" rx="4.5" ry="4" fill="#fef2f2" stroke="#b91c1c" stroke-width="0.8"/>`,
-        eyeCx: 22, eyeCy: 17, eyeMaxMove: 1.8, eyeR: 2.2, eyeColor: '#dc2626'
-    },
-    {
-        id: 'fox', label: 'Fox',
-        body: `
-            <circle cx="22" cy="22" r="11" fill="#ea580c"/>
-            <polygon points="13,14 8,4 18,12" fill="#ea580c" stroke="#c2410c" stroke-width="0.8"/>
-            <polygon points="31,14 36,4 26,12" fill="#ea580c" stroke="#c2410c" stroke-width="0.8"/>
-            <ellipse cx="22" cy="25" rx="7" ry="5" fill="#fed7aa" opacity="0.8"/>
-            <ellipse cx="16" cy="16" rx="3" ry="4" fill="#fed7aa" opacity="0.6"/>
-            <ellipse cx="28" cy="16" rx="3" ry="4" fill="#fed7aa" opacity="0.6"/>
-            <path d="M18,28 Q22,31 26,28" stroke="#c2410c" stroke-width="1.2" fill="none" stroke-linecap="round"/>
-            <circle cx="22" cy="27" r="1.5" fill="#c2410c"/>
-            <line x1="13" y1="23" x2="7" y2="22" stroke="#9a3412" stroke-width="1" opacity="0.5"/>
-            <line x1="31" y1="23" x2="37" y2="22" stroke="#9a3412" stroke-width="1" opacity="0.5"/>
-        `,
-        eyeBg: `<circle cx="22" cy="21" r="4.5" fill="#431407"/>`,
-        eyeCx: 22, eyeCy: 21, eyeMaxMove: 1.7, eyeR: 2.2, eyeColor: '#fb923c'
-    },
-    {
-        id: 'penguin', label: 'Penguin',
-        body: `
-            <ellipse cx="22" cy="26" rx="11" ry="14" fill="#1e293b"/>
-            <ellipse cx="22" cy="27" rx="7" ry="10" fill="#f1f5f9"/>
-            <circle cx="22" cy="14" r="9" fill="#1e293b"/>
-            <ellipse cx="22" cy="16" rx="5" ry="6" fill="#f1f5f9"/>
-            <ellipse cx="22" cy="32" rx="5" ry="3" fill="#f97316" opacity="0.8"/>
-            <polygon points="19,23 25,23 22,26" fill="#f97316"/>
-            <ellipse cx="13" cy="28" rx="4" ry="8" fill="#1e293b"/>
-            <ellipse cx="31" cy="28" rx="4" ry="8" fill="#1e293b"/>
-        `,
-        eyeBg: `<circle cx="22" cy="14" r="4.5" fill="#f1f5f9"/>`,
-        eyeCx: 22, eyeCy: 14, eyeMaxMove: 1.6, eyeR: 2.2, eyeColor: '#1e293b'
-    },
-    {
-        id: 'frog', label: 'Frog',
-        body: `
-            <ellipse cx="22" cy="28" rx="12" ry="10" fill="#16a34a"/>
-            <circle cx="22" cy="20" r="10" fill="#22c55e"/>
-            <circle cx="15" cy="13" r="5" fill="#22c55e" stroke="#16a34a" stroke-width="0.8"/>
-            <circle cx="29" cy="13" r="5" fill="#22c55e" stroke="#16a34a" stroke-width="0.8"/>
-            <ellipse cx="22" cy="26" rx="7" ry="5" fill="#4ade80" opacity="0.4"/>
-            <path d="M16,28 Q22,33 28,28" stroke="#15803d" stroke-width="1.5" fill="none" stroke-linecap="round"/>
-            <ellipse cx="20" cy="30" rx="2" ry="1" fill="#15803d"/>
-            <ellipse cx="24" cy="30" rx="2" ry="1" fill="#15803d"/>
-        `,
-        eyeBg: `<circle cx="15" cy="13" r="3.5" fill="#fef9c3"/>`,
-        eyeCx: 15, eyeCy: 13, eyeMaxMove: 1.5, eyeR: 2, eyeColor: '#15803d'
-    },
-    {
-        id: 'pirate', label: 'Pirate',
-        body: `
-            <circle cx="22" cy="24" r="12" fill="#fcd34d"/>
-            <path d="M10,18 Q10,8 22,8 Q34,8 34,18" fill="#1e293b"/>
-            <rect x="16" y="8" width="12" height="4" rx="1" fill="#dc2626"/>
-            <path d="M10,18 Q16,14 22,16 Q28,14 34,18" fill="#292524"/>
-            <path d="M17,29 Q22,33 27,29" stroke="#92400e" stroke-width="1.3" fill="none" stroke-linecap="round"/>
-            <rect x="10" y="22" width="8" height="5" rx="1" fill="#1e293b" opacity="0.9"/>
-            <line x1="10" y1="22" x2="18" y2="27" stroke="#64748b" stroke-width="0.8"/>
-            <line x1="18" y1="22" x2="10" y2="27" stroke="#64748b" stroke-width="0.8"/>
-        `,
-        eyeBg: `<circle cx="28" cy="23" r="4.5" fill="white" stroke="#92400e" stroke-width="0.8"/>`,
-        eyeCx: 28, eyeCy: 23, eyeMaxMove: 1.8, eyeR: 2.4, eyeColor: '#1e293b'
-    },
-    {
-        id: 'unicorn', label: 'Unicorn',
-        body: `
-            <circle cx="22" cy="24" r="12" fill="#fce7f3"/>
-            <path d="M19,10 Q22,2 25,10" fill="#a855f7" stroke="#9333ea" stroke-width="0.8"/>
-            <ellipse cx="14" cy="16" rx="4" ry="5" fill="#fce7f3" stroke="#f9a8d4" stroke-width="0.8"/>
-            <ellipse cx="30" cy="16" rx="4" ry="5" fill="#fce7f3" stroke="#f9a8d4" stroke-width="0.8"/>
-            <ellipse cx="22" cy="28" rx="7" ry="5" fill="#fbcfe8" opacity="0.6"/>
-            <path d="M17,29 Q22,33 27,29" stroke="#ec4899" stroke-width="1.2" fill="none" stroke-linecap="round"/>
-            <circle cx="18" cy="31" r="1" fill="#ec4899"/>
-            <circle cx="22" cy="32.5" r="1" fill="#a855f7"/>
-            <circle cx="26" cy="31" r="1" fill="#3b82f6"/>
-        `,
-        eyeBg: `<circle cx="22" cy="23" r="4.5" fill="white" stroke="#f9a8d4" stroke-width="0.8"/>`,
-        eyeCx: 22, eyeCy: 23, eyeMaxMove: 1.8, eyeR: 2.3, eyeColor: '#a855f7'
-    },
-    {
-        id: 'zombie', label: 'Zombie',
-        body: `
-            <circle cx="22" cy="23" r="12" fill="#86efac"/>
-            <path d="M10,18 Q10,8 22,8 Q34,8 34,18" fill="#4b5563"/>
-            <path d="M12,18 Q17,15 22,17 Q27,15 32,18" fill="#374151"/>
-            <ellipse cx="22" cy="28" rx="7" ry="5" fill="#6ee7b7" opacity="0.5"/>
-            <path d="M16,29 L17,33 M19,30 L19,34 M22,30 L22,34 M25,30 L25,34 M28,29 L27,33" stroke="#166534" stroke-width="1.5" stroke-linecap="round"/>
-            <path d="M16,27 Q22,22 28,27" stroke="#166534" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+            <circle cx="22" cy="23" r="12" fill="#4ade80"/>
+            <path d="M10,18 Q10,8 22,8 Q34,8 34,18" fill="#dc2626"/>
+            <path d="M12,18 Q17,15 22,17 Q27,15 32,18" fill="#b91c1c"/>
+            <ellipse cx="22" cy="28" rx="7" ry="5" fill="#86efac" opacity="0.6"/>
+            <path d="M16,29 L17,34 M19,30 L19,35 M22,30 L22,35 M25,30 L25,35 M28,29 L27,34" stroke="#15803d" stroke-width="1.8" stroke-linecap="round"/>
+            <path d="M16,27 Q22,22 28,27" stroke="#15803d" stroke-width="1.4" fill="none" stroke-linecap="round"/>
+            <circle cx="16" cy="20" r="2" fill="#fef08a"/>
+            <circle cx="28" cy="20" r="2" fill="#fef08a"/>
         `,
         eyeBg: `<circle cx="22" cy="22" r="5" fill="#fef9c3"/>`,
-        eyeCx: 22, eyeCy: 22, eyeMaxMove: 1.5, eyeR: 2.8, eyeColor: '#dc2626'
+        eyeCx: 22, eyeCy: 22, eyeMaxMove: 1.5, eyeR: 2.8, eyeColor: '#ef4444'
     },
     {
-        id: 'knight', label: 'Knight',
+        id: 'knight', label: 'Gold Guardian',
         body: `
-            <rect x="11" y="14" width="22" height="22" rx="4" fill="#94a3b8" stroke="#64748b" stroke-width="1.2"/>
-            <rect x="11" y="14" width="22" height="10" rx="4" fill="#cbd5e1" stroke="#94a3b8" stroke-width="1"/>
-            <rect x="14" y="18" width="16" height="6" rx="2" fill="#475569"/>
-            <rect x="7" y="18" width="4" height="14" rx="2" fill="#94a3b8"/>
-            <rect x="33" y="18" width="4" height="14" rx="2" fill="#94a3b8"/>
-            <rect x="14" y="32" width="5" height="8" rx="2" fill="#94a3b8"/>
-            <rect x="25" y="32" width="5" height="8" rx="2" fill="#94a3b8"/>
-            <rect x="18" y="16" width="8" height="2" rx="1" fill="#fbbf24"/>
+            <rect x="11" y="14" width="22" height="22" rx="4" fill="#fbbf24" stroke="#d97706" stroke-width="1.2"/>
+            <rect x="11" y="14" width="22" height="10" rx="4" fill="#fcd34d" stroke="#fbbf24" stroke-width="1"/>
+            <rect x="14" y="18" width="16" height="6" rx="2" fill="#92400e"/>
+            <rect x="7" y="18" width="4" height="14" rx="2" fill="#fbbf24"/>
+            <rect x="33" y="18" width="4" height="14" rx="2" fill="#fbbf24"/>
+            <rect x="14" y="32" width="5" height="8" rx="2" fill="#fcd34d"/>
+            <rect x="25" y="32" width="5" height="8" rx="2" fill="#fcd34d"/>
+            <rect x="18" y="16" width="8" height="2" rx="1" fill="#dc2626"/>
+            <line x1="22" y1="14" x2="22" y2="36" stroke="#d97706" stroke-width="1" opacity="0.5"/>
+            <line x1="11" y1="25" x2="33" y2="25" stroke="#d97706" stroke-width="1" opacity="0.5"/>
         `,
-        eyeBg: `<rect x="15" y="19" width="12" height="4" rx="1" fill="#0f172a"/>`,
-        eyeCx: 22, eyeCy: 21, eyeMaxMove: 2, eyeR: 2.2, eyeColor: '#38bdf8'
+        eyeBg: `<rect x="15" y="19" width="12" height="4" rx="1" fill="#1c1917"/>`,
+        eyeCx: 22, eyeCy: 21, eyeMaxMove: 2, eyeR: 2.2, eyeColor: '#fbbf24'
     },
     {
-        id: 'panda', label: 'Panda',
+        id: 'snowman', label: 'Frosty Dude',
         body: `
-            <circle cx="22" cy="23" r="13" fill="white" stroke="#e2e8f0" stroke-width="0.8"/>
-            <circle cx="14" cy="15" r="6" fill="#1e293b"/>
-            <circle cx="30" cy="15" r="6" fill="#1e293b"/>
-            <ellipse cx="22" cy="28" rx="8" ry="6" fill="#f1f5f9"/>
-            <path d="M17,30 Q22,34 27,30" stroke="#475569" stroke-width="1.3" fill="none" stroke-linecap="round"/>
-            <ellipse cx="22" cy="31" rx="2.5" ry="1.5" fill="#475569"/>
-        `,
-        eyeBg: `<ellipse cx="22" cy="21" rx="5" ry="5" fill="#1e293b"/>`,
-        eyeCx: 22, eyeCy: 21, eyeMaxMove: 1.6, eyeR: 2.4, eyeColor: '#f1f5f9'
-    },
-    {
-        id: 'mermaid', label: 'Mermaid',
-        body: `
-            <path d="M14,26 Q14,40 22,42 Q30,40 30,26 Q30,38 22,40 Q14,38 14,26 Z" fill="#0891b2"/>
-            <ellipse cx="22" cy="24" rx="10" ry="13" fill="#fcd34d"/>
-            <path d="M12,20 Q12,10 22,10 Q32,10 32,20" fill="#fbbf24" opacity="0.4"/>
-            <path d="M12,18 Q17,14 22,16 Q27,14 32,18 Q30,10 22,8 Q14,10 12,18Z" fill="#fbbf24"/>
-            <path d="M16,28 Q22,32 28,28" stroke="#92400e" stroke-width="1.2" fill="none" stroke-linecap="round"/>
-            <path d="M14,36 Q18,34 22,36 Q26,34 30,36" stroke="#0e7490" stroke-width="2" fill="none" stroke-linecap="round"/>
-        `,
-        eyeBg: `<circle cx="22" cy="22" r="4.5" fill="white" stroke="#0891b2" stroke-width="0.8"/>`,
-        eyeCx: 22, eyeCy: 22, eyeMaxMove: 1.8, eyeR: 2.3, eyeColor: '#0891b2'
-    },
-    {
-        id: 'snowman', label: 'Snowman',
-        body: `
-            <circle cx="22" cy="32" r="10" fill="white" stroke="#bfdbfe" stroke-width="1"/>
-            <circle cx="22" cy="18" r="8" fill="white" stroke="#bfdbfe" stroke-width="1"/>
+            <circle cx="22" cy="32" r="10" fill="#bfdbfe" stroke="#93c5fd" stroke-width="1"/>
+            <circle cx="22" cy="18" r="8" fill="#dbeafe" stroke="#93c5fd" stroke-width="1"/>
             <ellipse cx="22" cy="24" rx="3" ry="1.5" fill="#f97316"/>
-            <rect x="15" y="13" width="14" height="3" rx="1" fill="#1e293b"/>
-            <rect x="16" y="10" width="12" height="5" rx="2" fill="#1e293b"/>
-            <line x1="12" y1="26" x2="6" y2="22" stroke="#92400e" stroke-width="1.5" stroke-linecap="round"/>
-            <line x1="32" y1="26" x2="38" y2="22" stroke="#92400e" stroke-width="1.5" stroke-linecap="round"/>
-            <circle cx="20" cy="30" r="1.2" fill="#475569"/>
-            <circle cx="22" cy="33" r="1.2" fill="#475569"/>
-            <circle cx="24" cy="36" r="1.2" fill="#475569"/>
+            <rect x="15" y="13" width="14" height="3" rx="1" fill="#7c3aed"/>
+            <rect x="16" y="10" width="12" height="5" rx="2" fill="#7c3aed"/>
+            <line x1="12" y1="26" x2="6" y2="21" stroke="#f472b6" stroke-width="1.8" stroke-linecap="round"/>
+            <line x1="32" y1="26" x2="38" y2="21" stroke="#f472b6" stroke-width="1.8" stroke-linecap="round"/>
+            <circle cx="20" cy="30" r="1.4" fill="#1d4ed8"/>
+            <circle cx="22" cy="33" r="1.4" fill="#1d4ed8"/>
+            <circle cx="24" cy="36" r="1.4" fill="#1d4ed8"/>
+            <circle cx="19" cy="17" r="1.2" fill="#dc2626"/>
+            <circle cx="25" cy="17" r="1.2" fill="#dc2626"/>
         `,
-        eyeBg: `<circle cx="22" cy="18" r="4" fill="white"/>`,
-        eyeCx: 22, eyeCy: 18, eyeMaxMove: 1.5, eyeR: 2, eyeColor: '#1e293b'
+        eyeBg: `<circle cx="22" cy="18" r="4" fill="#eff6ff"/>`,
+        eyeCx: 22, eyeCy: 18, eyeMaxMove: 1.5, eyeR: 2, eyeColor: '#1d4ed8'
     },
     {
-        id: 'sun', label: 'Sunny',
+        id: 'sun', label: 'Blazing Sol',
         body: `
-            <circle cx="22" cy="22" r="10" fill="#fbbf24"/>
-            <line x1="22" y1="6" x2="22" y2="10" stroke="#fbbf24" stroke-width="2.5" stroke-linecap="round"/>
-            <line x1="22" y1="34" x2="22" y2="38" stroke="#fbbf24" stroke-width="2.5" stroke-linecap="round"/>
-            <line x1="6" y1="22" x2="10" y2="22" stroke="#fbbf24" stroke-width="2.5" stroke-linecap="round"/>
-            <line x1="34" y1="22" x2="38" y2="22" stroke="#fbbf24" stroke-width="2.5" stroke-linecap="round"/>
-            <line x1="11" y1="11" x2="14" y2="14" stroke="#fbbf24" stroke-width="2.5" stroke-linecap="round"/>
-            <line x1="30" y1="30" x2="33" y2="33" stroke="#fbbf24" stroke-width="2.5" stroke-linecap="round"/>
-            <line x1="33" y1="11" x2="30" y2="14" stroke="#fbbf24" stroke-width="2.5" stroke-linecap="round"/>
-            <line x1="14" y1="30" x2="11" y2="33" stroke="#fbbf24" stroke-width="2.5" stroke-linecap="round"/>
-            <path d="M16,26 Q22,30 28,26" stroke="#d97706" stroke-width="1.3" fill="none" stroke-linecap="round"/>
+            <circle cx="22" cy="22" r="10" fill="#f97316"/>
+            <line x1="22" y1="5" x2="22" y2="10" stroke="#fbbf24" stroke-width="3" stroke-linecap="round"/>
+            <line x1="22" y1="34" x2="22" y2="39" stroke="#fbbf24" stroke-width="3" stroke-linecap="round"/>
+            <line x1="5" y1="22" x2="10" y2="22" stroke="#fbbf24" stroke-width="3" stroke-linecap="round"/>
+            <line x1="34" y1="22" x2="39" y2="22" stroke="#fbbf24" stroke-width="3" stroke-linecap="round"/>
+            <line x1="10" y1="10" x2="13.5" y2="13.5" stroke="#fbbf24" stroke-width="3" stroke-linecap="round"/>
+            <line x1="30.5" y1="30.5" x2="34" y2="34" stroke="#fbbf24" stroke-width="3" stroke-linecap="round"/>
+            <line x1="34" y1="10" x2="30.5" y2="13.5" stroke="#fbbf24" stroke-width="3" stroke-linecap="round"/>
+            <line x1="13.5" y1="30.5" x2="10" y2="34" stroke="#fbbf24" stroke-width="3" stroke-linecap="round"/>
+            <path d="M16,26 Q22,30 28,26" stroke="#9a3412" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+            <circle cx="19" cy="28" r="1" fill="#9a3412"/>
+            <circle cx="25" cy="28" r="1" fill="#9a3412"/>
         `,
-        eyeBg: `<circle cx="22" cy="21" r="4.5" fill="#fffbeb" stroke="#d97706" stroke-width="0.8"/>`,
-        eyeCx: 22, eyeCy: 21, eyeMaxMove: 1.8, eyeR: 2.2, eyeColor: '#d97706'
+        eyeBg: `<circle cx="22" cy="21" r="4.5" fill="#fff7ed" stroke="#ea580c" stroke-width="1"/>`,
+        eyeCx: 22, eyeCy: 21, eyeMaxMove: 1.8, eyeR: 2.2, eyeColor: '#dc2626'
     },
     {
-        id: 'shark', label: 'Shark',
+        id: 'shark', label: 'Chomper Blue',
         body: `
-            <ellipse cx="22" cy="27" rx="13" ry="10" fill="#94a3b8"/>
-            <ellipse cx="22" cy="27" rx="9" ry="7" fill="#e2e8f0"/>
-            <path d="M18,16 Q22,6 26,16" fill="#94a3b8" stroke="#64748b" stroke-width="0.8"/>
-            <path d="M8,24 Q8,32 15,34" stroke="#94a3b8" stroke-width="3" fill="none" stroke-linecap="round"/>
-            <path d="M36,24 Q36,32 29,34" stroke="#94a3b8" stroke-width="3" fill="none" stroke-linecap="round"/>
-            <path d="M15,30 L17,35 M19,32 L20,36 M22,32 L22,36 M25,32 L26,36 M28,30 L27,35" stroke="#475569" stroke-width="1.2" stroke-linecap="round"/>
-            <path d="M14,28 Q22,24 30,28" stroke="#64748b" stroke-width="1" fill="none" stroke-linecap="round"/>
+            <ellipse cx="22" cy="27" rx="13" ry="10" fill="#0ea5e9"/>
+            <ellipse cx="22" cy="27" rx="9" ry="7" fill="#f0f9ff"/>
+            <path d="M18,16 Q22,5 26,16" fill="#0ea5e9" stroke="#0284c7" stroke-width="0.8"/>
+            <path d="M8,24 Q8,32 15,34" stroke="#38bdf8" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+            <path d="M36,24 Q36,32 29,34" stroke="#38bdf8" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+            <path d="M15,30 L17,35 M19,32 L20,36 M22,32 L22,36 M25,32 L26,36 M28,30 L27,35" stroke="#0284c7" stroke-width="1.5" stroke-linecap="round"/>
+            <path d="M14,28 Q22,23 30,28" stroke="#0284c7" stroke-width="1.2" fill="none" stroke-linecap="round"/>
+            <circle cx="18" cy="24" r="1.5" fill="#fbbf24"/>
+            <circle cx="26" cy="24" r="1.5" fill="#fbbf24"/>
         `,
-        eyeBg: `<circle cx="22" cy="23" r="4.5" fill="#1e293b"/>`,
-        eyeCx: 22, eyeCy: 23, eyeMaxMove: 2, eyeR: 2.4, eyeColor: '#38bdf8'
+        eyeBg: `<circle cx="22" cy="23" r="4.5" fill="#0c4a6e"/>`,
+        eyeCx: 22, eyeCy: 23, eyeMaxMove: 2, eyeR: 2.4, eyeColor: '#7dd3fc'
     },
     {
         id: 'rabbit', label: '4orce Rabbit',
@@ -406,28 +263,20 @@ const CHARS = [
             <ellipse cx="29" cy="7" rx="3" ry="8" fill="#9b8465" stroke="#7a6548" stroke-width="0.8"/>
             <ellipse cx="15" cy="7" rx="1.8" ry="6" fill="#c0392b" opacity="0.6"/>
             <ellipse cx="29" cy="7" rx="1.8" ry="6" fill="#c0392b" opacity="0.6"/>
-            <!-- Hoodie -->
             <path d="M8,38 Q8,24 22,22 Q36,24 36,38 Z" fill="#3d6b3d"/>
             <path d="M8,38 Q8,24 22,22 Q36,24 36,38 Z" fill="#2d5a2d" opacity="0.4"/>
             <path d="M14,22 Q14,16 22,15 Q30,16 30,22 Q28,18 22,17 Q16,18 14,22Z" fill="#3d6b3d"/>
-            <!-- Hood shadow -->
             <path d="M12,20 Q14,12 22,11 Q30,12 32,20 Q30,15 22,14 Q14,15 12,20Z" fill="#2d5a2d"/>
-            <!-- Dreads -->
             <line x1="15" y1="19" x2="10" y2="30" stroke="#3d2b1a" stroke-width="2" stroke-linecap="round"/>
             <line x1="17" y1="20" x2="13" y2="32" stroke="#4a3520" stroke-width="1.8" stroke-linecap="round"/>
             <line x1="27" y1="20" x2="31" y2="32" stroke="#3d2b1a" stroke-width="2" stroke-linecap="round"/>
             <line x1="29" y1="19" x2="34" y2="30" stroke="#4a3520" stroke-width="1.8" stroke-linecap="round"/>
-            <!-- Face -->
             <ellipse cx="22" cy="22" rx="8" ry="7" fill="#9b8465"/>
-            <!-- Neck gaiter -->
             <rect x="15" y="27" width="14" height="5" rx="2" fill="#1a1a1a"/>
-            <!-- Gold chain -->
             <path d="M15,28 Q22,31 29,28" stroke="#fbbf24" stroke-width="1.5" fill="none" stroke-linecap="round"/>
             <circle cx="22" cy="31" r="1.5" fill="#f59e0b"/>
-            <!-- Carrot -->
             <rect x="24" y="24" width="10" height="3" rx="1.5" fill="#f97316" transform="rotate(-15 24 24)"/>
             <path d="M32,21 Q34,19 36,20 Q34,22 33,23" fill="#16a34a"/>
-            <!-- Mouth eating carrot -->
             <path d="M20,25 Q22,27 24,25" stroke="#7a6548" stroke-width="1" fill="none" stroke-linecap="round"/>
         `,
         eyeBg: `<circle cx="22" cy="20" r="4.5" fill="#1a0a0a" stroke="#7a6548" stroke-width="0.8"/>`,
@@ -436,19 +285,14 @@ const CHARS = [
     {
         id: 'msjackson', label: 'Ms. Jackson',
         body: `
-            <!-- Body / cardigan -->
             <ellipse cx="22" cy="34" rx="12" ry="9" fill="#d6b8e8"/>
             <rect x="11" y="27" width="22" height="12" rx="4" fill="#9b6fc7"/>
-            <!-- Neck -->
             <rect x="19" y="24" width="6" height="5" rx="2" fill="#f5d5b8"/>
-            <!-- Pearl necklace -->
             <path d="M16,28 Q22,31 28,28" stroke="white" stroke-width="1.5" fill="none" stroke-linecap="round"/>
             <circle cx="22" cy="30.5" r="1.2" fill="#f0e6ff"/>
             <circle cx="18" cy="29" r="1.1" fill="#f0e6ff"/>
             <circle cx="26" cy="29" r="1.1" fill="#f0e6ff"/>
-            <!-- Head -->
             <circle cx="22" cy="18" r="11" fill="#f5d5b8"/>
-            <!-- White curly hair -->
             <ellipse cx="22" cy="10" rx="11" ry="6" fill="white"/>
             <circle cx="12" cy="13" r="4.5" fill="white"/>
             <circle cx="32" cy="13" r="4.5" fill="white"/>
@@ -457,20 +301,15 @@ const CHARS = [
             <circle cx="22" cy="8" r="4" fill="white"/>
             <circle cx="17" cy="8" r="3.5" fill="white"/>
             <circle cx="27" cy="8" r="3.5" fill="white"/>
-            <!-- Glasses -->
             <rect x="13" y="17" width="7" height="5" rx="2.5" fill="none" stroke="#92400e" stroke-width="1.2"/>
             <rect x="24" y="17" width="7" height="5" rx="2.5" fill="none" stroke="#92400e" stroke-width="1.2"/>
             <line x1="20" y1="19" x2="24" y2="19" stroke="#92400e" stroke-width="1.2"/>
             <line x1="13" y1="19" x2="10" y2="18" stroke="#92400e" stroke-width="1.2"/>
             <line x1="31" y1="19" x2="34" y2="18" stroke="#92400e" stroke-width="1.2"/>
-            <!-- Nose -->
             <ellipse cx="22" cy="22" rx="1.5" ry="1" fill="#e8b89a"/>
-            <!-- Smile -->
             <path d="M18,25 Q22,28 26,25" stroke="#c0836a" stroke-width="1.2" fill="none" stroke-linecap="round"/>
-            <!-- Rosy cheeks -->
             <ellipse cx="15" cy="23" rx="3" ry="2" fill="#f9a8d4" opacity="0.35"/>
             <ellipse cx="29" cy="23" rx="3" ry="2" fill="#f9a8d4" opacity="0.35"/>
-            <!-- Handbag hint -->
             <rect x="30" y="30" width="6" height="5" rx="2" fill="#7c3aed"/>
             <path d="M31,30 Q33,28 35,30" stroke="#6d28d9" stroke-width="1.2" fill="none"/>
         `,
