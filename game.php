@@ -25,7 +25,7 @@ if($stmt = mysqli_prepare($link, $sql)) {
     mysqli_stmt_execute($stmt);
     mysqli_stmt_store_result($stmt);
     mysqli_stmt_bind_result($stmt, $game_type, $score, $total_questions);
-    
+
     while(mysqli_stmt_fetch($stmt)) {
         if($game_type == 'password_fortress') {
             $password_score = $score;
@@ -168,26 +168,6 @@ if($stmt = mysqli_prepare($link, $sql)) {
             text-align: center;
         }
 
-        .score-item {
-            margin-bottom: 15px;
-            padding: 12px 15px;
-            background: #f8fafc;
-            border-radius: 8px;
-            border: 1px solid #e2e8f0;
-        }
-
-        .score-label {
-            color: #64748b;
-            font-size: 0.9rem;
-            margin-bottom: 4px;
-        }
-
-        .score-value {
-            color: #1e40af;
-            font-size: 1.2rem;
-            font-weight: 600;
-        }
-
         .score-progress {
             margin-top: 8px;
             height: 6px;
@@ -207,6 +187,7 @@ if($stmt = mysqli_prepare($link, $sql)) {
             flex-direction: column;
             gap: 12px;
             margin-bottom: 15px;
+            width: 100%;
         }
 
         .level-container {
@@ -317,18 +298,20 @@ if($stmt = mysqli_prepare($link, $sql)) {
 
                     <!-- Card 3: Your Progress + Certificate -->
                     <div class="game-card">
-                        <div class="game-content" style="align-items: stretch;">
-                            <h2 class="stats-header">Your Progress</h2>
-
-                            <div class="score-item">
-                                <div class="score-label">Password Fortress</div>
-                                <div class="score-value"><?php echo $password_score; ?>/5</div>
-                                <div class="score-progress">
-                                    <div class="score-fill" style="width: <?php echo ($password_score / 5) * 100; ?>%"></div>
-                                </div>
-                            </div>
+                        <div class="game-content">
+                            <img src="images/about2.png" alt="">
+                            <h2>Your Progress</h2>
 
                             <div class="phishing-levels">
+                                <div class="level-container">
+                                    <div class="level-header">
+                                        <div class="level-name">Password Fortress</div>
+                                        <div class="level-score"><?php echo $password_score; ?>/5</div>
+                                    </div>
+                                    <div class="score-progress">
+                                        <div class="score-fill" style="width: <?php echo ($password_score / 5) * 100; ?>%"></div>
+                                    </div>
+                                </div>
                                 <div class="level-container">
                                     <div class="level-header">
                                         <div class="level-name">Phishing Level 1</div>
@@ -338,7 +321,6 @@ if($stmt = mysqli_prepare($link, $sql)) {
                                         <div class="score-fill" style="width: <?php echo ($phishing_lvl1_score / 10) * 100; ?>%"></div>
                                     </div>
                                 </div>
-
                                 <div class="level-container">
                                     <div class="level-header">
                                         <div class="level-name">Phishing Level 2</div>
