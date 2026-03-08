@@ -21,7 +21,7 @@
                         <p>Through our game, players learn essential skills like creating strong passwords, identifying phishing attempts, and practicing safe online behaviors - all while enjoying an immersive gaming experience.</p>
                     </div>
                     <div class="about-image">
-                        <img src="images/about1.png" alt="CybAware Game Interface">
+                        <img src="images/about1.png" alt="CybAware Game Interface" style="width: 200px;">
                     </div>
                 </div>
 
@@ -34,7 +34,7 @@
                         <p>Each mission includes scoring systems, instant feedback, and achievement certificates to motivate continuous learning.</p>
                     </div>
                     <div class="about-image">
-                        <img src="images/about2.png" alt="CybAware Game Missions">
+                        <img src="images/about2.png" alt="CybAware Game Missions" style="width: 300px;">
                     </div>
                 </div>
 
@@ -46,7 +46,7 @@
                         <p>The project emphasizes practical application of cybersecurity principles while developing valuable project management and software development skills.</p>
                     </div>
                     <div class="about-image">
-                        <img src="images/about3.png" alt="CybAware Development">
+                        <img src="images/about3.png" alt="CybAware Development" style="width: 300px;">
                     </div>
                 </div>
 
@@ -64,7 +64,7 @@
                         <p class="signature">With gratitude,<br><strong>The CybAware Development Team</strong><br>Ahndre Walters & Joshua Evelyn</p>
                     </div>
                     <div class="about-image">
-                        <img src="images/about4.png" alt="CybAware Team Appreciation">
+                        <img src="images/about4.png" alt="CybAware Team Appreciation" style="width: 300px;">
                     </div>
                 </div>
             </div>
