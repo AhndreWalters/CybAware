@@ -279,7 +279,7 @@ if($stmt = mysqli_prepare($link, $sql)) {
                             <img src="images/password.png" alt="Password Security Icon">
                             <h2>Password Fortress</h2>
                             <p>Learn what makes a strong password and avoid common security mistakes. Test your knowledge with 5 challenging questions.</p>
-                            <a href="password-game.php" class="play-btn">Start Mission</a>
+                            <a href="password-game.php" class="play-btn">Test Security</a>
                         </div>
                     </div>
 
@@ -290,8 +290,8 @@ if($stmt = mysqli_prepare($link, $sql)) {
                             <h2>Phishing Detective</h2>
                             <p>Learn to spot fake emails and protect yourself from online scams. Complete 3 levels of increasing difficulty.</p>
                             <div class="level-buttons">
-                                <a href="phishing-game-lvl1.php" class="play-btn">Level 1</a>
-                                <a href="phishing-game-lvl3.php" class="play-btn">Level 2</a>
+                                <a href="phishing-game-lvl1.php" class="play-btn">Read Emails</a>
+                                <a href="phishing-game-lvl3.php" class="play-btn">Hunt Errors</a>
                             </div>
                         </div>
                     </div>
