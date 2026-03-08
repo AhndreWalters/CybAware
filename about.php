@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="shortcut icon" href="images/ui-icon-social-engineering.png" type="image/x-icon">
+    <link rel="shortcut icon" href="images/cybawarelogo.png" type="image/x-icon">
     <title>About | CybAware</title>
     <link rel="stylesheet" href="css/styles.css">
 </head>
@@ -21,7 +21,7 @@
                         <p>Through our game, players learn essential skills like creating strong passwords, identifying phishing attempts, and practicing safe online behaviors - all while enjoying an immersive gaming experience.</p>
                     </div>
                     <div class="about-image">
-                        <img src="images/marketing-programme-team.png" alt="CybAware Game Interface">
+                        <img src="images/about1.png" alt="CybAware Game Interface">
                     </div>
                 </div>
 
@@ -34,7 +34,7 @@
                         <p>Each mission includes scoring systems, instant feedback, and achievement certificates to motivate continuous learning.</p>
                     </div>
                     <div class="about-image">
-                        <img src="images/ui-user-play.png" alt="CybAware Game Missions">
+                        <img src="images/about2.png" alt="CybAware Game Missions">
                     </div>
                 </div>
 
@@ -46,7 +46,7 @@
                         <p>The project emphasizes practical application of cybersecurity principles while developing valuable project management and software development skills.</p>
                     </div>
                     <div class="about-image">
-                        <img src="images/ui-team-icon.png" alt="CybAware Development">
+                        <img src="images/about3.png" alt="CybAware Development">
                     </div>
                 </div>
 
@@ -64,7 +64,7 @@
                         <p class="signature">With gratitude,<br><strong>The CybAware Development Team</strong><br>Ahndre Walters & Joshua Evelyn</p>
                     </div>
                     <div class="about-image">
-                        <img src="images/ui-user-learn.png" alt="CybAware Team Appreciation">
+                        <img src="images/about4.png" alt="CybAware Team Appreciation">
                     </div>
                 </div>
             </div>
