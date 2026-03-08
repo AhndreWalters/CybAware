@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
+    <audio src="music/the_mountain-technology-485572.mp3" loop autoplay></audio>
     <div class="container">
         <?php include 'includes/navigation.php'; ?>
 
