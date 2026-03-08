@@ -8,7 +8,7 @@
     <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
-    <audio src="music/your-song.mp3" loop autoplay></audio>
+    <audio src="music/" loop autoplay></audio>
     <div class="container">
 
         <?php include 'includes/navigation.php'; ?>
