@@ -310,8 +310,7 @@ if($stmt = mysqli_prepare($link, $sql)) {
                             <p>Learn to spot fake emails and protect yourself from online scams. Complete 3 levels of increasing difficulty.</p>
                             <div class="level-buttons">
                                 <a href="phishing-game-lvl1.php" class="play-btn">Level 1</a>
-                                <a href="phishing-game-lvl2.php" class="play-btn">Level 2</a>
-                                <a href="phishing-game-lvl3.php" class="play-btn">Level 3</a>
+                                <a href="phishing-game-lvl3.php" class="play-btn">Level 2</a>
                             </div>
                         </div>
                     </div>
@@ -343,16 +342,6 @@ if($stmt = mysqli_prepare($link, $sql)) {
                                 <div class="level-container">
                                     <div class="level-header">
                                         <div class="level-name">Phishing Level 2</div>
-                                        <div class="level-score"><?php echo $phishing_lvl2_score; ?>/140</div>
-                                    </div>
-                                    <div class="score-progress">
-                                        <div class="score-fill" style="width: <?php echo ($phishing_lvl2_score / 140) * 100; ?>%"></div>
-                                    </div>
-                                </div>
-
-                                <div class="level-container">
-                                    <div class="level-header">
-                                        <div class="level-name">Phishing Level 3</div>
                                         <div class="level-score"><?php echo $phishing_lvl3_score; ?>/10</div>
                                     </div>
                                     <div class="score-progress">
