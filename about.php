@@ -6,6 +6,32 @@
     <link rel="shortcut icon" href="images/cybawarelogo.png" type="image/x-icon">
     <title>About | CybAware</title>
     <link rel="stylesheet" href="css/styles.css">
+    <style>
+        .about-section {
+            display: flex;
+            align-items: center;
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        /* Odd sections: text left, image right */
+        .about-section:nth-child(odd) {
+            flex-direction: row;
+        }
+
+        /* Even sections: image left, text right */
+        .about-section:nth-child(even) {
+            flex-direction: row-reverse;
+        }
+
+        .about-text {
+            flex: 1;
+        }
+
+        .about-image {
+            flex-shrink: 0;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
@@ -13,6 +39,7 @@
 
         <div class="main-content">
             <div class="about-container">
+                <!-- Section 1: text left, image RIGHT -->
                 <div class="about-section">
                     <div class="about-text">
                         <h2>About CybAware</h2>
@@ -25,6 +52,7 @@
                     </div>
                 </div>
 
+                <!-- Section 2: image LEFT, text right -->
                 <div class="about-section">
                     <div class="about-text">
                         <h2>Our Interactive Missions</h2>
@@ -38,6 +66,7 @@
                     </div>
                 </div>
 
+                <!-- Section 3: text left, image RIGHT -->
                 <div class="about-section">
                     <div class="about-text">
                         <h2>Project Development & Team</h2>
@@ -50,6 +79,7 @@
                     </div>
                 </div>
 
+                <!-- Section 4: image LEFT, text right -->
                 <div class="about-section">
                     <div class="about-text">
                         <h2>Message from the CybAware Team</h2>
