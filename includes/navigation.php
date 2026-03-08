@@ -4,7 +4,6 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 ?>
-
 <nav>
     <div class="logo">
         <a href="index.php">
@@ -17,17 +16,28 @@ if (session_status() === PHP_SESSION_NONE) {
         <li><a href="game.php">Game</a></li>
         <li><a href="contact.php">Contact</a></li>
         <?php if(isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true): ?>
-            <li><a href="logout.php" style="color: #e0e0e0; font-weight: 600;">
-                <?php echo htmlspecialchars($_SESSION["first_name"]); ?> (Logout)
+            <li><a href="logout.php" style="font-weight: 600;">
+                <span style="color: white; position: relative; display: inline-block;">
+                    <?php echo htmlspecialchars($_SESSION["first_name"]); ?> (Logout)
+                    <svg style="position: absolute; bottom: -6px; left: 0; width: 100%; height: 8px;" viewBox="0 0 100 8" preserveAspectRatio="none">
+                        <path d="M0,5 Q50,1 100,5" stroke="#4ade80" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+                    </svg>
+                </span>
             </a></li>
         <?php else: ?>
-            <li><a href="login.php">Sign In</a></li>
+            <li><a href="login.php">
+                <span style="color: white; position: relative; display: inline-block;">
+                    Sign In
+                    <svg style="position: absolute; bottom: -6px; left: 0; width: 100%; height: 8px;" viewBox="0 0 100 8" preserveAspectRatio="none">
+                        <path d="M0,5 Q50,1 100,5" stroke="#4ade80" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+                    </svg>
+                </span>
+            </a></li>
         <?php endif; ?>
     </ul>
     
     <div class="mobile-menu-btn" id="mobileMenuBtn">☰</div>
 </nav>
-
 <script>
 document.addEventListener('DOMContentLoaded', function() {
     const mobileMenuBtn = document.getElementById('mobileMenuBtn');

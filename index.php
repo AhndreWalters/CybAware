@@ -15,7 +15,7 @@
         <div class="main-content">
             <div class="hero-content">
                 <div class="hero">
-                    <h1>Upgrade Your Cybersecurity Skills</h1>
+                    <h1>Upgrade Your <span style="color: white; position: relative; display: inline-block;">Cybersecurity<svg style="position: absolute; bottom: -6px; left: 0; width: 100%; height: 8px;" viewBox="0 0 100 8" preserveAspectRatio="none"><path d="M0,5 Q50,-2 100,5" stroke="#4ade80" stroke-width="2.5" fill="none" stroke-linecap="round"/>/></svg></span> Skills</h1>
                     <div class="tagline">Digital Safety Through Gaming</div>
                     <p class="description">
                         Keep secure your data and information. Protect yourself from cyber attacks with our interactive learning platform. Join the cybersecurity-aware community.
