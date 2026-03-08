@@ -7,7 +7,10 @@ if (session_status() === PHP_SESSION_NONE) {
 <nav>
     <div class="logo">
         <a href="index.php">
-            <div class="logo-text">CybAware</div>
+            <div class="logo-text">
+                <img src="images/cybawarelogo.png" alt="CybAware Logo" style="width: 35px; height: 35px; object-fit: contain; vertical-align: middle; margin-right: 8px;">
+                CybAware
+            </div>
         </a>
     </div>
     
