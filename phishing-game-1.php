@@ -393,7 +393,7 @@ if(isset($_GET['reset'])) {
     unset($_SESSION['phishing_answered_question']);
     $score = 0;
     $current_question = 1;
-    header("location: phishing-game-lvl1.php");
+    header("location: phishing-game-1.php");
     exit;
 }
 
@@ -441,7 +441,6 @@ if($current_question > $total_questions && !$game_completed) {
             font-size: 1.1rem;
         }
         
-        /* ── Progress bar (matching password game) ── */
         .progress-container {
             margin-bottom: 25px;
             width: 100%;
@@ -469,7 +468,6 @@ if($current_question > $total_questions && !$game_completed) {
             transition: width 0.3s ease;
         }
 
-        /* ── Feedback boxes (matching password game) ── */
         .feedback {
             padding: 16px;
             border-radius: 6px;
@@ -492,7 +490,6 @@ if($current_question > $total_questions && !$game_completed) {
             border-color: #ef4444;
         }
 
-        /* ── Hint box (matching password game) ── */
         .hint-box {
             background: #fef3c7;
             border: 1px solid #f59e0b;
@@ -840,9 +837,7 @@ if($current_question > $total_questions && !$game_completed) {
                 </div>
 
                 <?php
-                // Only show the correct/incorrect feedback box here (not the hint)
                 if(!empty($feedback)) {
-                    // Extract just the feedback div (not the hint-box) to show at top
                     preg_match('/<div class=\'feedback[^\']*\'.*?<\/div>/s', $feedback, $topFeedback);
                     if(!empty($topFeedback)) echo $topFeedback[0];
                 }
@@ -869,16 +864,16 @@ if($current_question > $total_questions && !$game_completed) {
                         <div class="completion-actions">
                             <a href="game.php" class="action-btn secondary">Back to Games</a>
                             <a href="certificate.php" class="action-btn">View Certificate</a>
-                            <a href="phishing-game-lvl1.php?reset=1" class="action-btn">Play Again</a>
+                            <a href="phishing-game-1.php?reset=1" class="action-btn">Play Again</a>
                         </div>
                         
                         <div class="certificate-note">
-                            <strong>Progress:</strong> You've completed Phishing Detective Level 1. Complete Levels 2 and 3 and Password Fortress to unlock your cybersecurity awareness certificate.
+                            <strong>Progress:</strong> You've completed Phishing Detective - Read Emails. Complete Hunt Errors and Password Fortress to unlock your cybersecurity awareness certificate.
                         </div>
                     </div>
                 <?php else: ?>
                     <?php if($current_email): ?>
-                        <form method="POST" action="phishing-game-lvl1.php" id="gameForm">
+                        <form method="POST" action="phishing-game-1.php" id="gameForm">
                             <input type="hidden" name="question_id" value="<?php echo $current_question; ?>">
                             <input type="hidden" name="answer" id="selectedAnswer" value="">
                             
@@ -917,7 +912,6 @@ if($current_question > $total_questions && !$game_completed) {
                             </div>
 
                             <?php
-                            // Show only the hint-box portion of feedback here (below email, above buttons)
                             if(!empty($feedback)) {
                                 preg_match('/<div class=\'hint-box\'.*?<\/div>/s', $feedback, $hintMatch);
                                 if(!empty($hintMatch)) echo $hintMatch[0];
@@ -935,7 +929,7 @@ if($current_question > $total_questions && !$game_completed) {
                             
                             <div class="game-controls">
                                 <button type="submit" class="submit-btn" id="submitBtn" disabled>
-                                    <?php echo $current_question == $total_questions ? 'Complete Assessment' : 'Next Question'; ?>
+                                    <?php echo $current_question == $total_questions ? 'Complete Assessment' : 'Submit Answer'; ?>
                                 </button>
                             </div>
                         </form>
@@ -943,7 +937,7 @@ if($current_question > $total_questions && !$game_completed) {
                         <div class="completion-screen">
                             <p>Loading assessment...</p>
                             <div class="completion-actions">
-                                <a href="phishing-game-lvl1.php?reset=1" class="action-btn">Restart Game</a>
+                                <a href="phishing-game-1.php?reset=1" class="action-btn">Restart Game</a>
                             </div>
                         </div>
                     <?php endif; ?>
