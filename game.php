@@ -14,9 +14,8 @@ $user_id = $_SESSION['id'];
 $password_score = 0;
 $phishing_lvl1_score = 0;
 $phishing_lvl2_score = 0;
-$phishing_lvl3_score = 0;
 $games_completed = 0;
-$total_games = 4;
+$total_games = 3;
 
 // Fetch scores from database
 $sql = "SELECT game_type, score, total_questions FROM game_scores WHERE user_id = ?";
@@ -35,9 +34,6 @@ if($stmt = mysqli_prepare($link, $sql)) {
             $games_completed++;
         } elseif($game_type == 'phishing_detective_lvl2') {
             $phishing_lvl2_score = $score;
-            $games_completed++;
-        } elseif($game_type == 'phishing_detective_lvl3') {
-            $phishing_lvl3_score = $score;
             $games_completed++;
         }
     }
@@ -288,10 +284,10 @@ if($stmt = mysqli_prepare($link, $sql)) {
                         <div class="game-content">
                             <img src="images/phishing.png" alt="Phishing Detection Icon">
                             <h2>Phishing Detective</h2>
-                            <p>Learn to spot fake emails and protect yourself from online scams. Complete 3 levels of increasing difficulty.</p>
+                            <p>Learn to spot fake emails and protect yourself from online scams. Complete 2 levels of increasing difficulty.</p>
                             <div class="level-buttons">
-                                <a href="phishing-game-lvl1.php" class="play-btn">Read Emails</a>
-                                <a href="phishing-game-lvl3.php" class="play-btn">Hunt Errors</a>
+                                <a href="phishing-game-1.php" class="play-btn">Read Emails</a>
+                                <a href="phishing-game-2.php" class="play-btn">Hunt Errors</a>
                             </div>
                         </div>
                     </div>
@@ -324,10 +320,10 @@ if($stmt = mysqli_prepare($link, $sql)) {
                                 <div class="level-container">
                                     <div class="level-header">
                                         <div class="level-name">Phishing Detective | Hunt Errors</div>
-                                        <div class="level-score"><?php echo $phishing_lvl3_score; ?>/10</div>
+                                        <div class="level-score"><?php echo $phishing_lvl2_score; ?>/10</div>
                                     </div>
                                     <div class="score-progress">
-                                        <div class="score-fill" style="width: <?php echo ($phishing_lvl3_score / 10) * 100; ?>%"></div>
+                                        <div class="score-fill" style="width: <?php echo ($phishing_lvl2_score / 10) * 100; ?>%"></div>
                                     </div>
                                 </div>
                             </div>
