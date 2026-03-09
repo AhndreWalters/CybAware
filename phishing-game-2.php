@@ -14,7 +14,7 @@ $current_score = 0;
 $clues_found = 0;
 $game_completed = false;
 
-$sql = "SELECT score, total_questions FROM game_scores WHERE user_id = ? AND game_type = 'phishing_detective_lvl3'";
+$sql = "SELECT score, total_questions FROM game_scores WHERE user_id = ? AND game_type = 'phishing_detective_lvl2'";
 if($stmt = mysqli_prepare($link, $sql)) {
     mysqli_stmt_bind_param($stmt, "i", $user_id);
     mysqli_stmt_execute($stmt);
@@ -30,13 +30,13 @@ if($stmt = mysqli_prepare($link, $sql)) {
 }
 
 if(isset($_GET['reset'])) {
-    $delete_sql = "DELETE FROM game_scores WHERE user_id = ? AND game_type = 'phishing_detective_lvl3'";
+    $delete_sql = "DELETE FROM game_scores WHERE user_id = ? AND game_type = 'phishing_detective_lvl2'";
     if($stmt = mysqli_prepare($link, $delete_sql)) {
         mysqli_stmt_bind_param($stmt, "i", $user_id);
         mysqli_stmt_execute($stmt);
         mysqli_stmt_close($stmt);
     }
-    header("location: phishing-game-lvl3.php");
+    header("location: phishing-game-2.php");
     exit;
 }
 
@@ -48,7 +48,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action'])) {
         $new_clues = min(10, $new_score);
         
         $upsert_sql = "INSERT INTO game_scores (user_id, game_type, score, total_questions, completed_at) 
-                      VALUES (?, 'phishing_detective_lvl3', ?, 10, NOW())
+                      VALUES (?, 'phishing_detective_lvl2', ?, 10, NOW())
                       ON DUPLICATE KEY UPDATE score = VALUES(score), completed_at = NOW()";
         
         if($stmt = mysqli_prepare($link, $upsert_sql)) {
@@ -259,7 +259,6 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action'])) {
         .email-body p { margin-bottom: 16px; color: #333; }
         .email-body strong { color: #1a2980; font-weight: 600; }
         
-        /* Clue styles — no visual hint until clicked */
         .clue {
             cursor: default;
             color: inherit;
@@ -284,7 +283,6 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action'])) {
             font-weight: bold;
         }
 
-        /* Yellow hints box */
         .hints-box {
             background: #fef3c7;
             border: 1px solid #f59e0b;
@@ -540,11 +538,11 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action'])) {
                         <div class="completion-actions">
                             <a href="game.php" class="action-btn secondary">Back to Games</a>
                             <a href="certificate.php" class="action-btn">View Certificate</a>
-                            <a href="phishing-game-lvl3.php?reset=1" class="action-btn">Play Again</a>
+                            <a href="phishing-game-2.php?reset=1" class="action-btn">Play Again</a>
                         </div>
                         
                         <div class="certificate-note">
-                            <strong>Progress:</strong> You've completed Phishing Detective Level 3. Complete Password Fortress to unlock your cybersecurity awareness certificate.
+                            <strong>Progress:</strong> You've completed Phishing Detective - Hunt Errors. Complete Password Fortress to unlock your cybersecurity awareness certificate.
                         </div>
                     </div>
                 <?php else: ?>
@@ -601,13 +599,11 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action'])) {
                         </div>
                     </div>
 
-                    <!-- Yellow hints box — appears below email, above submit, once first clue is found -->
                     <div id="hints-box" class="hints-box">
                         <div class="hints-box-title">Clues Found:</div>
                         <div id="hints-list"></div>
                     </div>
 
-                    <!-- Full results — appears when all clues are found -->
                     <div id="results-section" class="results-section" style="display: none;">
                         <h3 style="color: #1e40af; margin-bottom: 15px;">📋 Analysis Complete!</h3>
                         <div id="results-message" style="margin-bottom: 20px;"></div>
@@ -630,7 +626,6 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action'])) {
     <div id="flash-overlay"></div>
     
     <script>
-        // 10 clues — IDs 1–10 (clue 11 in HTML maps to id 11 but we only score 10 unique IDs)
         const clues = [
             { id: 1,  category: "Spelling Error",                info: "'exsiting' is misspelled — the correct word is 'exciting'." },
             { id: 2,  category: "Spelling Error",                info: "'extreamly' is misspelled — the correct word is 'extremely'." },
@@ -645,10 +640,8 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action'])) {
             { id: 11, category: "Grammar Error",                 info: "'continued supporting' should be 'continued support', and 'looking forward' should be 'look forward'." }
         ];
 
-        // We score 10 points per unique clue; IDs 1–11 but only 10 count
         const scorableIds = new Set([1,2,3,4,5,6,7,8,9,10]);
         const totalClues = 10;
-        const maxScore = 10;
         
         let score = <?php echo $current_score; ?>;
         let foundClues = new Set(<?php echo $clues_found > 0 ? json_encode(range(1, $clues_found)) : '[]'; ?>);
@@ -691,7 +684,6 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action'])) {
             foundClues.add(clueId);
             document.querySelectorAll(`.clue[data-id="${clueId}"]`).forEach(el => el.classList.add('found'));
             
-            // Only add to score for the 10 scorable IDs
             if (scorableIds.has(clueId)) score += 1;
             
             flashScreen('green');
@@ -699,7 +691,6 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action'])) {
             updateProgressBar();
             addHint(clueId);
             
-            // Count how many scorable IDs have been found
             const scorableFound = [...foundClues].filter(id => scorableIds.has(id)).length;
             if (scorableFound === totalClues) {
                 showResults();
@@ -757,7 +748,6 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action'])) {
             resultsMessage.innerHTML = `<strong>Grade: ${grade}</strong><br>${message}`;
             
             errorsList.innerHTML = '';
-            // Only show the 10 scorable clues in the breakdown
             clues.filter(c => scorableIds.has(c.id)).forEach(clue => {
                 const item = document.createElement('div');
                 item.className = `error-item ${foundClues.has(clue.id) ? 'found' : 'not-found'}`;
@@ -798,14 +788,14 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action'])) {
             submitBtn.disabled = true;
             submitBtn.innerHTML = 'Saving...';
             try {
-                const response = await fetch('phishing-game-lvl3.php', {
+                const response = await fetch('phishing-game-2.php', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
                     body: `action=save_progress&score=${score}`
                 });
                 const result = await response.json();
                 if (result.success) {
-                    window.location.href = 'phishing-game-lvl3.php';
+                    window.location.href = 'phishing-game-2.php';
                 } else {
                     alert('Error saving score. Please try again.');
                     submitBtn.disabled = false;
