@@ -105,7 +105,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                 <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
                     <div class="form-group">
                         <label class="form-label">Email or Name</label>
-                        <input type="text" name="login_input" class="form-input <?php echo (!empty($login_err)) ? 'error' : ''; ?>" value="<?php echo htmlspecialchars($login_input); ?>" placeholder="Email or First Name & Last Name">
+                        <input type="text" name="login_input" class="form-input <?php echo (!empty($login_err)) ? 'error' : ''; ?>" value="<?php echo htmlspecialchars($login_input); ?>" placeholder="Enter your email or name">
                         <?php if(!empty($login_err)): ?>
                             <span class="error-message"><?php echo $login_err; ?></span>
                         <?php endif; ?>
@@ -113,7 +113,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                     
                     <div class="form-group">
                         <label class="form-label">Password</label>
-                        <input type="password" name="password" class="form-input <?php echo (!empty($password_err)) ? 'error' : ''; ?>" placeholder="Password">
+                        <input type="password" name="password" class="form-input <?php echo (!empty($password_err)) ? 'error' : ''; ?>" placeholder="Enter your password">
                         <?php if(!empty($password_err)): ?>
                             <span class="error-message"><?php echo $password_err; ?></span>
                         <?php endif; ?>
