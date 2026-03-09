@@ -52,17 +52,17 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     if(empty(trim($_POST["password"]))){
         $password_err = "Please enter a password.";
     } elseif(strlen(trim($_POST["password"])) < 6){
-        $password_err = "Password must have atleast 6 characters.";
+        $password_err = "Password must have at least 6 characters.";
     } else{
         $password = trim($_POST["password"]);
     }
     
     if(empty(trim($_POST["confirm_password"]))){
-        $confirm_password_err = "Please confirm password.";
+        $confirm_password_err = "Please confirm your password.";
     } else{
         $confirm_password = trim($_POST["confirm_password"]);
         if(empty($password_err) && ($password != $confirm_password)){
-            $confirm_password_err = "Password did not match.";
+            $confirm_password_err = "Passwords do not match.";
         }
     }
     
@@ -100,6 +100,19 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     <link rel="shortcut icon" href="images/cybawarelogo.png" type="image/x-icon">
     <title>Sign Up | CybAware</title>
     <link rel="stylesheet" href="css/styles.css">
+    <style>
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        @media (max-width: 600px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
 </head>
 <body>
     <div class="container">
@@ -108,21 +121,22 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
         <div class="main-content">
             <div class="login-container">
                 <h1 class="login-title">Create Account</h1>
-                <p class="login-subtitle">Please fill this form to create an account.</p>
+                <p class="login-subtitle">Please fill in the form below to create your account.</p>
 
                 <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
-                    <div class="form-row" style="display: flex; gap: 15px; margin-bottom: 20px;">
-                        <div class="form-group" style="flex: 1;">
+
+                    <div class="form-row">
+                        <div class="form-group">
                             <label class="form-label">First Name</label>
-                            <input type="text" name="first_name" class="form-input <?php echo (!empty($first_name_err)) ? 'error' : ''; ?>" value="<?php echo htmlspecialchars($first_name); ?>">
+                            <input type="text" name="first_name" class="form-input <?php echo (!empty($first_name_err)) ? 'error' : ''; ?>" value="<?php echo htmlspecialchars($first_name); ?>" placeholder="John">
                             <?php if(!empty($first_name_err)): ?>
                                 <span class="error-message"><?php echo $first_name_err; ?></span>
                             <?php endif; ?>
                         </div>
                         
-                        <div class="form-group" style="flex: 1;">
+                        <div class="form-group">
                             <label class="form-label">Last Name</label>
-                            <input type="text" name="last_name" class="form-input <?php echo (!empty($last_name_err)) ? 'error' : ''; ?>" value="<?php echo htmlspecialchars($last_name); ?>">
+                            <input type="text" name="last_name" class="form-input <?php echo (!empty($last_name_err)) ? 'error' : ''; ?>" value="<?php echo htmlspecialchars($last_name); ?>" placeholder="Doe">
                             <?php if(!empty($last_name_err)): ?>
                                 <span class="error-message"><?php echo $last_name_err; ?></span>
                             <?php endif; ?>
@@ -131,7 +145,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                     
                     <div class="form-group">
                         <label class="form-label">Email Address</label>
-                        <input type="email" name="email" class="form-input <?php echo (!empty($email_err)) ? 'error' : ''; ?>" value="<?php echo htmlspecialchars($email); ?>">
+                        <input type="email" name="email" class="form-input <?php echo (!empty($email_err)) ? 'error' : ''; ?>" value="<?php echo htmlspecialchars($email); ?>" placeholder="Enter your email address">
                         <?php if(!empty($email_err)): ?>
                             <span class="error-message"><?php echo $email_err; ?></span>
                         <?php endif; ?>
@@ -140,16 +154,16 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                     
                     <div class="form-group">
                         <label class="form-label">Password</label>
-                        <input type="password" name="password" class="form-input <?php echo (!empty($password_err)) ? 'error' : ''; ?>" value="<?php echo htmlspecialchars($password); ?>">
+                        <input type="password" name="password" class="form-input <?php echo (!empty($password_err)) ? 'error' : ''; ?>" placeholder="Create a strong password">
                         <?php if(!empty($password_err)): ?>
                             <span class="error-message"><?php echo $password_err; ?></span>
                         <?php endif; ?>
-                        <small class="form-hint">Password must be at least 6 characters long.</small>
+                        <small class="form-hint">Must be at least 6 characters long.</small>
                     </div>
                     
                     <div class="form-group">
                         <label class="form-label">Confirm Password</label>
-                        <input type="password" name="confirm_password" class="form-input <?php echo (!empty($confirm_password_err)) ? 'error' : ''; ?>" value="<?php echo htmlspecialchars($confirm_password); ?>">
+                        <input type="password" name="confirm_password" class="form-input <?php echo (!empty($confirm_password_err)) ? 'error' : ''; ?>" placeholder="Re-enter your password">
                         <?php if(!empty($confirm_password_err)): ?>
                             <span class="error-message"><?php echo $confirm_password_err; ?></span>
                         <?php endif; ?>
