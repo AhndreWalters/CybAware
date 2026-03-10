@@ -274,10 +274,10 @@ if($stmt = mysqli_prepare($link, $sql)) {
                         <div class="game-content">
                             <img src="images/password.png" alt="Password Security Icon">
                             <h2>Password Fortress</h2>
-                            <p>Learn what makes a strong password and avoid common security mistakes. Test your knowledge with 10 challenging questions.</p>
+                            <p>Learn password security basics, then put your skills to the test by securing a real company fortress.</p>
                             <div class="level-buttons">
-                                <a href="password-game-1.php" class="play-btn">Test Security</a>
-                                <a href="password-game-2.php" class="play-btn">Next Game</a>
+                                <a href="password-game-1.php" class="play-btn">Learn Security</a>
+                                <a href="password-game-2.php" class="play-btn">Deeper Security</a>
                             </div>
                         </div>
                     </div>
@@ -287,7 +287,7 @@ if($stmt = mysqli_prepare($link, $sql)) {
                         <div class="game-content">
                             <img src="images/phishing.png" alt="Phishing Detection Icon">
                             <h2>Phishing Detective</h2>
-                            <p>Learn to spot fake emails and protect yourself from online scams. Complete 2 levels of increasing difficulty.</p>
+                            <p>Read suspicious emails and decide if they're real or fake, then hunt for hidden phishing errors in a single email.</p>
                             <div class="level-buttons">
                                 <a href="phishing-game-1.php" class="play-btn">Read Emails</a>
                                 <a href="phishing-game-2.php" class="play-btn">Hunt Errors</a>
