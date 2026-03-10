@@ -1,7 +1,6 @@
 <?php
 session_start();
 
-// Check if user is logged in
 if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){
     header("location: login.php");
     exit;
@@ -9,14 +8,13 @@ if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){
 
 require_once "config/database.php";
 
-// Initialize game variables
-$score = isset($_SESSION['password_score']) ? $_SESSION['password_score'] : 0;
+$score            = isset($_SESSION['password_score'])    ? $_SESSION['password_score']    : 0;
 $current_question = isset($_SESSION['password_question']) ? $_SESSION['password_question'] : 1;
-$total_questions = 10;
-$feedback = "";
-$game_completed = false;
+$total_questions  = 10;
+$feedback         = "";
+$game_completed   = false;
 
-// Handle reset FIRST before any other logic
+// Handle reset first
 if(isset($_GET['reset'])) {
     unset($_SESSION['password_score']);
     unset($_SESSION['password_question']);
@@ -30,7 +28,6 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
         $user_answer = $_POST['answer'];
         $question_id = (int)$_POST['question_id'];
 
-        // Correct answers
         $correct_answers = [
             1  => "StrongPass2024!",
             2  => "Phishing",
@@ -47,30 +44,28 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
         if(isset($correct_answers[$question_id]) && $user_answer === $correct_answers[$question_id]) {
             $score++;
             $_SESSION['password_score'] = $score;
-            $feedback = "<div class='feedback correct'><span>✓ Correct!</span></div>";
+            $feedback = "<div class='feedback correct'><span>Correct!</span></div>";
         } else {
             $hints = [
-                4  => " (Password length is the most critical factor against brute force attacks)",
-                5  => " (A strong password needs uppercase, lowercase, numbers, and symbols — at least 12 characters)",
-                6  => " (Password managers securely store and generate complex passwords for you)",
-                7  => " (2FA adds a second verification step beyond just your password)",
-                8  => " (Passwords should never be stored in plain text — only as secure hashes)",
-                9  => " (Reusing passwords means one breach can compromise all your accounts)",
-                10 => " (Brute force attacks try every possible combination to crack a password)"
+                4  => "Password length is the most critical factor against brute force attacks.",
+                5  => "A strong password needs uppercase, lowercase, numbers, and symbols — at least 12 characters.",
+                6  => "Password managers securely store and generate complex passwords for you.",
+                7  => "2FA adds a second verification step beyond just your password.",
+                8  => "Passwords should never be stored in plain text — only as secure hashes.",
+                9  => "Reusing passwords means one breach can compromise all your accounts.",
+                10 => "Brute force attacks try every possible combination to crack a password."
             ];
-            $hint = isset($hints[$question_id]) ? $hints[$question_id] : "";
-            $feedback = "<div class='feedback incorrect'><span>✗ Incorrect</span>$hint</div>";
+            $hint = isset($hints[$question_id]) ? "<div class='hint-box'><strong>Hint:</strong> " . $hints[$question_id] . "</div>" : "";
+            $feedback = "<div class='feedback incorrect'><span>Incorrect</span></div>" . $hint;
         }
 
         $current_question = $question_id + 1;
         $_SESSION['password_question'] = $current_question;
 
-        // Check if game is completed
         if($current_question > $total_questions) {
             $game_completed = true;
             $user_id = $_SESSION['id'];
 
-            // Create table if it doesn't exist
             mysqli_query($link, "CREATE TABLE IF NOT EXISTS game_scores (
                 id INT AUTO_INCREMENT PRIMARY KEY,
                 user_id INT NOT NULL,
@@ -80,43 +75,24 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
                 completed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )");
 
-            // Insert score record
             $sql = "INSERT INTO game_scores (user_id, game_type, score, total_questions, completed_at)
                     VALUES (?, 'password_fortress', ?, ?, NOW())";
-
             if($stmt = mysqli_prepare($link, $sql)) {
                 mysqli_stmt_bind_param($stmt, "iii", $user_id, $score, $total_questions);
                 mysqli_stmt_execute($stmt);
                 mysqli_stmt_close($stmt);
             }
 
-            // Clear session data
             unset($_SESSION['password_score']);
             unset($_SESSION['password_question']);
         }
     }
 }
 
-// Edge case: session says past last question but game_completed wasn't set this request
 if($current_question > $total_questions && !$game_completed) {
     $game_completed = true;
     unset($_SESSION['password_score']);
     unset($_SESSION['password_question']);
-}
-
-// Password strength helper
-function calculatePasswordStrength($password) {
-    if(empty($password)) return "Weak";
-    $strength = 0;
-    if(strlen($password) >= 8)              $strength++;
-    if(strlen($password) >= 12)             $strength++;
-    if(preg_match('/[a-z]/', $password))    $strength++;
-    if(preg_match('/[A-Z]/', $password))    $strength++;
-    if(preg_match('/[0-9]/', $password))    $strength++;
-    if(preg_match('/[^A-Za-z0-9]/', $password)) $strength++;
-    if($strength <= 2) return "Weak";
-    if($strength <= 4) return "Fair";
-    return "Strong";
 }
 ?>
 <!DOCTYPE html>
@@ -129,36 +105,43 @@ function calculatePasswordStrength($password) {
     <link rel="stylesheet" href="css/styles.css">
     <style>
         .game-interface {
-            max-width: 900px;
+            max-width: 800px;
             margin: 0 auto;
-            padding: 30px;
-            background: white;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-            border: 1px solid #e5e7eb;
+            padding: 20px;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
+        .game-interface > * {
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        /* ── Header ── */
         .game-header {
             text-align: center;
             margin-bottom: 30px;
-            border-bottom: 1px solid #e5e7eb;
-            padding-bottom: 20px;
+            width: 100%;
         }
 
         .game-header h1 {
             color: #1e40af;
-            font-size: 28px;
-            font-weight: 600;
-            margin-bottom: 8px;
+            font-size: 2rem;
+            margin-bottom: 10px;
         }
 
         .game-header p {
-            color: #6b7280;
-            font-size: 16px;
+            color: #64748b;
+            font-size: 1.1rem;
         }
 
+        /* ── Progress ── */
         .progress-container {
             margin-bottom: 25px;
+            width: 100%;
+            box-sizing: border-box;
         }
 
         .progress-info {
@@ -179,111 +162,14 @@ function calculatePasswordStrength($password) {
         .progress-fill {
             height: 100%;
             background: #1e40af;
-            width: <?php
-                if($game_completed) {
-                    echo '100';
-                } else {
-                    echo round((($current_question - 1) / $total_questions) * 100);
-                }
-            ?>%;
             transition: width 0.3s ease;
         }
 
-        .question-container {
-            background: white;
-            border: 1px solid #e5e7eb;
-            border-radius: 6px;
-            padding: 30px;
-            margin-bottom: 25px;
-        }
-
-        .question-number {
-            color: #6b7280;
-            font-size: 14px;
-            font-weight: 500;
-            margin-bottom: 5px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .question-text {
-            color: #111827;
-            font-size: 18px;
-            font-weight: 600;
-            margin-bottom: 25px;
-            line-height: 1.5;
-        }
-
-        .options-container {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .option {
-            position: relative;
-            border: 1px solid #d1d5db;
-            border-radius: 6px;
-            padding: 16px 20px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            background: white;
-            display: flex;
-            align-items: center;
-        }
-
-        .option:hover {
-            border-color: #3b82f6;
-            background: #f8fafc;
-        }
-
-        .option.selected {
-            border-color: #1e40af;
-            background: #eff6ff;
-            border-width: 2px;
-        }
-
-        .option-label {
-            display: flex;
-            align-items: center;
-            width: 100%;
-        }
-
-        .option-letter {
-            background: #f3f4f6;
-            border-radius: 4px;
-            width: 32px;
-            height: 32px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-right: 15px;
-            font-weight: 600;
-            color: #374151;
-            font-size: 14px;
-            flex-shrink: 0;
-        }
-
-        .option.selected .option-letter {
-            background: #1e40af;
-            color: white;
-        }
-
-        .option-text {
-            color: #374151;
-            font-size: 16px;
-            flex: 1;
-        }
-
-        /* Hide the actual radio inputs — clicks handled via JS */
-        input[type="radio"] {
-            display: none;
-        }
-
+        /* ── Feedback ── */
         .feedback {
             padding: 16px;
             border-radius: 6px;
-            margin: 20px 0;
+            margin: 0 0 16px 0;
             font-size: 15px;
             font-weight: 500;
             text-align: center;
@@ -302,12 +188,141 @@ function calculatePasswordStrength($password) {
             border-color: #ef4444;
         }
 
+        .hint-box {
+            background: #fef3c7;
+            border: 1px solid #f59e0b;
+            border-radius: 6px;
+            padding: 14px;
+            margin: 0 0 20px 0;
+            font-size: 14px;
+            color: #92400e;
+        }
+
+        /* ── Question card (mirrors email-container from phishing game) ── */
+        .question-container {
+            background: white;
+            border-radius: 8px;
+            padding: 0;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border: 1px solid #e2e8f0;
+            overflow: hidden;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        .question-header {
+            background: #f8fafc;
+            padding: 20px 25px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .question-number {
+            font-size: 13px;
+            font-weight: 600;
+            color: #6b7280;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+        }
+
+        .question-text {
+            color: #1f2937;
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin: 0;
+            line-height: 1.5;
+        }
+
+        .question-body {
+            padding: 25px;
+        }
+
+        /* ── Options (match phishing game option-btn style) ── */
+        .options-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .option {
+            width: 100%;
+            padding: 16px 20px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            background: white;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            color: #374151;
+            box-sizing: border-box;
+        }
+
+        .option:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            border-color: #93c5fd;
+            background: #f8fafc;
+        }
+
+        .option.selected {
+            background: #eff6ff;
+            border-color: #1e40af;
+            color: #1e40af;
+        }
+
+        .option-letter {
+            background: #f3f4f6;
+            border-radius: 4px;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: #374151;
+            font-size: 13px;
+            flex-shrink: 0;
+        }
+
+        .option.selected .option-letter {
+            background: #1e40af;
+            color: white;
+        }
+
+        .option-text {
+            font-size: 1rem;
+            flex: 1;
+        }
+
+        input[type="radio"] { display: none; }
+
+        /* ── Instruction note ── */
+        .instruction-note {
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            border-left: 4px solid #1e40af;
+            border-radius: 6px;
+            padding: 12px 16px;
+            margin-bottom: 18px;
+            font-size: 14px;
+            color: #374151;
+            line-height: 1.6;
+        }
+
+        .instruction-note strong { color: #1e40af; }
+
+        /* ── Password tester ── */
         .password-test-container {
             background: #f9fafb;
             border: 1px solid #e5e7eb;
             border-radius: 6px;
             padding: 20px;
-            margin-top: 20px;
         }
 
         .password-input {
@@ -319,6 +334,8 @@ function calculatePasswordStrength($password) {
             margin-bottom: 15px;
             font-family: monospace;
             box-sizing: border-box;
+            background: white;
+            transition: border-color 0.2s, box-shadow 0.2s;
         }
 
         .password-input:focus {
@@ -327,7 +344,7 @@ function calculatePasswordStrength($password) {
             box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
         }
 
-        .strength-indicator { margin-top: 20px; }
+        .strength-indicator { margin-top: 5px; }
 
         .strength-label {
             font-size: 14px;
@@ -337,9 +354,9 @@ function calculatePasswordStrength($password) {
         }
 
         .strength-meter {
-            height: 8px;
+            height: 6px;
             background: #e5e7eb;
-            border-radius: 4px;
+            border-radius: 3px;
             margin-bottom: 8px;
             overflow: hidden;
         }
@@ -347,70 +364,74 @@ function calculatePasswordStrength($password) {
         .strength-bar {
             height: 100%;
             width: 0%;
-            border-radius: 4px;
+            border-radius: 3px;
             transition: width 0.3s ease, background-color 0.3s ease;
         }
 
-        .strength-text { font-size: 14px; font-weight: 500; }
+        .strength-text { font-size: 14px; font-weight: 500; color: #6b7280; }
         .strength-weak   { color: #dc2626; }
         .strength-fair   { color: #d97706; }
         .strength-strong { color: #059669; }
 
-        .hint-box {
-            background: #fef3c7;
-            border: 1px solid #f59e0b;
-            border-radius: 6px;
-            padding: 14px;
-            margin-top: 15px;
-            font-size: 14px;
-            color: #92400e;
-        }
-
-        .controls {
+        /* ── Game controls ── */
+        .game-controls {
             text-align: center;
-            margin-top: 30px;
-            padding-top: 25px;
-            border-top: 1px solid #e5e7eb;
+            margin-top: 10px;
+            width: 100%;
         }
 
-        .btn-next {
+        .submit-btn {
+            padding: 16px 50px;
             background: #1e40af;
             color: white;
             border: none;
-            border-radius: 6px;
-            padding: 14px 36px;
-            font-size: 16px;
+            border-radius: 8px;
+            font-size: 1.1rem;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.2s ease;
+            min-width: 250px;
+            display: inline-block;
+            box-shadow: 0 4px 6px rgba(30, 64, 175, 0.2);
+            text-align: center;
         }
 
-        .btn-next:hover:not(:disabled) {
+        .submit-btn:hover:not(:disabled) {
             background: #1e3a8a;
-            transform: translateY(-1px);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(30, 64, 175, 0.3);
         }
 
-        .btn-next:disabled {
-            background: #9ca3af;
+        .submit-btn:disabled {
+            background: #94a3b8;
             cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
         }
 
+        /* ── Completion ── */
         .completion-screen {
             text-align: center;
-            padding: 40px 30px;
+            padding: 40px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            width: 100%;
+            box-sizing: border-box;
+            border: 1px solid #e2e8f0;
         }
 
         .completion-screen h2 {
             color: #1e40af;
-            font-size: 24px;
-            font-weight: 600;
+            font-size: 2rem;
             margin-bottom: 15px;
         }
 
         .score-result {
-            font-size: 18px;
-            color: #374151;
+            font-size: 1.3rem;
+            color: #334155;
             margin-bottom: 25px;
+            font-weight: 600;
         }
 
         .completion-actions {
@@ -455,7 +476,7 @@ function calculatePasswordStrength($password) {
             background: #f8fafc;
             border-color: #cbd5e1;
             transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+            box-shadow: none;
         }
 
         .certificate-note {
@@ -469,21 +490,15 @@ function calculatePasswordStrength($password) {
             text-align: center;
         }
 
-        .instruction-note {
-            background: #e0f2fe;
-            border-left: 4px solid #0ea5e9;
-            padding: 12px;
-            margin-bottom: 20px;
-            border-radius: 6px;
-            font-size: 0.95rem;
-        }
-
+        /* ── Responsive ── */
         @media (max-width: 768px) {
-            .game-interface { padding: 20px; }
-            .question-container { padding: 20px; }
-            .option { padding: 14px 16px; }
+            .game-interface { padding: 15px; }
+            .game-header h1 { font-size: 1.6rem; }
+            .submit-btn { width: 100%; max-width: 100%; min-width: unset; }
             .completion-actions { flex-direction: column; align-items: center; }
-            .action-btn { width: 100%; max-width: 250px; text-align: center; }
+            .action-btn { width: 100%; max-width: 300px; text-align: center; margin-bottom: 10px; }
+            .question-header { padding: 16px 20px; }
+            .question-body { padding: 20px; }
         }
     </style>
 </head>
@@ -493,8 +508,9 @@ function calculatePasswordStrength($password) {
 
         <div class="main-content">
             <div class="game-interface">
+
                 <div class="game-header">
-                    <h1>Password Fortress</h1>
+                    <h1>Password Fortress | Learn Security</h1>
                     <p>Test your knowledge of password security best practices</p>
                 </div>
 
@@ -504,163 +520,174 @@ function calculatePasswordStrength($password) {
                         <span>Score: <?php echo $score; ?>/<?php echo $total_questions; ?></span>
                     </div>
                     <div class="progress-bar">
-                        <div class="progress-fill"></div>
+                        <div class="progress-fill" style="width:<?php echo $game_completed ? '100' : round((($current_question - 1) / $total_questions) * 100); ?>%;"></div>
                     </div>
                 </div>
 
                 <?php echo $feedback; ?>
 
                 <?php if($game_completed): ?>
+
                     <div class="completion-screen">
                         <h2>Assessment Complete</h2>
                         <div class="score-result">
                             You scored <?php echo $score; ?> out of <?php echo $total_questions; ?> points.
                         </div>
-
                         <?php
                         $percentage = ($score / $total_questions) * 100;
-                        if($percentage >= 90) {
-                            echo '<p style="color:#059669;font-weight:600;font-size:1.1rem;margin-bottom:20px;">⭐ Outstanding! You have excellent password security knowledge.</p>';
-                        } elseif($percentage >= 70) {
-                            echo '<p style="color:#1e40af;font-weight:600;font-size:1.1rem;margin-bottom:20px;">👍 Good work! You have a solid grasp of password security principles.</p>';
-                        } elseif($percentage >= 50) {
-                            echo '<p style="color:#d97706;font-weight:600;font-size:1.1rem;margin-bottom:20px;">📖 Not bad, but review some password security fundamentals.</p>';
-                        } else {
-                            echo '<p style="color:#dc2626;font-weight:600;font-size:1.1rem;margin-bottom:20px;">⚠️ Needs improvement. Review password security basics and try again.</p>';
-                        }
+                        if($percentage >= 90)      echo '<p style="color:#059669;font-weight:600;font-size:1.1rem;margin-bottom:20px;">Outstanding! You have excellent password security knowledge.</p>';
+                        elseif($percentage >= 70)  echo '<p style="color:#1e40af;font-weight:600;font-size:1.1rem;margin-bottom:20px;">Good work! You have a solid grasp of password security principles.</p>';
+                        elseif($percentage >= 50)  echo '<p style="color:#d97706;font-weight:600;font-size:1.1rem;margin-bottom:20px;">Not bad, but review some password security fundamentals.</p>';
+                        else                       echo '<p style="color:#dc2626;font-weight:600;font-size:1.1rem;margin-bottom:20px;">Needs improvement. Review password security basics and try again.</p>';
                         ?>
-
                         <div class="completion-actions">
                             <a href="game.php" class="action-btn secondary">Back to Games</a>
                             <a href="certificate.php" class="action-btn">View Certificate</a>
                             <a href="password-game-1.php?reset=1" class="action-btn">Play Again</a>
                         </div>
-
                         <div class="certificate-note">
-                            <strong>Progress:</strong> You've completed Password Fortress. Complete all Phishing Detective levels to unlock your cybersecurity awareness certificate.
+                            <strong>Progress:</strong> You have completed Password Fortress. Complete all Phishing Detective levels to unlock your cybersecurity awareness certificate.
                         </div>
                     </div>
 
                 <?php else: ?>
+
                     <form method="POST" action="password-game-1.php" id="gameForm">
                         <input type="hidden" name="question_id" value="<?php echo (int)$current_question; ?>">
                         <input type="hidden" name="answer" id="selectedAnswer" value="">
 
                         <div class="question-container">
-                            <div class="question-number">Question <?php echo $current_question; ?></div>
+                            <div class="question-header">
+                                <div class="question-number">Question <?php echo $current_question; ?> of <?php echo $total_questions; ?></div>
 
-                            <?php if($current_question == 1): ?>
-                                <div class="question-text">Which of the following passwords would be considered the most secure?</div>
-                                <div class="options-container">
-                                    <label class="option"><input type="radio" name="r" value="password123"><div class="option-label"><div class="option-letter">A</div><div class="option-text">password123</div></div></label>
-                                    <label class="option"><input type="radio" name="r" value="StrongPass2024!"><div class="option-label"><div class="option-letter">B</div><div class="option-text">StrongPass2024!</div></div></label>
-                                    <label class="option"><input type="radio" name="r" value="123456"><div class="option-label"><div class="option-letter">C</div><div class="option-text">123456</div></div></label>
-                                    <label class="option"><input type="radio" name="r" value="qwerty"><div class="option-label"><div class="option-letter">D</div><div class="option-text">qwerty</div></div></label>
-                                </div>
-                                <div class="hint-box"><strong>Hint:</strong> Secure passwords should include uppercase letters, lowercase letters, numbers, and special characters.</div>
+                                <?php if($current_question == 1): ?>
+                                    <div class="question-text">Which of the following passwords would be considered the most secure?</div>
+                                <?php elseif($current_question == 2): ?>
+                                    <div class="question-text">What is the term for the technique where attackers trick users into revealing passwords through deceptive emails or websites?</div>
+                                <?php elseif($current_question == 3): ?>
+                                    <div class="question-text">What is the recommended frequency for changing passwords according to cybersecurity best practices?</div>
+                                <?php elseif($current_question == 4): ?>
+                                    <div class="question-text">Which of the following is the most important factor for password security?</div>
+                                <?php elseif($current_question == 5): ?>
+                                    <div class="question-text">Evaluate the strength of a password by entering one below:</div>
+                                <?php elseif($current_question == 6): ?>
+                                    <div class="question-text">What is the safest way to manage a large number of unique passwords across many accounts?</div>
+                                <?php elseif($current_question == 7): ?>
+                                    <div class="question-text">Which security feature adds an extra layer of protection beyond just a password by requiring a second form of verification?</div>
+                                <?php elseif($current_question == 8): ?>
+                                    <div class="question-text">How should a website correctly store your password to protect it in the event of a data breach?</div>
+                                <?php elseif($current_question == 9): ?>
+                                    <div class="question-text">A popular social media site suffers a data breach and passwords are exposed. What is the most important action to take immediately?</div>
+                                <?php elseif($current_question == 10): ?>
+                                    <div class="question-text">What type of attack involves an automated program systematically trying every possible combination of characters until it cracks a password?</div>
+                                <?php endif; ?>
+                            </div>
 
-                            <?php elseif($current_question == 2): ?>
-                                <div class="question-text">What is the term for the technique where attackers trick users into revealing passwords through deceptive emails or websites?</div>
-                                <div class="options-container">
-                                    <label class="option"><input type="radio" name="r" value="Encryption"><div class="option-label"><div class="option-letter">A</div><div class="option-text">Encryption</div></div></label>
-                                    <label class="option"><input type="radio" name="r" value="Phishing"><div class="option-label"><div class="option-letter">B</div><div class="option-text">Phishing</div></div></label>
-                                    <label class="option"><input type="radio" name="r" value="Firewall"><div class="option-label"><div class="option-letter">C</div><div class="option-text">Firewall</div></div></label>
-                                    <label class="option"><input type="radio" name="r" value="VPN"><div class="option-label"><div class="option-letter">D</div><div class="option-text">VPN</div></div></label>
-                                </div>
-
-                            <?php elseif($current_question == 3): ?>
-                                <div class="question-text">What is the recommended frequency for changing passwords according to cybersecurity best practices?</div>
-                                <div class="options-container">
-                                    <label class="option"><input type="radio" name="r" value="Every day"><div class="option-label"><div class="option-letter">A</div><div class="option-text">Every day</div></div></label>
-                                    <label class="option"><input type="radio" name="r" value="Every 3-6 months"><div class="option-label"><div class="option-letter">B</div><div class="option-text">Every 3–6 months</div></div></label>
-                                    <label class="option"><input type="radio" name="r" value="Never"><div class="option-label"><div class="option-letter">C</div><div class="option-text">Never</div></div></label>
-                                    <label class="option"><input type="radio" name="r" value="Only when hacked"><div class="option-label"><div class="option-letter">D</div><div class="option-text">Only when there's evidence of compromise</div></div></label>
-                                </div>
-
-                            <?php elseif($current_question == 4): ?>
-                                <div class="question-text">Which of the following is the MOST important factor for password security?</div>
-                                <div class="options-container">
-                                    <label class="option"><input type="radio" name="r" value="Minimum of 12 characters in length"><div class="option-label"><div class="option-letter">A</div><div class="option-text">Minimum of 12 characters in length</div></div></label>
-                                    <label class="option"><input type="radio" name="r" value="Combination of uppercase letters, lowercase letters, numbers, and symbols"><div class="option-label"><div class="option-letter">B</div><div class="option-text">Combination of uppercase, lowercase, numbers, and symbols</div></div></label>
-                                    <label class="option"><input type="radio" name="r" value="Not reused across multiple websites or services"><div class="option-label"><div class="option-letter">C</div><div class="option-text">Not reused across multiple websites or services</div></div></label>
-                                    <label class="option"><input type="radio" name="r" value="Contains personal information like birth dates"><div class="option-label"><div class="option-letter">D</div><div class="option-text">Contains personal information like birth dates</div></div></label>
-                                </div>
-                                <div class="hint-box"><strong>Hint:</strong> Password length is the most critical factor against brute force attacks.</div>
-
-                            <?php elseif($current_question == 5): ?>
-                                <div class="question-text">Evaluate the strength of a password by entering one below:</div>
-                                <div class="instruction-note">
-                                    <strong>Goal:</strong> Create a password that scores "Strong" — needs uppercase, lowercase, numbers, and symbols, at least 12 characters long.
-                                </div>
-                                <div class="password-test-container">
-                                    <input type="text" class="password-input" id="passwordTest" placeholder="Enter a password to test its strength" autocomplete="off">
-                                    <div class="strength-indicator">
-                                        <span class="strength-label">Password Strength:</span>
-                                        <div class="strength-meter">
-                                            <div class="strength-bar" id="strengthBar"></div>
-                                        </div>
-                                        <div class="strength-text" id="strengthText">Enter a password to see strength analysis</div>
+                            <div class="question-body">
+                                <?php if($current_question == 1): ?>
+                                    <div class="options-container">
+                                        <button type="button" class="option" onclick="selectAnswer('password123', this)"><div class="option-letter">A</div><div class="option-text">password123</div></button>
+                                        <button type="button" class="option" onclick="selectAnswer('StrongPass2024!', this)"><div class="option-letter">B</div><div class="option-text">StrongPass2024!</div></button>
+                                        <button type="button" class="option" onclick="selectAnswer('123456', this)"><div class="option-letter">C</div><div class="option-text">123456</div></button>
+                                        <button type="button" class="option" onclick="selectAnswer('qwerty', this)"><div class="option-letter">D</div><div class="option-text">qwerty</div></button>
                                     </div>
-                                </div>
+                                    <div style="margin-top:16px;" class="hint-box"><strong>Hint:</strong> Secure passwords include uppercase letters, lowercase letters, numbers, and special characters.</div>
 
-                            <?php elseif($current_question == 6): ?>
-                                <div class="question-text">What is the safest way to manage a large number of unique passwords across many accounts?</div>
-                                <div class="options-container">
-                                    <label class="option"><input type="radio" name="r" value="Write them in a notebook"><div class="option-label"><div class="option-letter">A</div><div class="option-text">Write them in a notebook kept near your desk</div></div></label>
-                                    <label class="option"><input type="radio" name="r" value="A password manager"><div class="option-label"><div class="option-letter">B</div><div class="option-text">A password manager</div></div></label>
-                                    <label class="option"><input type="radio" name="r" value="Use the same password everywhere"><div class="option-label"><div class="option-letter">C</div><div class="option-text">Use the same strong password for every account</div></div></label>
-                                    <label class="option"><input type="radio" name="r" value="Save passwords in browser notes"><div class="option-label"><div class="option-letter">D</div><div class="option-text">Save them in an unprotected notes app</div></div></label>
-                                </div>
-                                <div class="hint-box"><strong>Hint:</strong> This tool encrypts and stores your credentials securely, and can generate strong passwords for you.</div>
+                                <?php elseif($current_question == 2): ?>
+                                    <div class="options-container">
+                                        <button type="button" class="option" onclick="selectAnswer('Encryption', this)"><div class="option-letter">A</div><div class="option-text">Encryption</div></button>
+                                        <button type="button" class="option" onclick="selectAnswer('Phishing', this)"><div class="option-letter">B</div><div class="option-text">Phishing</div></button>
+                                        <button type="button" class="option" onclick="selectAnswer('Firewall', this)"><div class="option-letter">C</div><div class="option-text">Firewall</div></button>
+                                        <button type="button" class="option" onclick="selectAnswer('VPN', this)"><div class="option-letter">D</div><div class="option-text">VPN</div></button>
+                                    </div>
 
-                            <?php elseif($current_question == 7): ?>
-                                <div class="question-text">Which security feature adds an extra layer of protection beyond just a password by requiring a second form of verification?</div>
-                                <div class="options-container">
-                                    <label class="option"><input type="radio" name="r" value="Incognito Mode"><div class="option-label"><div class="option-letter">A</div><div class="option-text">Incognito / Private Browsing Mode</div></div></label>
-                                    <label class="option"><input type="radio" name="r" value="Antivirus Software"><div class="option-label"><div class="option-letter">B</div><div class="option-text">Antivirus Software</div></div></label>
-                                    <label class="option"><input type="radio" name="r" value="Two-Factor Authentication (2FA)"><div class="option-label"><div class="option-letter">C</div><div class="option-text">Two-Factor Authentication (2FA)</div></div></label>
-                                    <label class="option"><input type="radio" name="r" value="A VPN"><div class="option-label"><div class="option-letter">D</div><div class="option-text">A VPN (Virtual Private Network)</div></div></label>
-                                </div>
+                                <?php elseif($current_question == 3): ?>
+                                    <div class="options-container">
+                                        <button type="button" class="option" onclick="selectAnswer('Every day', this)"><div class="option-letter">A</div><div class="option-text">Every day</div></button>
+                                        <button type="button" class="option" onclick="selectAnswer('Every 3-6 months', this)"><div class="option-letter">B</div><div class="option-text">Every 3–6 months</div></button>
+                                        <button type="button" class="option" onclick="selectAnswer('Never', this)"><div class="option-letter">C</div><div class="option-text">Never</div></button>
+                                        <button type="button" class="option" onclick="selectAnswer('Only when hacked', this)"><div class="option-letter">D</div><div class="option-text">Only when there is evidence of compromise</div></button>
+                                    </div>
 
-                            <?php elseif($current_question == 8): ?>
-                                <div class="question-text">How should a website correctly store your password to protect it in the event of a data breach?</div>
-                                <div class="options-container">
-                                    <label class="option"><input type="radio" name="r" value="In plain text in a database"><div class="option-label"><div class="option-letter">A</div><div class="option-text">In plain text in a database</div></div></label>
-                                    <label class="option"><input type="radio" name="r" value="Sent via email to the admin"><div class="option-label"><div class="option-letter">B</div><div class="option-text">Sent via email to the site administrator</div></div></label>
-                                    <label class="option"><input type="radio" name="r" value="Encoded in Base64"><div class="option-label"><div class="option-letter">C</div><div class="option-text">Encoded in Base64 format</div></div></label>
-                                    <label class="option"><input type="radio" name="r" value="It is stored as an irreversible hash"><div class="option-label"><div class="option-letter">D</div><div class="option-text">It is stored as an irreversible hash</div></div></label>
-                                </div>
-                                <div class="hint-box"><strong>Hint:</strong> A secure website never stores your actual password — only a one-way transformed version that cannot be reversed.</div>
+                                <?php elseif($current_question == 4): ?>
+                                    <div class="options-container">
+                                        <button type="button" class="option" onclick="selectAnswer('Minimum of 12 characters in length', this)"><div class="option-letter">A</div><div class="option-text">Minimum of 12 characters in length</div></button>
+                                        <button type="button" class="option" onclick="selectAnswer('Combination of uppercase letters, lowercase letters, numbers, and symbols', this)"><div class="option-letter">B</div><div class="option-text">Combination of uppercase, lowercase, numbers, and symbols</div></button>
+                                        <button type="button" class="option" onclick="selectAnswer('Not reused across multiple websites or services', this)"><div class="option-letter">C</div><div class="option-text">Not reused across multiple websites or services</div></button>
+                                        <button type="button" class="option" onclick="selectAnswer('Contains personal information like birth dates', this)"><div class="option-letter">D</div><div class="option-text">Contains personal information like birth dates</div></button>
+                                    </div>
+                                    <div style="margin-top:16px;" class="hint-box"><strong>Hint:</strong> Password length is the most critical factor against brute force attacks.</div>
 
-                            <?php elseif($current_question == 9): ?>
-                                <div class="question-text">A popular social media site suffers a data breach and passwords are exposed. What is the MOST important action to take immediately?</div>
-                                <div class="options-container">
-                                    <label class="option"><input type="radio" name="r" value="Wait for the company to fix it"><div class="option-label"><div class="option-letter">A</div><div class="option-text">Wait for the company to notify you before doing anything</div></div></label>
-                                    <label class="option"><input type="radio" name="r" value="Delete your account"><div class="option-label"><div class="option-letter">B</div><div class="option-text">Permanently delete your account on that site</div></div></label>
-                                    <label class="option"><input type="radio" name="r" value="Use a unique password for every account"><div class="option-label"><div class="option-letter">C</div><div class="option-text">Change your password on that site and every account where you used the same password</div></div></label>
-                                    <label class="option"><input type="radio" name="r" value="Run a virus scan"><div class="option-label"><div class="option-letter">D</div><div class="option-text">Run a virus scan on your computer</div></div></label>
-                                </div>
+                                <?php elseif($current_question == 5): ?>
+                                    <div class="instruction-note">
+                                        <strong>Goal:</strong> Create a password that scores "Strong" — it needs uppercase, lowercase, numbers, and symbols, and should be at least 12 characters long.
+                                    </div>
+                                    <div class="password-test-container">
+                                        <input type="text" class="password-input" id="passwordTest" placeholder="Enter a password to test its strength" autocomplete="off">
+                                        <div class="strength-indicator">
+                                            <span class="strength-label">Password Strength:</span>
+                                            <div class="strength-meter">
+                                                <div class="strength-bar" id="strengthBar"></div>
+                                            </div>
+                                            <div class="strength-text" id="strengthText">Enter a password to see strength analysis</div>
+                                        </div>
+                                    </div>
 
-                            <?php elseif($current_question == 10): ?>
-                                <div class="question-text">What type of attack involves an automated program systematically trying every possible combination of characters until it cracks a password?</div>
-                                <div class="options-container">
-                                    <label class="option"><input type="radio" name="r" value="Man-in-the-middle attack"><div class="option-label"><div class="option-letter">A</div><div class="option-text">Man-in-the-middle attack</div></div></label>
-                                    <label class="option"><input type="radio" name="r" value="SQL injection"><div class="option-label"><div class="option-letter">B</div><div class="option-text">SQL injection</div></div></label>
-                                    <label class="option"><input type="radio" name="r" value="Denial of Service attack"><div class="option-label"><div class="option-letter">C</div><div class="option-text">Denial of Service (DoS) attack</div></div></label>
-                                    <label class="option"><input type="radio" name="r" value="Brute force attack"><div class="option-label"><div class="option-letter">D</div><div class="option-text">Brute force attack</div></div></label>
-                                </div>
-                                <div class="hint-box"><strong>Hint:</strong> Each extra character multiplies the number of combinations an attacker must try — this is why longer passwords are exponentially stronger.</div>
+                                <?php elseif($current_question == 6): ?>
+                                    <div class="options-container">
+                                        <button type="button" class="option" onclick="selectAnswer('Write them in a notebook', this)"><div class="option-letter">A</div><div class="option-text">Write them in a notebook kept near your desk</div></button>
+                                        <button type="button" class="option" onclick="selectAnswer('A password manager', this)"><div class="option-letter">B</div><div class="option-text">A password manager</div></button>
+                                        <button type="button" class="option" onclick="selectAnswer('Use the same password everywhere', this)"><div class="option-letter">C</div><div class="option-text">Use the same strong password for every account</div></button>
+                                        <button type="button" class="option" onclick="selectAnswer('Save passwords in browser notes', this)"><div class="option-letter">D</div><div class="option-text">Save them in an unprotected notes app</div></button>
+                                    </div>
+                                    <div style="margin-top:16px;" class="hint-box"><strong>Hint:</strong> This tool encrypts and stores your credentials securely, and can generate strong passwords for you.</div>
 
-                            <?php endif; ?>
+                                <?php elseif($current_question == 7): ?>
+                                    <div class="options-container">
+                                        <button type="button" class="option" onclick="selectAnswer('Incognito Mode', this)"><div class="option-letter">A</div><div class="option-text">Incognito / Private Browsing Mode</div></button>
+                                        <button type="button" class="option" onclick="selectAnswer('Antivirus Software', this)"><div class="option-letter">B</div><div class="option-text">Antivirus Software</div></button>
+                                        <button type="button" class="option" onclick="selectAnswer('Two-Factor Authentication (2FA)', this)"><div class="option-letter">C</div><div class="option-text">Two-Factor Authentication (2FA)</div></button>
+                                        <button type="button" class="option" onclick="selectAnswer('A VPN', this)"><div class="option-letter">D</div><div class="option-text">A VPN (Virtual Private Network)</div></button>
+                                    </div>
+
+                                <?php elseif($current_question == 8): ?>
+                                    <div class="options-container">
+                                        <button type="button" class="option" onclick="selectAnswer('In plain text in a database', this)"><div class="option-letter">A</div><div class="option-text">In plain text in a database</div></button>
+                                        <button type="button" class="option" onclick="selectAnswer('Sent via email to the admin', this)"><div class="option-letter">B</div><div class="option-text">Sent via email to the site administrator</div></button>
+                                        <button type="button" class="option" onclick="selectAnswer('Encoded in Base64', this)"><div class="option-letter">C</div><div class="option-text">Encoded in Base64 format</div></button>
+                                        <button type="button" class="option" onclick="selectAnswer('It is stored as an irreversible hash', this)"><div class="option-letter">D</div><div class="option-text">It is stored as an irreversible hash</div></button>
+                                    </div>
+                                    <div style="margin-top:16px;" class="hint-box"><strong>Hint:</strong> A secure website never stores your actual password — only a one-way transformed version that cannot be reversed.</div>
+
+                                <?php elseif($current_question == 9): ?>
+                                    <div class="options-container">
+                                        <button type="button" class="option" onclick="selectAnswer('Wait for the company to fix it', this)"><div class="option-letter">A</div><div class="option-text">Wait for the company to notify you before doing anything</div></button>
+                                        <button type="button" class="option" onclick="selectAnswer('Delete your account', this)"><div class="option-letter">B</div><div class="option-text">Permanently delete your account on that site</div></button>
+                                        <button type="button" class="option" onclick="selectAnswer('Use a unique password for every account', this)"><div class="option-letter">C</div><div class="option-text">Change your password on that site and every account where you used the same password</div></button>
+                                        <button type="button" class="option" onclick="selectAnswer('Run a virus scan', this)"><div class="option-letter">D</div><div class="option-text">Run a virus scan on your computer</div></button>
+                                    </div>
+
+                                <?php elseif($current_question == 10): ?>
+                                    <div class="options-container">
+                                        <button type="button" class="option" onclick="selectAnswer('Man-in-the-middle attack', this)"><div class="option-letter">A</div><div class="option-text">Man-in-the-middle attack</div></button>
+                                        <button type="button" class="option" onclick="selectAnswer('SQL injection', this)"><div class="option-letter">B</div><div class="option-text">SQL injection</div></button>
+                                        <button type="button" class="option" onclick="selectAnswer('Denial of Service attack', this)"><div class="option-letter">C</div><div class="option-text">Denial of Service (DoS) attack</div></button>
+                                        <button type="button" class="option" onclick="selectAnswer('Brute force attack', this)"><div class="option-letter">D</div><div class="option-text">Brute force attack</div></button>
+                                    </div>
+                                    <div style="margin-top:16px;" class="hint-box"><strong>Hint:</strong> Each extra character multiplies the number of combinations an attacker must try — this is why longer passwords are exponentially stronger.</div>
+                                <?php endif; ?>
+                            </div>
                         </div>
 
-                        <div class="controls">
-                            <button type="submit" class="btn-next" id="submitBtn" disabled>
+                        <div class="game-controls">
+                            <button type="submit" class="submit-btn" id="submitBtn" disabled>
                                 <?php echo $current_question == $total_questions ? 'Complete Assessment' : 'Next Question'; ?>
                             </button>
                         </div>
                     </form>
+
                 <?php endif; ?>
+
             </div>
         </div>
 
@@ -674,81 +701,86 @@ function calculatePasswordStrength($password) {
         const currentQuestion = <?php echo (int)$current_question; ?>;
         const totalQuestions  = <?php echo (int)$total_questions; ?>;
 
-        if (currentQuestion > totalQuestions || !submitBtn) return;
+        if(currentQuestion > totalQuestions || !submitBtn) return;
 
-        // Disable submit by default
         submitBtn.disabled = true;
 
-        // ── Radio-button questions (Q1–Q4, Q6–Q10) ──
-        if (currentQuestion !== 5) {
-            const options = document.querySelectorAll('.option');
-
-            options.forEach(function (option) {
-                option.addEventListener('click', function () {
-                    // Deselect all
-                    options.forEach(function (o) { o.classList.remove('selected'); });
-                    // Select clicked
-                    this.classList.add('selected');
-
-                    const radio = this.querySelector('input[type="radio"]');
-                    if (radio) {
-                        radio.checked = true;
-                        selectedAnswer.value = radio.value;
-                    }
-                    submitBtn.disabled = false;
-                });
-            });
-
-            // Validate on submit
-            document.getElementById('gameForm').addEventListener('submit', function (e) {
-                if (!selectedAnswer.value) {
-                    e.preventDefault();
-                    alert('Please select an answer before continuing.');
-                }
-            });
+        // ── Option buttons (Q1–4, Q6–10) ──
+        function selectAnswer(answer, btn) {
+            document.querySelectorAll('.option').forEach(function(o) { o.classList.remove('selected'); });
+            btn.classList.add('selected');
+            selectedAnswer.value = answer;
+            submitBtn.disabled = false;
         }
+        window.selectAnswer = selectAnswer;
+
+        document.getElementById('gameForm')?.addEventListener('submit', function(e) {
+            if(!selectedAnswer.value && currentQuestion !== 5) {
+                e.preventDefault();
+                alert('Please select an answer before continuing.');
+            }
+        });
 
         // ── Question 5: password strength meter ──
-        if (currentQuestion === 5) {
+        if(currentQuestion === 5) {
             const passwordInput = document.getElementById('passwordTest');
 
             function calculateStrength(password) {
-                if (!password) return { width: 0, text: 'Enter a password to see strength analysis', cls: '', answer: '', color: '#e5e7eb' };
+                if(!password) return { width: 0, text: 'Enter a password to see strength analysis', cls: '', answer: '', color: '#e5e7eb' };
                 let s = 0;
-                if (password.length >= 8)           s++;
-                if (password.length >= 12)          s++;
-                if (/[a-z]/.test(password))         s++;
-                if (/[A-Z]/.test(password))         s++;
-                if (/[0-9]/.test(password))         s++;
-                if (/[^A-Za-z0-9]/.test(password))  s++;
+                if(password.length >= 8)            s++;
+                if(password.length >= 12)           s++;
+                if(/[a-z]/.test(password))          s++;
+                if(/[A-Z]/.test(password))          s++;
+                if(/[0-9]/.test(password))          s++;
+                if(/[^A-Za-z0-9]/.test(password))   s++;
 
                 const width = Math.round((s / 6) * 100);
-                if (s <= 2) return { width, text: 'Weak — easily compromised',        cls: 'strength-weak',   answer: 'Weak',   color: '#dc2626' };
-                if (s <= 4) return { width, text: 'Fair — could be stronger',          cls: 'strength-fair',   answer: 'Fair',   color: '#d97706' };
-                            return { width, text: 'Strong — meets security standards', cls: 'strength-strong', answer: 'Strong', color: '#059669' };
+                if(s <= 2) return { width, text: 'Weak — easily compromised',        cls: 'strength-weak',   answer: 'Weak',   color: '#dc2626' };
+                if(s <= 4) return { width, text: 'Fair — could be stronger',          cls: 'strength-fair',   answer: 'Fair',   color: '#d97706' };
+                           return { width, text: 'Strong — meets security standards', cls: 'strength-strong', answer: 'Strong', color: '#059669' };
             }
 
-            if (passwordInput) {
-                passwordInput.addEventListener('input', function () {
+            if(passwordInput) {
+                passwordInput.addEventListener('input', function() {
                     const r   = calculateStrength(this.value);
                     const bar = document.getElementById('strengthBar');
                     const txt = document.getElementById('strengthText');
-
-                    if (bar) { bar.style.width = r.width + '%'; bar.style.backgroundColor = r.color; }
-                    if (txt) { txt.textContent = r.text; txt.className = 'strength-text ' + r.cls; }
-
-                    selectedAnswer.value   = r.answer;
-                    submitBtn.disabled     = this.value.trim() === '';
+                    if(bar) { bar.style.width = r.width + '%'; bar.style.backgroundColor = r.color; }
+                    if(txt) { txt.textContent = r.text; txt.className = 'strength-text ' + r.cls; }
+                    selectedAnswer.value = r.answer;
+                    submitBtn.disabled   = this.value.trim() === '';
                 });
             }
 
-            document.getElementById('gameForm').addEventListener('submit', function (e) {
-                if (!passwordInput || passwordInput.value.trim() === '') {
+            document.getElementById('gameForm')?.addEventListener('submit', function(e) {
+                if(!passwordInput || passwordInput.value.trim() === '') {
                     e.preventDefault();
                     alert('Please enter a password to test its strength.');
                 }
             });
         }
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            if(currentQuestion === 5) return;
+            const opts = document.querySelectorAll('.option');
+            const map  = { '1': 0, 'a': 0, '2': 1, 'b': 1, '3': 2, 'c': 2, '4': 3, 'd': 3 };
+            const vals = ['password123','StrongPass2024!','123456','qwerty',
+                          'Encryption','Phishing','Firewall','VPN',
+                          'Every day','Every 3-6 months','Never','Only when hacked',
+                          'Minimum of 12 characters in length','Combination of uppercase letters, lowercase letters, numbers, and symbols','Not reused across multiple websites or services','Contains personal information like birth dates',
+                          'Write them in a notebook','A password manager','Use the same password everywhere','Save passwords in browser notes',
+                          'Incognito Mode','Antivirus Software','Two-Factor Authentication (2FA)','A VPN',
+                          'In plain text in a database','Sent via email to the admin','Encoded in Base64','It is stored as an irreversible hash',
+                          'Wait for the company to fix it','Delete your account','Use a unique password for every account','Run a virus scan',
+                          'Man-in-the-middle attack','SQL injection','Denial of Service attack','Brute force attack'];
+            if(map[e.key] !== undefined && opts[map[e.key]]) {
+                opts[map[e.key]].click();
+            } else if(e.key === 'Enter' && selectedAnswer.value) {
+                submitBtn?.click();
+            }
+        });
     });
     </script>
 </body>
