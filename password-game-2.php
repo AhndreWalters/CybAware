@@ -8,27 +8,25 @@ if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){
 
 require_once "config/database.php";
 
-$user_id          = $_SESSION['id'];
-$game_completed   = false;
-$score            = 0;
-$feedback         = "";
-$total_questions  = 10;
+$user_id         = $_SESSION['id'];
+$game_completed  = false;
+$total_questions = 10; // 5 departments x 2 points each
+$score           = 0;
 
 // Reset
 if(isset($_GET['reset'])) {
-    unset($_SESSION['pg2_score'], $_SESSION['pg2_question'], $_SESSION['pg2_fortress_done'], $_SESSION['pg2_dept_results'], $_SESSION['pg2_feedback']);
+    unset($_SESSION['pg2_score'], $_SESSION['pg2_done'], $_SESSION['pg2_dept_results']);
     header("location: password-game-2.php");
     exit;
 }
 
 // Initialize session
-if(!isset($_SESSION['pg2_score']))         $_SESSION['pg2_score']         = 0;
-if(!isset($_SESSION['pg2_question']))      $_SESSION['pg2_question']       = 1;
-if(!isset($_SESSION['pg2_fortress_done'])) $_SESSION['pg2_fortress_done']  = false;
+if(!isset($_SESSION['pg2_score'])) $_SESSION['pg2_score'] = 0;
+if(!isset($_SESSION['pg2_done']))  $_SESSION['pg2_done']  = false;
 
-$score            = $_SESSION['pg2_score'];
-$current_question = $_SESSION['pg2_question'];
-$fortress_done    = $_SESSION['pg2_fortress_done'];
+$score         = $_SESSION['pg2_score'];
+$fortress_done = $_SESSION['pg2_done'];
+$dept_results  = $_SESSION['pg2_dept_results'] ?? [];
 
 $departments = [
     1 => ['name' => 'IT / Cyber Department',       'desc' => 'Network infrastructure and security systems'],
@@ -36,39 +34,6 @@ $departments = [
     3 => ['name' => 'HR & Legal',                  'desc' => 'Employee data and confidential documents'],
     4 => ['name' => 'Executive Leadership',        'desc' => 'Strategic plans and executive communications'],
     5 => ['name' => 'Sales, Finance & Marketing',  'desc' => 'Financial data, sales reports, and strategies'],
-];
-
-$quiz_questions = [
-    6 => [
-        'question' => 'Which of the following is considered a strong password?',
-        'options'  => ['a' => 'password123', 'b' => 'P@ssw0rd!2024Secure', 'c' => '123456789', 'd' => 'qwerty'],
-        'answer'   => 'b',
-        'hint'     => 'A strong password is long and uses uppercase, lowercase, numbers, and special characters.'
-    ],
-    7 => [
-        'question' => 'What is the minimum recommended length for a secure password?',
-        'options'  => ['a' => '6 characters', 'b' => '8 characters', 'c' => '12 characters', 'd' => '20 characters'],
-        'answer'   => 'c',
-        'hint'     => 'Security experts recommend at least 12 characters for strong passwords.'
-    ],
-    8 => [
-        'question' => 'What is the safest way to store multiple unique passwords?',
-        'options'  => ['a' => 'Write them in a notebook', 'b' => 'Use the same password everywhere', 'c' => 'Use a password manager', 'd' => 'Save them in a plain text file'],
-        'answer'   => 'c',
-        'hint'     => 'A password manager securely encrypts and stores all your passwords in one place.'
-    ],
-    9 => [
-        'question' => 'What does a brute force attack do?',
-        'options'  => ['a' => 'Sends phishing emails', 'b' => 'Tries every possible password combination', 'c' => 'Installs malware on your device', 'd' => 'Intercepts network traffic'],
-        'answer'   => 'b',
-        'hint'     => 'Brute force attacks systematically try every combination — longer passwords make this exponentially harder.'
-    ],
-    10 => [
-        'question' => 'Which security feature best protects an account even if the password is stolen?',
-        'options'  => ['a' => 'A longer password', 'b' => 'Changing your password monthly', 'c' => 'Two-Factor Authentication (2FA)', 'd' => 'Using a VPN'],
-        'answer'   => 'c',
-        'hint'     => '2FA requires a second form of verification, so a stolen password alone cannot grant access.'
-    ],
 ];
 
 // Password scorer
@@ -92,76 +57,50 @@ function scorePassword($password) {
 if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['phase']) && $_POST['phase'] == 'fortress') {
     if(!$fortress_done) {
         $dept_results = [];
-        $strong_count = 0;
+        $total_score  = 0;
+
         for($i = 1; $i <= 5; $i++) {
-            $pw = isset($_POST['dept'.$i]) ? trim($_POST['dept'.$i]) : '';
-            $s  = scorePassword($pw);
-            $dept_results[] = ['name' => $departments[$i]['name'], 'score' => $s, 'secure' => ($s >= 80)];
-            if($s >= 80) $strong_count++;
+            $pw       = isset($_POST['dept'.$i]) ? trim($_POST['dept'.$i]) : '';
+            $strength = scorePassword($pw);
+
+            // 2 points for strong (80+), 1 point for fair (50-79), 0 for weak
+            if($strength >= 80)      $pts = 2;
+            elseif($strength >= 50)  $pts = 1;
+            else                     $pts = 0;
+
+            $dept_results[] = [
+                'name'     => $departments[$i]['name'],
+                'score'    => $strength,
+                'pts'      => $pts,
+                'rating'   => ($strength >= 80) ? 'Strong' : (($strength >= 50) ? 'Fair' : 'Weak'),
+            ];
+            $total_score += $pts;
         }
-        $_SESSION['pg2_score']         = $strong_count;
-        $_SESSION['pg2_fortress_done'] = true;
-        $_SESSION['pg2_dept_results']  = $dept_results;
-        $_SESSION['pg2_question']      = 6;
-        $score            = $strong_count;
-        $fortress_done    = true;
-        $current_question = 6;
-    }
-}
 
-// Handle quiz POST
-if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['phase']) && $_POST['phase'] == 'quiz') {
-    $question_id = (int)$_POST['question_id'];
-    $user_answer = $_POST['answer'] ?? '';
+        $_SESSION['pg2_score']        = $total_score;
+        $_SESSION['pg2_done']         = true;
+        $_SESSION['pg2_dept_results'] = $dept_results;
 
-    if(isset($quiz_questions[$question_id])) {
-        $correct = $quiz_questions[$question_id]['answer'];
-        $hint    = $quiz_questions[$question_id]['hint'];
+        $score         = $total_score;
+        $fortress_done = true;
+        $dept_results  = $dept_results;
+        $game_completed = true;
 
-        if($user_answer === $correct) {
-            $_SESSION['pg2_score']++;
-            $feedback = "<div class='feedback correct'><span>Correct!</span></div>";
-        } else {
-            $feedback = "<div class='feedback incorrect'><span>Incorrect</span></div>";
-        }
-        $feedback .= "<div class='hint-box'><strong>Hint:</strong> " . htmlspecialchars($hint) . "</div>";
-
-        $_SESSION['pg2_feedback'] = $feedback;
-        $_SESSION['pg2_question'] = $question_id + 1;
-        $score            = $_SESSION['pg2_score'];
-        $current_question = $_SESSION['pg2_question'];
-
-        if($current_question > $total_questions) {
-            $game_completed = true;
-            $sql = "INSERT INTO game_scores (user_id, game_type, score, total_questions, completed_at)
-                    VALUES (?, 'password_fortress', ?, ?, NOW())
-                    ON DUPLICATE KEY UPDATE score = VALUES(score), completed_at = NOW()";
-            if($stmt = mysqli_prepare($link, $sql)) {
-                mysqli_stmt_bind_param($stmt, "iii", $user_id, $score, $total_questions);
-                mysqli_stmt_execute($stmt);
-                mysqli_stmt_close($stmt);
-            }
-            unset($_SESSION['pg2_score'], $_SESSION['pg2_question'], $_SESSION['pg2_fortress_done'], $_SESSION['pg2_dept_results'], $_SESSION['pg2_feedback']);
+        // Save to DB
+        $sql = "INSERT INTO game_scores (user_id, game_type, score, total_questions, completed_at)
+                VALUES (?, 'password_fortress_2', ?, ?, NOW())
+                ON DUPLICATE KEY UPDATE score = VALUES(score), completed_at = NOW()";
+        if($stmt = mysqli_prepare($link, $sql)) {
+            mysqli_stmt_bind_param($stmt, "iii", $user_id, $score, $total_questions);
+            mysqli_stmt_execute($stmt);
+            mysqli_stmt_close($stmt);
         }
     }
 }
 
-// Load feedback from session
-if(empty($feedback) && isset($_SESSION['pg2_feedback'])) {
-    $feedback = $_SESSION['pg2_feedback'];
-    unset($_SESSION['pg2_feedback']);
-}
-
-if($current_question > $total_questions && !$game_completed) {
+if($fortress_done && !$game_completed) {
     $game_completed = true;
 }
-
-// Re-read session after all processing
-$fortress_done    = $_SESSION['pg2_fortress_done'] ?? false;
-$current_question = $_SESSION['pg2_question'] ?? 1;
-$score            = $_SESSION['pg2_score'] ?? 0;
-$dept_results     = $_SESSION['pg2_dept_results'] ?? [];
-$phase            = (!$fortress_done) ? 'fortress' : 'quiz';
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -187,7 +126,6 @@ $phase            = (!$fortress_done) ? 'fortress' : 'quiz';
             box-sizing: border-box;
         }
 
-        /* ── Header ── */
         .game-header {
             text-align: center;
             margin-bottom: 30px;
@@ -205,7 +143,6 @@ $phase            = (!$fortress_done) ? 'fortress' : 'quiz';
             font-size: 1.1rem;
         }
 
-        /* ── Progress ── */
         .progress-container {
             margin-bottom: 25px;
             width: 100%;
@@ -233,29 +170,6 @@ $phase            = (!$fortress_done) ? 'fortress' : 'quiz';
             transition: width 0.3s ease;
         }
 
-        /* ── Feedback ── */
-        .feedback {
-            padding: 16px;
-            border-radius: 6px;
-            margin: 0 0 16px 0;
-            font-size: 15px;
-            font-weight: 500;
-            text-align: center;
-            border: 1px solid transparent;
-        }
-
-        .feedback.correct {
-            background: #f0fdf4;
-            color: #065f46;
-            border-color: #10b981;
-        }
-
-        .feedback.incorrect {
-            background: #fef2f2;
-            color: #991b1b;
-            border-color: #ef4444;
-        }
-
         .hint-box {
             background: #fef3c7;
             border: 1px solid #f59e0b;
@@ -266,7 +180,6 @@ $phase            = (!$fortress_done) ? 'fortress' : 'quiz';
             color: #92400e;
         }
 
-        /* ── Mission brief ── */
         .mission-brief {
             background: #eff6ff;
             border: 1px solid #bfdbfe;
@@ -281,22 +194,40 @@ $phase            = (!$fortress_done) ? 'fortress' : 'quiz';
 
         .mission-brief strong { color: #1e40af; }
 
-        /* ── Phase badge ── */
-        .phase-badge {
-            display: inline-block;
-            background: #eff6ff;
-            color: #1e40af;
-            font-size: 12px;
-            font-weight: 600;
-            padding: 4px 12px;
-            border-radius: 20px;
-            border: 1px solid #bfdbfe;
-            margin-bottom: 18px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+        /* Scoring legend */
+        .scoring-legend {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
         }
 
-        /* ── Department card (mimics email-container) ── */
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 6px;
+            padding: 8px 14px;
+            font-size: 13px;
+            color: #374151;
+            flex: 1;
+            min-width: 140px;
+        }
+
+        .legend-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+
+        .dot-strong { background: #10b981; }
+        .dot-fair   { background: #f59e0b; }
+        .dot-weak   { background: #ef4444; }
+
+        /* Department cards */
         .department-card {
             background: white;
             border-radius: 8px;
@@ -310,9 +241,7 @@ $phase            = (!$fortress_done) ? 'fortress' : 'quiz';
             transition: border-color 0.2s;
         }
 
-        .department-card:hover {
-            border-color: #93c5fd;
-        }
+        .department-card:hover { border-color: #93c5fd; }
 
         .dept-header {
             background: #f8fafc;
@@ -337,6 +266,8 @@ $phase            = (!$fortress_done) ? 'fortress' : 'quiz';
             flex-shrink: 0;
         }
 
+        .dept-info { flex: 1; }
+
         .dept-info h3 {
             color: #1f2937;
             font-size: 1rem;
@@ -350,14 +281,20 @@ $phase            = (!$fortress_done) ? 'fortress' : 'quiz';
             margin: 0;
         }
 
-        .dept-body {
-            padding: 20px 25px;
+        .dept-points {
+            font-size: 12px;
+            font-weight: 700;
+            color: #1e40af;
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            border-radius: 12px;
+            padding: 3px 10px;
+            white-space: nowrap;
         }
 
-        /* ── Input ── */
-        .input-group {
-            position: relative;
-        }
+        .dept-body { padding: 20px 25px; }
+
+        .input-group { position: relative; }
 
         .input-group input {
             width: 100%;
@@ -399,7 +336,6 @@ $phase            = (!$fortress_done) ? 'fortress' : 'quiz';
 
         .toggle-password:hover { color: #1e40af; }
 
-        /* ── Strength ── */
         .strength-row {
             display: flex;
             align-items: center;
@@ -435,7 +371,6 @@ $phase            = (!$fortress_done) ? 'fortress' : 'quiz';
             text-align: right;
         }
 
-        /* ── Duplicate warning ── */
         .dup-warning {
             background: #fef2f2;
             border: 1px solid #fecaca;
@@ -449,7 +384,6 @@ $phase            = (!$fortress_done) ? 'fortress' : 'quiz';
 
         .dup-warning.show { display: block; }
 
-        /* ── Hint tip (fortress phase) ── */
         .hint-tip {
             background: #fefce8;
             border: 1px solid #fde68a;
@@ -460,155 +394,6 @@ $phase            = (!$fortress_done) ? 'fortress' : 'quiz';
             margin-bottom: 20px;
         }
 
-        /* ── Fortress results ── */
-        .fortress-results {
-            background: white;
-            border-radius: 8px;
-            padding: 0;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            border: 1px solid #e2e8f0;
-            overflow: hidden;
-        }
-
-        .fortress-results-header {
-            background: #f8fafc;
-            padding: 16px 25px;
-            border-bottom: 1px solid #e2e8f0;
-            font-size: 14px;
-            font-weight: 600;
-            color: #374151;
-        }
-
-        .dept-result-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px 25px;
-            border-bottom: 1px solid #f3f4f6;
-            font-size: 14px;
-        }
-
-        .dept-result-row:last-child { border-bottom: none; }
-        .dept-result-name { color: #374151; }
-
-        .badge {
-            display: inline-block;
-            padding: 3px 10px;
-            border-radius: 12px;
-            font-size: 12px;
-            font-weight: 600;
-        }
-
-        .badge-secure { background: #d1fae5; color: #065f46; }
-        .badge-weak   { background: #fee2e2; color: #991b1b; }
-
-        /* ── Quiz question (mimics email-container) ── */
-        .question-container {
-            background: white;
-            border-radius: 8px;
-            padding: 0;
-            margin-bottom: 30px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            border: 1px solid #e2e8f0;
-            overflow: hidden;
-            width: 100%;
-            box-sizing: border-box;
-        }
-
-        .question-header {
-            background: #f8fafc;
-            padding: 20px 25px;
-            border-bottom: 1px solid #e2e8f0;
-        }
-
-        .question-number {
-            font-size: 13px;
-            font-weight: 600;
-            color: #6b7280;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-            margin-bottom: 6px;
-        }
-
-        .question-text {
-            color: #1f2937;
-            font-size: 1.2rem;
-            font-weight: 600;
-            margin: 0;
-            line-height: 1.5;
-        }
-
-        .question-body {
-            padding: 25px;
-        }
-
-        /* ── Options (mimics option-btn style from phishing game) ── */
-        .options-list {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-
-        .option-btn {
-            width: 100%;
-            padding: 16px 20px;
-            border: 2px solid #e2e8f0;
-            border-radius: 8px;
-            background: white;
-            font-size: 1rem;
-            font-weight: 500;
-            cursor: pointer;
-            text-align: left;
-            transition: all 0.2s ease;
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            color: #374151;
-            box-sizing: border-box;
-        }
-
-        .option-btn:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            border-color: #93c5fd;
-            background: #f8fafc;
-        }
-
-        .option-btn.selected {
-            background: #eff6ff;
-            border-color: #1e40af;
-            border-width: 2px;
-            color: #1e40af;
-        }
-
-        .option-letter {
-            background: #f3f4f6;
-            border-radius: 4px;
-            width: 30px;
-            height: 30px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: 700;
-            color: #374151;
-            font-size: 13px;
-            flex-shrink: 0;
-        }
-
-        .option-btn.selected .option-letter {
-            background: #1e40af;
-            color: white;
-        }
-
-        .option-text {
-            font-size: 1rem;
-            flex: 1;
-        }
-
-        input[type="radio"] { display: none; }
-
-        /* ── Form actions ── */
         .form-actions {
             display: flex;
             justify-content: space-between;
@@ -619,7 +404,6 @@ $phase            = (!$fortress_done) ? 'fortress' : 'quiz';
             box-sizing: border-box;
         }
 
-        /* ── Buttons (match phishing game exactly) ── */
         .submit-btn {
             padding: 16px 50px;
             background: #1e40af;
@@ -666,13 +450,67 @@ $phase            = (!$fortress_done) ? 'fortress' : 'quiz';
             border-color: #cbd5e1;
         }
 
-        .game-controls {
-            text-align: center;
-            margin-top: 10px;
-            width: 100%;
+        /* Results */
+        .fortress-results {
+            background: white;
+            border-radius: 8px;
+            padding: 0;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border: 1px solid #e2e8f0;
+            overflow: hidden;
         }
 
-        /* ── Completion ── */
+        .fortress-results-header {
+            background: #f8fafc;
+            padding: 16px 25px;
+            border-bottom: 1px solid #e2e8f0;
+            font-size: 14px;
+            font-weight: 600;
+            color: #374151;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .dept-result-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 25px;
+            border-bottom: 1px solid #f3f4f6;
+            font-size: 14px;
+        }
+
+        .dept-result-row:last-child { border-bottom: none; }
+
+        .dept-result-left { display: flex; flex-direction: column; gap: 2px; }
+        .dept-result-name { color: #374151; font-weight: 500; }
+        .dept-result-sub  { color: #9ca3af; font-size: 12px; }
+
+        .dept-result-right { display: flex; align-items: center; gap: 10px; }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .badge-strong { background: #d1fae5; color: #065f46; }
+        .badge-fair   { background: #fef3c7; color: #92400e; }
+        .badge-weak   { background: #fee2e2; color: #991b1b; }
+
+        .pts-badge {
+            font-size: 13px;
+            font-weight: 700;
+            color: #1e40af;
+            min-width: 50px;
+            text-align: right;
+        }
+
+        /* Completion */
         .completion-screen {
             text-align: center;
             padding: 40px;
@@ -687,14 +525,20 @@ $phase            = (!$fortress_done) ? 'fortress' : 'quiz';
         .completion-screen h2 {
             color: #1e40af;
             font-size: 2rem;
-            margin-bottom: 15px;
+            margin-bottom: 10px;
         }
 
         .score-result {
             font-size: 1.3rem;
             color: #334155;
-            margin-bottom: 25px;
+            margin-bottom: 8px;
             font-weight: 600;
+        }
+
+        .score-sub {
+            font-size: 13px;
+            color: #9ca3af;
+            margin-bottom: 25px;
         }
 
         .completion-actions {
@@ -753,15 +597,16 @@ $phase            = (!$fortress_done) ? 'fortress' : 'quiz';
             text-align: center;
         }
 
-        /* ── Responsive ── */
         @media (max-width: 768px) {
             .game-interface { padding: 15px; }
             .game-header h1 { font-size: 1.6rem; }
             .form-actions { flex-direction: column; }
-            .submit-btn { width: 100%; max-width: 100%; min-width: unset; }
+            .submit-btn { width: 100%; min-width: unset; }
             .btn-secondary { width: 100%; text-align: center; }
             .completion-actions { flex-direction: column; align-items: center; }
-            .action-btn { width: 100%; max-width: 300px; text-align: center; margin-bottom: 10px; }
+            .action-btn { width: 100%; max-width: 300px; margin-bottom: 10px; }
+            .scoring-legend { flex-direction: column; }
+            .dept-result-row { flex-wrap: wrap; gap: 8px; }
         }
     </style>
 </head>
@@ -774,58 +619,86 @@ $phase            = (!$fortress_done) ? 'fortress' : 'quiz';
 
                 <div class="game-header">
                     <h1>Password Fortress | Deeper Security</h1>
-                    <p>Secure the fortress, then prove your knowledge</p>
+                    <p>Create strong, unique passwords to secure each department</p>
                 </div>
 
                 <?php if($game_completed): ?>
 
-                    <!-- Completion -->
+                    <!-- Results screen -->
                     <div class="progress-container">
                         <div class="progress-info">
                             <span>Complete</span>
                             <span>Score: <?php echo $score; ?>/<?php echo $total_questions; ?></span>
                         </div>
-                        <div class="progress-bar"><div class="progress-fill" style="width:100%;"></div></div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width:<?php echo round(($score / $total_questions) * 100); ?>%;"></div>
+                        </div>
                     </div>
+
+                    <?php if(!empty($dept_results)): ?>
+                    <div class="fortress-results">
+                        <div class="fortress-results-header">
+                            <span>Department Audit Results</span>
+                            <span style="color:#1e40af;"><?php echo $score; ?>/<?php echo $total_questions; ?> points</span>
+                        </div>
+                        <?php foreach($dept_results as $dr): ?>
+                        <div class="dept-result-row">
+                            <div class="dept-result-left">
+                                <div class="dept-result-name"><?php echo htmlspecialchars($dr['name']); ?></div>
+                                <div class="dept-result-sub">Strength score: <?php echo $dr['score']; ?>/100</div>
+                            </div>
+                            <div class="dept-result-right">
+                                <span class="badge badge-<?php echo strtolower($dr['rating']); ?>">
+                                    <?php echo $dr['rating']; ?>
+                                </span>
+                                <span class="pts-badge"><?php echo $dr['pts']; ?>/2 pts</span>
+                            </div>
+                        </div>
+                        <?php endforeach; ?>
+                    </div>
+                    <?php endif; ?>
 
                     <div class="completion-screen">
                         <h2>Assessment Complete</h2>
-                        <div class="score-result">
-                            You scored <?php echo $score; ?> out of <?php echo $total_questions; ?> points.
-                        </div>
+                        <div class="score-result">You scored <?php echo $score; ?> out of <?php echo $total_questions; ?> points.</div>
+                        <div class="score-sub">Each department was worth 2 points — 2 for Strong (80+), 1 for Fair (50–79), 0 for Weak.</div>
                         <?php
                         $pct = ($score / $total_questions) * 100;
-                        if($pct >= 80)     echo '<p style="color:#059669;font-weight:600;font-size:1.1rem;margin-bottom:20px;">Excellent! You have strong password security skills.</p>';
-                        elseif($pct >= 60) echo '<p style="color:#d97706;font-weight:600;font-size:1.1rem;margin-bottom:20px;">Good job! You have a solid grasp of password security.</p>';
-                        else               echo '<p style="color:#dc2626;font-weight:600;font-size:1.1rem;margin-bottom:20px;">Practice makes perfect! Review password security basics to improve.</p>';
+                        if($pct >= 90)     echo '<p style="color:#059669;font-weight:600;font-size:1.1rem;margin-bottom:20px;">Outstanding! All departments are well protected.</p>';
+                        elseif($pct >= 70) echo '<p style="color:#1e40af;font-weight:600;font-size:1.1rem;margin-bottom:20px;">Well done! Most of your passwords meet security standards.</p>';
+                        elseif($pct >= 50) echo '<p style="color:#d97706;font-weight:600;font-size:1.1rem;margin-bottom:20px;">Some departments need stronger passwords. Try again!</p>';
+                        else               echo '<p style="color:#dc2626;font-weight:600;font-size:1.1rem;margin-bottom:20px;">Several departments are at risk. Review password security basics and try again.</p>';
                         ?>
                         <div class="completion-actions">
                             <a href="game.php" class="action-btn secondary">Back to Games</a>
                             <a href="certificate.php" class="action-btn">View Certificate</a>
-                            <a href="password-game-2.php?reset=1" class="action-btn">Play Again</a>
+                            <a href="password-game-2.php?reset=1" class="action-btn">Try Again</a>
                         </div>
                         <div class="certificate-note">
                             <strong>Progress saved.</strong> Complete all games to unlock your cybersecurity awareness certificate.
                         </div>
                     </div>
 
-                <?php elseif($phase == 'fortress'): ?>
+                <?php else: ?>
 
-                    <!-- Phase 1: Fortress -->
+                    <!-- Fortress challenge -->
                     <div class="progress-container">
                         <div class="progress-info">
-                            <span>Phase 1 of 2 — Password Fortress</span>
-                            <span>Score: <?php echo $score; ?>/<?php echo $total_questions; ?></span>
+                            <span>5 Departments — 2 points each</span>
+                            <span>Score: 0/<?php echo $total_questions; ?></span>
                         </div>
                         <div class="progress-bar"><div class="progress-fill" style="width:0%;"></div></div>
                     </div>
 
-                    <div class="phase-badge">Phase 1 — Secure the Fortress</div>
-
                     <div class="mission-brief">
                         As <strong>Chief Security Engineer</strong>, create a unique master password for each department below.
-                        Each password scoring <strong>80 or above</strong> earns 1 point — up to 5 points here.
-                        Then complete a 5-question quiz for the remaining 5 points.
+                        Each password is worth up to <strong>2 points</strong> — 2 for Strong, 1 for Fair, 0 for Weak — for a maximum of <strong>10 points</strong>.
+                    </div>
+
+                    <div class="scoring-legend">
+                        <div class="legend-item"><div class="legend-dot dot-strong"></div>Strong (80+) — 2 points</div>
+                        <div class="legend-item"><div class="legend-dot dot-fair"></div>Fair (50–79) — 1 point</div>
+                        <div class="legend-item"><div class="legend-dot dot-weak"></div>Weak (below 50) — 0 points</div>
                     </div>
 
                     <form id="fortressForm" method="POST" action="password-game-2.php">
@@ -834,13 +707,12 @@ $phase            = (!$fortress_done) ? 'fortress' : 'quiz';
                         <?php foreach($departments as $i => $dept): ?>
                         <div class="department-card">
                             <div class="dept-header">
-                                <div class="dept-avatar">
-                                    <?php echo strtoupper(substr($dept['name'], 0, 1)); ?>
-                                </div>
+                                <div class="dept-avatar"><?php echo strtoupper(substr($dept['name'], 0, 1)); ?></div>
                                 <div class="dept-info">
                                     <h3><?php echo htmlspecialchars($dept['name']); ?></h3>
                                     <p><?php echo htmlspecialchars($dept['desc']); ?></p>
                                 </div>
+                                <div class="dept-points">2 pts</div>
                             </div>
                             <div class="dept-body">
                                 <div class="input-group">
@@ -869,88 +741,9 @@ $phase            = (!$fortress_done) ? 'fortress' : 'quiz';
 
                         <div class="form-actions">
                             <button type="button" id="resetBtn" class="btn-secondary">Reset All</button>
-                            <button type="submit" id="submitBtn" class="submit-btn" disabled>Secure All Departments</button>
+                            <button type="submit" id="submitBtn" class="submit-btn" disabled>Submit Assessment</button>
                         </div>
                     </form>
-
-                <?php else: ?>
-
-                    <!-- Phase 2: Quiz -->
-                    <?php
-                    $q_index = $current_question - 5;
-                    $q = isset($quiz_questions[$current_question]) ? $quiz_questions[$current_question] : null;
-                    $progress_pct = round(($score / $total_questions) * 100);
-                    ?>
-
-                    <div class="progress-container">
-                        <div class="progress-info">
-                            <span>Question <?php echo $q_index; ?> of 5</span>
-                            <span>Score: <?php echo $score; ?>/<?php echo $total_questions; ?></span>
-                        </div>
-                        <div class="progress-bar">
-                            <div class="progress-fill" style="width:<?php echo $progress_pct; ?>%;"></div>
-                        </div>
-                    </div>
-
-                    <div class="phase-badge">Phase 2 — Knowledge Quiz</div>
-
-                    <?php if(!empty($feedback)):
-                        preg_match('/<div class=\'feedback[^\']*\'.*?<\/div>/s', $feedback, $topFeedback);
-                        if(!empty($topFeedback)) echo $topFeedback[0];
-                    endif; ?>
-
-                    <?php if(!empty($dept_results)): ?>
-                    <div class="fortress-results">
-                        <div class="fortress-results-header">
-                            Fortress Results — <?php echo array_sum(array_column($dept_results, 'secure')); ?>/5 departments secured
-                        </div>
-                        <?php foreach($dept_results as $dr): ?>
-                        <div class="dept-result-row">
-                            <span class="dept-result-name"><?php echo htmlspecialchars($dr['name']); ?></span>
-                            <span class="badge <?php echo $dr['secure'] ? 'badge-secure' : 'badge-weak'; ?>">
-                                <?php echo $dr['secure'] ? 'Secured ('.$dr['score'].')' : 'Weak ('.$dr['score'].')'; ?>
-                            </span>
-                        </div>
-                        <?php endforeach; ?>
-                    </div>
-                    <?php endif; ?>
-
-                    <?php if(!empty($feedback)):
-                        preg_match('/<div class=\'hint-box\'.*?<\/div>/s', $feedback, $hintMatch);
-                        if(!empty($hintMatch)) echo $hintMatch[0];
-                    endif; ?>
-
-                    <?php if($q): ?>
-                    <form method="POST" action="password-game-2.php" id="quizForm">
-                        <input type="hidden" name="phase" value="quiz">
-                        <input type="hidden" name="question_id" value="<?php echo $current_question; ?>">
-                        <input type="hidden" name="answer" id="selectedAnswer" value="">
-
-                        <div class="question-container">
-                            <div class="question-header">
-                                <div class="question-number">Question <?php echo $q_index; ?> of 5</div>
-                                <div class="question-text"><?php echo htmlspecialchars($q['question']); ?></div>
-                            </div>
-                            <div class="question-body">
-                                <div class="options-list">
-                                    <?php foreach($q['options'] as $key => $val): ?>
-                                    <button type="button" class="option-btn" onclick="selectAnswer('<?php echo $key; ?>', this)">
-                                        <input type="radio" name="r" value="<?php echo $key; ?>">
-                                        <div class="option-letter"><?php echo strtoupper($key); ?></div>
-                                        <div class="option-text"><?php echo htmlspecialchars($val); ?></div>
-                                    </button>
-                                    <?php endforeach; ?>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="game-controls">
-                            <button type="submit" class="submit-btn" id="quizSubmit" disabled>
-                                <?php echo $current_question == $total_questions ? 'Complete Assessment' : 'Submit Answer'; ?>
-                            </button>
-                        </div>
-                    </form>
-                    <?php endif; ?>
 
                 <?php endif; ?>
 
@@ -961,7 +754,6 @@ $phase            = (!$fortress_done) ? 'fortress' : 'quiz';
     </div>
 
     <script>
-    // ── Fortress JS ──
     function scorePassword(p) {
         let s = 0;
         if(p.length >= 12) s += 25; else if(p.length >= 8) s += 15; else if(p.length >= 5) s += 5;
@@ -986,10 +778,10 @@ $phase            = (!$fortress_done) ? 'fortress' : 'quiz';
         const val   = input.value;
         if(!val.length) { bar.className='strength-bar'; bar.style.width='0%'; label.textContent=''; return; }
         const sc = scorePassword(val);
-        if(sc >= 80)      { bar.className='strength-bar strong'; label.style.color='#059669'; label.textContent='Strong'; }
-        else if(sc >= 60) { bar.className='strength-bar good';   label.style.color='#d97706'; label.textContent='Good'; }
-        else if(sc >= 40) { bar.className='strength-bar fair';   label.style.color='#f59e0b'; label.textContent='Fair'; }
-        else              { bar.className='strength-bar weak';   label.style.color='#dc2626'; label.textContent='Weak'; }
+        if(sc >= 80)      { bar.className='strength-bar strong'; label.style.color='#059669'; label.textContent='Strong — 2 pts'; }
+        else if(sc >= 50) { bar.className='strength-bar fair';   label.style.color='#f59e0b'; label.textContent='Fair — 1 pt'; }
+        else if(sc >= 25) { bar.className='strength-bar good';   label.style.color='#d97706'; label.textContent='Weak — 0 pts'; }
+        else              { bar.className='strength-bar weak';   label.style.color='#dc2626'; label.textContent='Weak — 0 pts'; }
     }
 
     function checkDuplicates() {
@@ -1033,33 +825,6 @@ $phase            = (!$fortress_done) ? 'fortress' : 'quiz';
             if(submitBtn) submitBtn.disabled = true;
         });
     }
-
-    // ── Quiz JS ──
-    function selectAnswer(answer, btn) {
-        document.querySelectorAll('.option-btn').forEach(b => b.classList.remove('selected'));
-        btn.classList.add('selected');
-        document.getElementById('selectedAnswer').value = answer;
-        document.getElementById('quizSubmit').disabled = false;
-    }
-
-    document.getElementById('quizForm')?.addEventListener('submit', function(e) {
-        if(!document.getElementById('selectedAnswer')?.value) {
-            e.preventDefault();
-            alert('Please select an answer before continuing.');
-        }
-    });
-
-    // Keyboard shortcuts for quiz
-    document.addEventListener('keydown', function(e) {
-        const opts = document.querySelectorAll('.option-btn');
-        const map  = { '1': 0, 'a': 0, '2': 1, 'b': 1, '3': 2, 'c': 2, '4': 3, 'd': 3 };
-        if(map[e.key] !== undefined && opts[map[e.key]]) {
-            const keys = ['a','b','c','d'];
-            selectAnswer(keys[map[e.key]], opts[map[e.key]]);
-        } else if(e.key === 'Enter' && document.getElementById('selectedAnswer')?.value) {
-            document.getElementById('quizSubmit')?.click();
-        }
-    });
     </script>
 </body>
 </html>

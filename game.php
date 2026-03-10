@@ -1,7 +1,6 @@
 <?php
 session_start();
 
-// Check if user is logged in
 if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){
     header("location: login.php");
     exit;
@@ -9,15 +8,14 @@ if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){
 
 require_once "config/database.php";
 
-// Get user scores from database
-$user_id = $_SESSION['id'];
-$password_score = 0;
-$phishing_lvl1_score = 0;
-$phishing_lvl2_score = 0;
-$games_completed = 0;
-$total_games = 3;
+$user_id               = $_SESSION['id'];
+$password_score        = 0;
+$password2_score       = 0;
+$phishing_lvl1_score   = 0;
+$phishing_lvl2_score   = 0;
+$games_completed       = 0;
+$total_games           = 4;
 
-// Fetch scores from database
 $sql = "SELECT game_type, score, total_questions FROM game_scores WHERE user_id = ?";
 if($stmt = mysqli_prepare($link, $sql)) {
     mysqli_stmt_bind_param($stmt, "i", $user_id);
@@ -29,6 +27,9 @@ if($stmt = mysqli_prepare($link, $sql)) {
         if($game_type == 'password_fortress') {
             $password_score = $score;
             $games_completed++;
+        } elseif($game_type == 'password_fortress_2') {
+            $password2_score = $score;
+            $games_completed++;
         } elseif($game_type == 'phishing_detective_lvl1') {
             $phishing_lvl1_score = $score;
             $games_completed++;
@@ -39,6 +40,8 @@ if($stmt = mysqli_prepare($link, $sql)) {
     }
     mysqli_stmt_close($stmt);
 }
+
+$overall_pct = round((($password_score + $password2_score + $phishing_lvl1_score + $phishing_lvl2_score) / 40) * 100);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -154,19 +157,117 @@ if($stmt = mysqli_prepare($link, $sql)) {
             align-items: center;
         }
 
-        /* Progress Card */
-        .stats-header {
-            color: #1e40af;
-            font-size: 1.3rem;
-            margin-bottom: 20px;
-            padding-bottom: 15px;
-            border-bottom: 2px solid #e2e8f0;
-            text-align: center;
+        /* ── Progress Card ── */
+        .progress-card-content {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            flex: 1;
         }
 
+        .progress-card-content h2 {
+            color: #1e40af;
+            font-size: 1.4rem;
+            margin-bottom: 6px;
+        }
+
+        /* Overall summary bar */
+        .overall-summary {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 14px 16px;
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .overall-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .overall-label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #374151;
+        }
+
+        .overall-fraction {
+            font-size: 13px;
+            font-weight: 700;
+            color: #1e40af;
+        }
+
+        .overall-bar {
+            height: 7px;
+            background: #e2e8f0;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 6px;
+        }
+
+        .overall-fill {
+            height: 100%;
+            background: linear-gradient(to right, #1e40af, #3b82f6);
+            border-radius: 4px;
+            transition: width 0.4s ease;
+        }
+
+        .overall-sub {
+            font-size: 12px;
+            color: #9ca3af;
+        }
+
+        /* Game group labels */
+        .game-group-label {
+            font-size: 11px;
+            font-weight: 700;
+            color: #9ca3af;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            margin: 14px 0 8px 0;
+            text-align: left;
+        }
+
+        /* Individual level rows */
+        .level-container {
+            background: #f8fafc;
+            border-radius: 8px;
+            padding: 11px 14px;
+            border: 1px solid #e2e8f0;
+            margin-bottom: 8px;
+        }
+
+        .level-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 7px;
+            gap: 8px;
+        }
+
+        .level-name {
+            font-weight: 600;
+            color: #374151;
+            font-size: 0.85rem;
+            text-align: left;
+            flex: 1;
+        }
+
+        .level-score {
+            font-weight: 700;
+            font-size: 0.85rem;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        .level-score.done   { color: #059669; }
+        .level-score.undone { color: #9ca3af; }
+
         .score-progress {
-            margin-top: 8px;
-            height: 6px;
+            height: 5px;
             background: #e2e8f0;
             border-radius: 3px;
             overflow: hidden;
@@ -174,50 +275,43 @@ if($stmt = mysqli_prepare($link, $sql)) {
 
         .score-fill {
             height: 100%;
-            background: #10b981;
             border-radius: 3px;
+            transition: width 0.4s ease;
         }
 
-        .phishing-levels {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            margin-bottom: 15px;
-            width: 100%;
-        }
+        .fill-green  { background: #10b981; }
+        .fill-blue   { background: #3b82f6; }
+        .fill-orange { background: #f59e0b; }
+        .fill-purple { background: #8b5cf6; }
 
-        .level-container {
-            background: #f8fafc;
-            border-radius: 8px;
-            padding: 12px 15px;
-            border: 1px solid #e2e8f0;
-        }
-
-        .level-header {
-            display: flex;
-            justify-content: space-between;
+        /* Games completed badge */
+        .completed-badge {
+            display: inline-flex;
             align-items: center;
-            margin-bottom: 8px;
-        }
-
-        .level-name {
+            gap: 6px;
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            border-radius: 20px;
+            padding: 4px 12px;
+            font-size: 12px;
             font-weight: 600;
             color: #1e40af;
-            font-size: 0.9rem;
+            margin-bottom: 16px;
         }
 
-        .level-score {
-            font-weight: 600;
-            color: #059669;
-            font-size: 0.9rem;
+        .badge-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: #1e40af;
         }
 
-        /* Certificate button inside progress card */
+        /* Certificate button */
         .certificate-btn {
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-top: 20px;
+            margin-top: auto;
             padding: 15px 35px;
             background: linear-gradient(to right, #1e40af, #1e3a8a);
             color: white;
@@ -236,23 +330,13 @@ if($stmt = mysqli_prepare($link, $sql)) {
         }
 
         @media (max-width: 992px) {
-            .cards-grid {
-                grid-template-columns: 1fr 1fr;
-            }
+            .cards-grid { grid-template-columns: 1fr 1fr; }
         }
 
         @media (max-width: 768px) {
-            .cards-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .game-header h1 {
-                font-size: 2rem;
-            }
-
-            .game-container {
-                padding: 15px;
-            }
+            .cards-grid { grid-template-columns: 1fr; }
+            .game-header h1 { font-size: 2rem; }
+            .game-container { padding: 15px; }
         }
     </style>
 </head>
@@ -295,39 +379,82 @@ if($stmt = mysqli_prepare($link, $sql)) {
                         </div>
                     </div>
 
-                    <!-- Card 3: Your Progress + Certificate -->
+                    <!-- Card 3: Progress + Certificate -->
                     <div class="game-card">
-                        <div class="game-content">
-                            <img src="images/about2.png" alt="">
+                        <div class="progress-card-content">
+                            <img src="images/about2.png" alt="" style="width:80px;height:80px;object-fit:contain;margin:0 auto 16px;">
                             <h2>Your Progress</h2>
 
-                            <div class="phishing-levels">
-                                <div class="level-container">
-                                    <div class="level-header">
-                                        <div class="level-name">Password Fortress | Test Security</div>
-                                        <div class="level-score"><?php echo $password_score; ?>/10</div>
-                                    </div>
-                                    <div class="score-progress">
-                                        <div class="score-fill" style="width: <?php echo ($password_score / 10) * 100; ?>%"></div>
+                            <div class="completed-badge">
+                                <div class="badge-dot"></div>
+                                <?php echo $games_completed; ?>/<?php echo $total_games; ?> games completed
+                            </div>
+
+                            <!-- Overall bar -->
+                            <div class="overall-summary">
+                                <div class="overall-top">
+                                    <span class="overall-label">Overall Score</span>
+                                    <span class="overall-fraction">
+                                        <?php echo $password_score + $password2_score + $phishing_lvl1_score + $phishing_lvl2_score; ?>/40
+                                    </span>
+                                </div>
+                                <div class="overall-bar">
+                                    <div class="overall-fill" style="width:<?php echo $overall_pct; ?>%;"></div>
+                                </div>
+                                <div class="overall-sub"><?php echo $overall_pct; ?>% complete</div>
+                            </div>
+
+                            <!-- Password Fortress group -->
+                            <div class="game-group-label">Password Fortress</div>
+
+                            <div class="level-container">
+                                <div class="level-header">
+                                    <div class="level-name">Learn Security</div>
+                                    <div class="level-score <?php echo $password_score > 0 ? 'done' : 'undone'; ?>">
+                                        <?php echo $password_score; ?>/10
                                     </div>
                                 </div>
-                                <div class="level-container">
-                                    <div class="level-header">
-                                        <div class="level-name">Phishing Detective | Read Emails</div>
-                                        <div class="level-score"><?php echo $phishing_lvl1_score; ?>/10</div>
-                                    </div>
-                                    <div class="score-progress">
-                                        <div class="score-fill" style="width: <?php echo ($phishing_lvl1_score / 10) * 100; ?>%"></div>
+                                <div class="score-progress">
+                                    <div class="score-fill fill-blue" style="width:<?php echo ($password_score / 10) * 100; ?>%;"></div>
+                                </div>
+                            </div>
+
+                            <div class="level-container">
+                                <div class="level-header">
+                                    <div class="level-name">Deeper Security</div>
+                                    <div class="level-score <?php echo $password2_score > 0 ? 'done' : 'undone'; ?>">
+                                        <?php echo $password2_score; ?>/10
                                     </div>
                                 </div>
-                                <div class="level-container">
-                                    <div class="level-header">
-                                        <div class="level-name">Phishing Detective | Hunt Errors</div>
-                                        <div class="level-score"><?php echo $phishing_lvl2_score; ?>/10</div>
+                                <div class="score-progress">
+                                    <div class="score-fill fill-blue" style="width:<?php echo ($password2_score / 10) * 100; ?>%;"></div>
+                                </div>
+                            </div>
+
+                            <!-- Phishing Detective group -->
+                            <div class="game-group-label">Phishing Detective</div>
+
+                            <div class="level-container">
+                                <div class="level-header">
+                                    <div class="level-name">Read Emails</div>
+                                    <div class="level-score <?php echo $phishing_lvl1_score > 0 ? 'done' : 'undone'; ?>">
+                                        <?php echo $phishing_lvl1_score; ?>/10
                                     </div>
-                                    <div class="score-progress">
-                                        <div class="score-fill" style="width: <?php echo ($phishing_lvl2_score / 10) * 100; ?>%"></div>
+                                </div>
+                                <div class="score-progress">
+                                    <div class="score-fill fill-orange" style="width:<?php echo ($phishing_lvl1_score / 10) * 100; ?>%;"></div>
+                                </div>
+                            </div>
+
+                            <div class="level-container">
+                                <div class="level-header">
+                                    <div class="level-name">Hunt Errors</div>
+                                    <div class="level-score <?php echo $phishing_lvl2_score > 0 ? 'done' : 'undone'; ?>">
+                                        <?php echo $phishing_lvl2_score; ?>/10
                                     </div>
+                                </div>
+                                <div class="score-progress">
+                                    <div class="score-fill fill-orange" style="width:<?php echo ($phishing_lvl2_score / 10) * 100; ?>%;"></div>
                                 </div>
                             </div>
 
