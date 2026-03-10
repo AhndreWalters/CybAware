@@ -275,7 +275,10 @@ if($stmt = mysqli_prepare($link, $sql)) {
                             <img src="images/password.png" alt="Password Security Icon">
                             <h2>Password Fortress</h2>
                             <p>Learn what makes a strong password and avoid common security mistakes. Test your knowledge with 10 challenging questions.</p>
-                            <a href="password-game-1.php" class="play-btn">Test Security</a>
+                            <div class="level-buttons">
+                                <a href="password-game-1.php" class="play-btn">Test Security</a>
+                                <a href="password-game-2.php" class="play-btn">Next Game</a>
+                            </div>
                         </div>
                     </div>
 
