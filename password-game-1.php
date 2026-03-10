@@ -20,7 +20,7 @@ $game_completed = false;
 if(isset($_GET['reset'])) {
     unset($_SESSION['password_score']);
     unset($_SESSION['password_question']);
-    header("location: password-game.php");
+    header("location: password-game-1.php");
     exit;
 }
 
@@ -533,7 +533,7 @@ function calculatePasswordStrength($password) {
                         <div class="completion-actions">
                             <a href="game.php" class="action-btn secondary">Back to Games</a>
                             <a href="certificate.php" class="action-btn">View Certificate</a>
-                            <a href="password-game.php?reset=1" class="action-btn">Play Again</a>
+                            <a href="password-game-1.php?reset=1" class="action-btn">Play Again</a>
                         </div>
 
                         <div class="certificate-note">
@@ -542,7 +542,7 @@ function calculatePasswordStrength($password) {
                     </div>
 
                 <?php else: ?>
-                    <form method="POST" action="password-game.php" id="gameForm">
+                    <form method="POST" action="password-game-1.php" id="gameForm">
                         <input type="hidden" name="question_id" value="<?php echo (int)$current_question; ?>">
                         <input type="hidden" name="answer" id="selectedAnswer" value="">
 
