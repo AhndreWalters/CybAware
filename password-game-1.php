@@ -76,7 +76,9 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
             )");
 
             $sql = "INSERT INTO game_scores (user_id, game_type, score, total_questions, completed_at)
-                    VALUES (?, 'password_fortress', ?, ?, NOW())";
+                    VALUES (?, 'password_fortress', ?, ?, NOW())
+                    
+        ON DUPLICATE KEY UPDATE score = VALUES(score), completed_at = NOW()";
             if($stmt = mysqli_prepare($link, $sql)) {
                 mysqli_stmt_bind_param($stmt, "iii", $user_id, $score, $total_questions);
                 mysqli_stmt_execute($stmt);
