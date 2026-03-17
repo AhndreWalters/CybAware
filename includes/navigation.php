@@ -1,5 +1,4 @@
 <?php
-// Only start session if not already started
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
@@ -15,6 +14,11 @@ if (session_status() === PHP_SESSION_NONE) {
 #nav-avatar {
     position: relative;
     top: 0;
+}
+@media (max-width: 768px) {
+    #avatar-li {
+        display: none !important;
+    }
 }
 </style>
 <nav>
@@ -50,7 +54,6 @@ if (session_status() === PHP_SESSION_NONE) {
             </a></li>
         <?php endif; ?>
 
-        <!-- Character avatar — sits inline, pushes nothing vertically -->
         <li id="avatar-li" style="display:flex; align-items:center; margin-left:-4px; line-height:0; padding:0; align-self:center;">
             <div id="nav-avatar" title="Change character" style="
                 width: 44px;
@@ -73,7 +76,6 @@ if (session_status() === PHP_SESSION_NONE) {
     <div class="mobile-menu-btn" id="mobileMenuBtn">☰</div>
 </nav>
 
-<!-- Background Music -->
 <audio src="music/eliveta-technology.mp3" loop autoplay></audio>
 <script>
 const music = document.getElementById('bg-music');
@@ -83,7 +85,6 @@ document.addEventListener('click', function startMusic() {
     document.removeEventListener('click', startMusic);
 }, { once: true });
 
-// Resume from saved position
 music.addEventListener('canplay', () => {
     const saved = parseFloat(sessionStorage.getItem('music_time') || 0);
     if (saved) music.currentTime = saved;
@@ -93,7 +94,6 @@ setInterval(() => {
 }, 1000);
 </script>
 
-<!-- Character Picker Modal -->
 <div id="char-picker" style="
     display: none;
     position: fixed;
@@ -135,7 +135,6 @@ setInterval(() => {
 <script>
 (function () {
 
-/* ── Character definitions ── */
 const CHARS = [
     {
         id: 'robot', label: 'Neon Bot',
@@ -422,21 +421,29 @@ document.addEventListener('DOMContentLoaded', function () {
 
     const mobileMenuBtn = document.getElementById('mobileMenuBtn');
     const navLinks      = document.getElementById('navLinks');
+    const avatarLi      = document.getElementById('avatar-li');
 
     if (mobileMenuBtn && navLinks) {
         mobileMenuBtn.addEventListener('click', function (e) {
             e.stopPropagation();
             navLinks.classList.toggle('active');
-            mobileMenuBtn.textContent = navLinks.classList.contains('active') ? '✕' : '☰';
+            const isOpen = navLinks.classList.contains('active');
+            mobileMenuBtn.textContent = isOpen ? '✕' : '☰';
+            if (window.innerWidth <= 768) {
+                avatarLi.style.display = isOpen ? 'none' : 'flex';
+            }
         });
+
         navLinks.querySelectorAll('a').forEach(link => {
             link.addEventListener('click', function () {
                 if (window.innerWidth <= 768) {
                     navLinks.classList.remove('active');
                     mobileMenuBtn.textContent = '☰';
+                    avatarLi.style.display = 'flex';
                 }
             });
         });
+
         document.addEventListener('click', function (e) {
             if (navLinks.classList.contains('active') &&
                 !navLinks.contains(e.target) &&
@@ -444,6 +451,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 window.innerWidth <= 768) {
                 navLinks.classList.remove('active');
                 mobileMenuBtn.textContent = '☰';
+                avatarLi.style.display = 'flex';
             }
         });
     }
