@@ -1,4 +1,5 @@
 <?php
+// Start a new session only if one isn't already running
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
@@ -10,28 +11,36 @@ if (session_status() === PHP_SESSION_NONE) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
     <link rel="shortcut icon" href="images/cybawarelogo.png" type="image/x-icon">
     <title>Terms & Service | CybAware</title>
+
+    <?php // Load the main site stylesheet ?>
     <link rel="stylesheet" href="css/styles.css">
+
     <style>
+        <?php // Makes all elements include padding and border inside their width so layout stays consistent ?>
         * {
             box-sizing: border-box;
         }
 
+        <?php // Stops the page from scrolling sideways on any screen size ?>
         html, body {
             max-width: 100%;
             overflow-x: hidden;
         }
 
+        <?php // Centres the terms content and adds top and bottom spacing around it ?>
         .terms-wrapper {
             max-width: 780px;
             margin: 48px auto 72px;
             padding: 0 24px;
         }
 
+        <?php // Spacing and bottom border for the page title and intro text area ?>
         .terms-page-header {
             margin-bottom: 32px;
             padding-bottom: 24px;
         }
 
+        <?php // Large bold page heading that scales down on smaller screens using clamp ?>
         .terms-page-header h1 {
             font-size: clamp(1.75rem, 4vw, 2.4rem);
             font-weight: 700;
@@ -42,6 +51,7 @@ if (session_status() === PHP_SESSION_NONE) {
             overflow-wrap: break-word;
         }
 
+        <?php // Row containing the badge, date and control buttons beneath the page heading ?>
         .terms-meta {
             display: flex;
             align-items: center;
@@ -49,6 +59,7 @@ if (session_status() === PHP_SESSION_NONE) {
             flex-wrap: wrap;
         }
 
+        <?php // Small blue pill badge used to label the document version or status ?>
         .terms-badge {
             display: inline-block;
             padding: 4px 12px;
@@ -62,11 +73,13 @@ if (session_status() === PHP_SESSION_NONE) {
             border: 1px solid #bfdbfe;
         }
 
+        <?php // Grey date text shown next to the badge in the meta row ?>
         .terms-date {
             font-size: 0.875rem;
             color: #64748b;
         }
 
+        <?php // Shared base styles for the Expand All and Collapse All control buttons ?>
         .terms-ctrl-btn {
             padding: 4px 12px;
             border-radius: 20px;
@@ -78,6 +91,7 @@ if (session_status() === PHP_SESSION_NONE) {
             line-height: 1.6;
         }
 
+        <?php // Filled navy style used for the primary Expand All button ?>
         .terms-ctrl-btn.primary {
             background: #1e40af;
             color: white;
@@ -86,6 +100,7 @@ if (session_status() === PHP_SESSION_NONE) {
 
         .terms-ctrl-btn.primary:hover { background: #1d3fa8; border-color: #1d3fa8; }
 
+        <?php // Outlined style used for the secondary Collapse All button ?>
         .terms-ctrl-btn.secondary {
             background: none;
             color: #475569;
@@ -97,6 +112,7 @@ if (session_status() === PHP_SESSION_NONE) {
             border-color: #cbd5e1;
         }
 
+        <?php // Introductory paragraph shown beneath the page heading asking users to read the terms ?>
         .terms-intro {
             font-size: 1rem;
             color: #475569;
@@ -106,6 +122,7 @@ if (session_status() === PHP_SESSION_NONE) {
             overflow-wrap: break-word;
         }
 
+        <?php // Outer wrapper for each collapsible terms section with a border and subtle shadow ?>
         .terms-section {
             margin-bottom: 10px;
             border: 1px solid #e2e8f0;
@@ -120,11 +137,13 @@ if (session_status() === PHP_SESSION_NONE) {
             box-shadow: 0 2px 10px rgba(0,0,0,0.05);
         }
 
+        <?php // Blue border and shadow applied to a section when it is expanded open ?>
         .terms-section.open {
             border-color: #bfdbfe;
             box-shadow: 0 4px 16px rgba(30,64,175,0.07);
         }
 
+        <?php // Clickable header row for each section containing the number badge, title and chevron arrow ?>
         .terms-section-header {
             display: flex;
             align-items: center;
@@ -137,8 +156,11 @@ if (session_status() === PHP_SESSION_NONE) {
         }
 
         .terms-section-header:hover { background: #f8fafc; }
+
+        <?php // Light blue background applied to the header when the section is expanded ?>
         .terms-section.open .terms-section-header { background: #eff6ff; }
 
+        <?php // Small square badge showing the section number, turns navy when the section is open ?>
         .terms-section-number {
             display: flex;
             align-items: center;
@@ -161,6 +183,7 @@ if (session_status() === PHP_SESSION_NONE) {
             border-color: #1e40af;
         }
 
+        <?php // The section title text which turns blue when the section is open ?>
         .terms-section-title {
             flex: 1;
             font-size: 0.9375rem;
@@ -174,6 +197,7 @@ if (session_status() === PHP_SESSION_NONE) {
 
         .terms-section.open .terms-section-title { color: #1e40af; }
 
+        <?php // Chevron arrow that rotates 180 degrees when the section is expanded ?>
         .terms-chevron {
             color: #94a3b8;
             transition: transform 0.25s ease, color 0.2s;
@@ -185,6 +209,7 @@ if (session_status() === PHP_SESSION_NONE) {
             color: #1e40af;
         }
 
+        <?php // The collapsible body content area - hidden by default and shown when the section has the open class ?>
         .terms-section-body {
             display: none;
             padding: 4px 22px 22px 66px;
@@ -193,6 +218,7 @@ if (session_status() === PHP_SESSION_NONE) {
             overflow-wrap: break-word;
         }
 
+        <?php // Slides the body content down with a fade animation when a section is opened ?>
         .terms-section.open .terms-section-body {
             display: block;
             animation: slideDown 0.2s ease;
@@ -203,6 +229,7 @@ if (session_status() === PHP_SESSION_NONE) {
             to   { opacity: 1; transform: translateY(0); }
         }
 
+        <?php // Body paragraph text styling inside each expanded section ?>
         .terms-section-body p {
             font-size: 0.9375rem;
             color: #374151;
@@ -210,6 +237,7 @@ if (session_status() === PHP_SESSION_NONE) {
             margin-top: 14px;
         }
 
+        <?php // Small uppercase sub-heading used to label sub-sections inside the body content ?>
         .terms-section-body h3 {
             font-size: 0.8rem;
             font-weight: 700;
@@ -232,6 +260,7 @@ if (session_status() === PHP_SESSION_NONE) {
             margin-bottom: 5px;
         }
 
+        <?php // Styled link inside the body content with a blue underline that darkens on hover ?>
         .terms-section-body a {
             color: #1e40af;
             font-weight: 600;
@@ -243,6 +272,7 @@ if (session_status() === PHP_SESSION_NONE) {
 
         .terms-section-body a:hover { border-color: #1e40af; }
 
+        <?php // Blue left bordered note shown at the very bottom of the page beneath all the sections ?>
         .terms-footer-note {
             margin-top: 28px;
             padding: 16px 20px;
@@ -257,6 +287,7 @@ if (session_status() === PHP_SESSION_NONE) {
             overflow-wrap: break-word;
         }
 
+        <?php // On small screens the wrapper padding reduces and section body padding is removed to fit the screen ?>
         @media (max-width: 768px) {
             .terms-wrapper {
                 margin: 24px auto 48px;
@@ -280,11 +311,13 @@ if (session_status() === PHP_SESSION_NONE) {
 </head>
 <body>
     <div class="container">
+        <?php // Load the shared navigation bar at the top of the page ?>
         <?php include 'includes/navigation.php'; ?>
 
         <div class="main-content">
             <div class="terms-wrapper">
 
+                <?php // Page heading and introductory paragraph shown above all the collapsible sections ?>
                 <div class="terms-page-header">
                     <h1>Website Terms of Use</h1><br>
                     <div class="terms-meta">
@@ -292,8 +325,10 @@ if (session_status() === PHP_SESSION_NONE) {
                     <p class="terms-intro">Please read these terms and conditions carefully before using this site. These terms tell you the rules for using CybAware.</p>
                 </div>
 
+                <?php // Container holding all thirteen collapsible terms sections ?>
                 <div id="termsSections">
 
+                    <?php // Section 1 - who built CybAware and how to contact the team ?>
                     <div class="terms-section open" id="section-0">
                         <div class="terms-section-header" onclick="toggleSection(this)">
                             <div class="terms-section-number">1</div>
@@ -307,6 +342,7 @@ if (session_status() === PHP_SESSION_NONE) {
                         </div>
                     </div>
 
+                    <?php // Section 2 - using the site means the user accepts these terms ?>
                     <div class="terms-section" id="section-1">
                         <div class="terms-section-header" onclick="toggleSection(this)">
                             <div class="terms-section-number">2</div>
@@ -318,6 +354,7 @@ if (session_status() === PHP_SESSION_NONE) {
                         </div>
                     </div>
 
+                    <?php // Section 3 - the terms may be updated at any time ?>
                     <div class="terms-section" id="section-2">
                         <div class="terms-section-header" onclick="toggleSection(this)">
                             <div class="terms-section-number">3</div>
@@ -329,6 +366,7 @@ if (session_status() === PHP_SESSION_NONE) {
                         </div>
                     </div>
 
+                    <?php // Section 4 - the site may go offline or be restricted at any time ?>
                     <div class="terms-section" id="section-3">
                         <div class="terms-section-header" onclick="toggleSection(this)">
                             <div class="terms-section-number">4</div>
@@ -341,6 +379,7 @@ if (session_status() === PHP_SESSION_NONE) {
                         </div>
                     </div>
 
+                    <?php // Section 5 - CybAware is for learning only and is not professional security advice ?>
                     <div class="terms-section" id="section-4">
                         <div class="terms-section-header" onclick="toggleSection(this)">
                             <div class="terms-section-number">5</div>
@@ -353,6 +392,7 @@ if (session_status() === PHP_SESSION_NONE) {
                         </div>
                     </div>
 
+                    <?php // Section 6 - what data is collected and how it is used ?>
                     <div class="terms-section" id="section-5">
                         <div class="terms-section-header" onclick="toggleSection(this)">
                             <div class="terms-section-number">6</div>
@@ -365,6 +405,7 @@ if (session_status() === PHP_SESSION_NONE) {
                         </div>
                     </div>
 
+                    <?php // Section 7 - how cookies are used on the site ?>
                     <div class="terms-section" id="section-6">
                         <div class="terms-section-header" onclick="toggleSection(this)">
                             <div class="terms-section-number">7</div>
@@ -376,6 +417,7 @@ if (session_status() === PHP_SESSION_NONE) {
                         </div>
                     </div>
 
+                    <?php // Section 8 - rules around copying or reusing site content ?>
                     <div class="terms-section" id="section-7">
                         <div class="terms-section-header" onclick="toggleSection(this)">
                             <div class="terms-section-number">8</div>
@@ -388,6 +430,7 @@ if (session_status() === PHP_SESSION_NONE) {
                         </div>
                     </div>
 
+                    <?php // Section 9 - CybAware is not responsible for any linked external websites ?>
                     <div class="terms-section" id="section-8">
                         <div class="terms-section-header" onclick="toggleSection(this)">
                             <div class="terms-section-number">9</div>
@@ -400,6 +443,7 @@ if (session_status() === PHP_SESSION_NONE) {
                         </div>
                     </div>
 
+                    <?php // Section 10 - users must not try to attack or exploit the site ?>
                     <div class="terms-section" id="section-9">
                         <div class="terms-section-header" onclick="toggleSection(this)">
                             <div class="terms-section-number">10</div>
@@ -412,6 +456,7 @@ if (session_status() === PHP_SESSION_NONE) {
                         </div>
                     </div>
 
+                    <?php // Section 11 - what counts as acceptable use and what happens if the policy is breached ?>
                     <div class="terms-section" id="section-10">
                         <div class="terms-section-header" onclick="toggleSection(this)">
                             <div class="terms-section-number">11</div>
@@ -425,6 +470,7 @@ if (session_status() === PHP_SESSION_NONE) {
                         </div>
                     </div>
 
+                    <?php // Section 12 - expectation that users act with academic honesty ?>
                     <div class="terms-section" id="section-11">
                         <div class="terms-section-header" onclick="toggleSection(this)">
                             <div class="terms-section-number">12</div>
@@ -436,6 +482,7 @@ if (session_status() === PHP_SESSION_NONE) {
                         </div>
                     </div>
 
+                    <?php // Section 13 - CybAware is not liable for any loss arising from use of the site ?>
                     <div class="terms-section" id="section-12">
                         <div class="terms-section-header" onclick="toggleSection(this)">
                             <div class="terms-section-number">13</div>
@@ -449,6 +496,7 @@ if (session_status() === PHP_SESSION_NONE) {
 
                 </div>
 
+                <?php // Footer note at the bottom explaining where these terms were adapted from ?>
                 <div class="terms-footer-note">
                     These terms are based on standard educational project terms and have been adapted for the CybAware cybersecurity awareness project.
                 </div>
@@ -456,17 +504,23 @@ if (session_status() === PHP_SESSION_NONE) {
             </div>
         </div>
 
+        <?php // Load the shared footer at the bottom of the page ?>
         <?php include 'includes/footer.php'; ?>
+
+        <?php // Invisible overlay that darkens the page when the mobile menu is open ?>
         <div class="menu-overlay" id="menuOverlay"></div>
     </div>
 
+    <?php // Load the JavaScript file that controls the navigation menu behaviour ?>
     <script src="js/navigation.js"></script>
     <script>
+        // Toggle a single section open or closed when its header is clicked
         function toggleSection(header) {
             const section = header.parentElement;
             section.classList.toggle('open');
         }
 
+        // Expand or collapse all sections at once depending on the open parameter passed in
         function toggleAll(open) {
             document.querySelectorAll('.terms-section').forEach(s => {
                 open ? s.classList.add('open') : s.classList.remove('open');
