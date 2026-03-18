@@ -14,7 +14,6 @@ $total_questions  = 10;
 $feedback         = "";
 $game_completed   = false;
 
-// Handle reset first
 if(isset($_GET['reset'])) {
     unset($_SESSION['password_score']);
     unset($_SESSION['password_question']);
@@ -22,7 +21,6 @@ if(isset($_GET['reset'])) {
     exit;
 }
 
-// Process form submission
 if($_SERVER["REQUEST_METHOD"] == "POST") {
     if(isset($_POST['answer'])) {
         $user_answer = $_POST['answer'];
@@ -707,7 +705,6 @@ if($current_question > $total_questions && !$game_completed) {
 
         submitBtn.disabled = true;
 
-        // ── Option buttons (Q1–4, Q6–10) ──
         function selectAnswer(answer, btn) {
             document.querySelectorAll('.option').forEach(function(o) { o.classList.remove('selected'); });
             btn.classList.add('selected');
@@ -723,7 +720,6 @@ if($current_question > $total_questions && !$game_completed) {
             }
         });
 
-        // ── Question 5: password strength meter ──
         if(currentQuestion === 5) {
             const passwordInput = document.getElementById('passwordTest');
 
@@ -763,7 +759,6 @@ if($current_question > $total_questions && !$game_completed) {
             });
         }
 
-        // Keyboard shortcuts
         document.addEventListener('keydown', function(e) {
             if(currentQuestion === 5) return;
             const opts = document.querySelectorAll('.option');
