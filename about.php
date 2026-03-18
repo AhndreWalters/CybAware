@@ -2,11 +2,20 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
     <link rel="shortcut icon" href="images/cybawarelogo.png" type="image/x-icon">
     <title>About | CybAware</title>
     <link rel="stylesheet" href="css/styles.css">
     <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        html, body {
+            max-width: 100%;
+            overflow-x: hidden;
+        }
+
         .about-section {
             display: flex;
             align-items: center;
@@ -14,22 +23,46 @@
             margin-bottom: 3rem;
         }
 
-        /* Odd sections: text left, image right */
         .about-section:nth-child(odd) {
             flex-direction: row;
         }
 
-        /* Even sections: image left, text right */
         .about-section:nth-child(even) {
             flex-direction: row-reverse;
         }
 
         .about-text {
             flex: 1;
+            min-width: 0;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
         }
 
         .about-image {
             flex-shrink: 0;
+        }
+
+        .about-image img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        @media (max-width: 768px) {
+            .about-section,
+            .about-section:nth-child(odd),
+            .about-section:nth-child(even) {
+                flex-direction: column;
+            }
+
+            .about-image {
+                width: 100%;
+                text-align: center;
+            }
+
+            .about-image img {
+                margin: 0 auto;
+            }
         }
     </style>
 </head>
@@ -39,7 +72,6 @@
 
         <div class="main-content">
             <div class="about-container">
-                <!-- Section 1: text left, image RIGHT -->
                 <div class="about-section">
                     <div class="about-text">
                         <h2>About CybAware</h2>
@@ -52,7 +84,6 @@
                     </div>
                 </div>
 
-                <!-- Section 2: image LEFT, text right -->
                 <div class="about-section">
                     <div class="about-text">
                         <h2>Our Interactive Missions</h2>
@@ -66,7 +97,6 @@
                     </div>
                 </div>
 
-                <!-- Section 3: text left, image RIGHT -->
                 <div class="about-section">
                     <div class="about-text">
                         <h2>Project Development & Team</h2>
@@ -79,18 +109,13 @@
                     </div>
                 </div>
 
-                <!-- Section 4: image LEFT, text right -->
                 <div class="about-section">
                     <div class="about-text">
                         <h2>Message from the CybAware Team</h2>
                         <p>The CybAware development team would like to express our sincere gratitude to everyone who has supported our mission to bridge the cybersecurity skills gap through educational gaming.</p>
-
                         <p>While this project represents the culmination of our academic journey at T.A. Marryshow Community College, we hope it marks just the beginning of increased cybersecurity awareness in our community. We're incredibly proud of what we've achieved - from initial concept to functional game - and we hope CybAware serves as a valuable resource for students learning about digital safety.</p>
-
                         <p>We recognize that educational projects like ours are part of a larger ecosystem of cybersecurity learning tools. We encourage all users to continue their cybersecurity education journey, building upon the foundations established through CybAware's interactive missions.</p>
-                        
                         <p>Thank you for engaging with our project, for providing valuable feedback during testing, and for joining us in making cybersecurity education more accessible and engaging.</p>
-                        
                         <p class="signature">With gratitude,<br><strong>The CybAware Development Team</strong><br>Ahndre Walters & Joshua Evelyn</p>
                     </div>
                     <div class="about-image">
