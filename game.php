@@ -1,13 +1,17 @@
 <?php
+// Start the session so we can access the logged in user's data
 session_start();
 
+// If the user is not logged in, redirect them to the login page and stop the script
 if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){
     header("location: login.php");
     exit;
 }
 
+// Load the database connection
 require_once "config/database.php";
 
+// Get the current user's ID from the session and set up score variables for each game
 $user_id               = $_SESSION['id'];
 $password_score        = 0;
 $password2_score       = 0;
@@ -16,6 +20,7 @@ $phishing_lvl2_score   = 0;
 $games_completed       = 0;
 $total_games           = 4;
 
+// Query the database to fetch all game scores belonging to this user
 $sql = "SELECT game_type, score, total_questions FROM game_scores WHERE user_id = ?";
 if($stmt = mysqli_prepare($link, $sql)) {
     mysqli_stmt_bind_param($stmt, "i", $user_id);
@@ -23,6 +28,7 @@ if($stmt = mysqli_prepare($link, $sql)) {
     mysqli_stmt_store_result($stmt);
     mysqli_stmt_bind_result($stmt, $game_type, $score, $total_questions);
 
+    // Loop through each result and assign the score to the correct game variable
     while(mysqli_stmt_fetch($stmt)) {
         if($game_type == 'password_fortress') {
             $password_score = $score;
@@ -41,6 +47,7 @@ if($stmt = mysqli_prepare($link, $sql)) {
     mysqli_stmt_close($stmt);
 }
 
+// Calculate the overall percentage score across all four games out of a total of 40 points
 $overall_pct = round((($password_score + $password2_score + $phishing_lvl1_score + $phishing_lvl2_score) / 40) * 100);
 ?>
 <!DOCTYPE html>
@@ -50,14 +57,19 @@ $overall_pct = round((($password_score + $password2_score + $phishing_lvl1_score
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="shortcut icon" href="images/cybawarelogo.png" type="image/x-icon">
     <title>Game | CybAware</title>
+
+    <?php // Load the main site stylesheet ?>
     <link rel="stylesheet" href="css/styles.css">
+
     <style>
+        <?php // Centres the game page content and adds spacing around it ?>
         .game-container {
             max-width: 1200px;
             margin: 0 auto;
             padding: 20px;
         }
 
+        <?php // Centres the page heading and subtitle above the game cards ?>
         .game-header {
             text-align: center;
             margin-bottom: 40px;
@@ -76,6 +88,7 @@ $overall_pct = round((($password_score + $password2_score + $phishing_lvl1_score
             margin: 0 auto;
         }
 
+        <?php // Three column grid that holds the game cards side by side ?>
         .cards-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
@@ -83,6 +96,7 @@ $overall_pct = round((($password_score + $password2_score + $phishing_lvl1_score
             margin-bottom: 40px;
         }
 
+        <?php // Individual game card with a white background, border and lift effect on hover ?>
         .game-card {
             background: white;
             border-radius: 12px;
@@ -99,6 +113,7 @@ $overall_pct = round((($password_score + $password2_score + $phishing_lvl1_score
             box-shadow: 0 10px 25px rgba(0,0,0,0.1);
         }
 
+        <?php // Inner content wrapper that stacks the icon, title, description and buttons vertically ?>
         .game-content {
             display: flex;
             flex-direction: column;
@@ -126,6 +141,7 @@ $overall_pct = round((($password_score + $password2_score + $phishing_lvl1_score
             flex-grow: 1;
         }
 
+        <?php // Blue gradient button used to launch each game level ?>
         .play-btn {
             display: flex;
             align-items: center;
@@ -148,6 +164,7 @@ $overall_pct = round((($password_score + $password2_score + $phishing_lvl1_score
             box-shadow: 0 6px 18px rgba(30, 64, 175, 0.3);
         }
 
+        <?php // Stacks the two level buttons vertically inside the game card ?>
         .level-buttons {
             display: flex;
             flex-direction: column;
@@ -157,7 +174,7 @@ $overall_pct = round((($password_score + $password2_score + $phishing_lvl1_score
             align-items: center;
         }
 
-        /* ── Progress Card ── */
+        <?php // Layout wrapper for the progress card that stretches to fill the card height ?>
         .progress-card-content {
             display: flex;
             flex-direction: column;
@@ -171,7 +188,7 @@ $overall_pct = round((($password_score + $password2_score + $phishing_lvl1_score
             margin-bottom: 6px;
         }
 
-        /* Overall summary bar */
+        <?php // Light grey box showing the combined score bar across all games ?>
         .overall-summary {
             background: #f8fafc;
             border: 1px solid #e2e8f0;
@@ -181,6 +198,7 @@ $overall_pct = round((($password_score + $password2_score + $phishing_lvl1_score
             text-align: left;
         }
 
+        <?php // Row with the Overall Score label on the left and the fraction on the right ?>
         .overall-top {
             display: flex;
             justify-content: space-between;
@@ -200,6 +218,7 @@ $overall_pct = round((($password_score + $password2_score + $phishing_lvl1_score
             color: #1e40af;
         }
 
+        <?php // Thin grey track bar that the blue fill sits inside ?>
         .overall-bar {
             height: 7px;
             background: #e2e8f0;
@@ -208,6 +227,7 @@ $overall_pct = round((($password_score + $password2_score + $phishing_lvl1_score
             margin-bottom: 6px;
         }
 
+        <?php // Blue gradient fill that grows to show the overall completion percentage ?>
         .overall-fill {
             height: 100%;
             background: linear-gradient(to right, #1e40af, #3b82f6);
@@ -220,7 +240,7 @@ $overall_pct = round((($password_score + $password2_score + $phishing_lvl1_score
             color: #9ca3af;
         }
 
-        /* Game group labels */
+        <?php // Small uppercase group heading above each set of level progress bars ?>
         .game-group-label {
             font-size: 11px;
             font-weight: 700;
@@ -231,7 +251,7 @@ $overall_pct = round((($password_score + $password2_score + $phishing_lvl1_score
             text-align: left;
         }
 
-        /* Individual level rows */
+        <?php // Individual row showing the name and score for a single game level ?>
         .level-container {
             background: #f8fafc;
             border-radius: 8px;
@@ -240,6 +260,7 @@ $overall_pct = round((($password_score + $password2_score + $phishing_lvl1_score
             margin-bottom: 8px;
         }
 
+        <?php // Row with the level name on the left and the score on the right ?>
         .level-header {
             display: flex;
             justify-content: space-between;
@@ -263,9 +284,11 @@ $overall_pct = round((($password_score + $password2_score + $phishing_lvl1_score
             flex-shrink: 0;
         }
 
+        <?php // Green score text when the level has been completed, grey when it hasn't been played yet ?>
         .level-score.done   { color: #059669; }
         .level-score.undone { color: #9ca3af; }
 
+        <?php // Thin progress bar track beneath each level row ?>
         .score-progress {
             height: 5px;
             background: #e2e8f0;
@@ -279,12 +302,13 @@ $overall_pct = round((($password_score + $password2_score + $phishing_lvl1_score
             transition: width 0.4s ease;
         }
 
+        <?php // Colour options for each game's progress fill - blue for password, orange for phishing ?>
         .fill-green  { background: #10b981; }
         .fill-blue   { background: #3b82f6; }
         .fill-orange { background: #f59e0b; }
         .fill-purple { background: #8b5cf6; }
 
-        /* Games completed badge */
+        <?php // Small pill badge showing how many games the user has completed out of the total ?>
         .completed-badge {
             display: inline-flex;
             align-items: center;
@@ -306,7 +330,7 @@ $overall_pct = round((($password_score + $password2_score + $phishing_lvl1_score
             background: #1e40af;
         }
 
-        /* Certificate button */
+        <?php // Blue button at the bottom of the progress card that links to the certificate page ?>
         .certificate-btn {
             display: flex;
             align-items: center;
@@ -329,10 +353,12 @@ $overall_pct = round((($password_score + $password2_score + $phishing_lvl1_score
             box-shadow: 0 6px 18px rgba(30, 64, 175, 0.3);
         }
 
+        <?php // On medium screens the grid switches to two columns ?>
         @media (max-width: 992px) {
             .cards-grid { grid-template-columns: 1fr 1fr; }
         }
 
+        <?php // On small screens the cards stack in a single column and the heading shrinks ?>
         @media (max-width: 768px) {
             .cards-grid { grid-template-columns: 1fr; }
             .game-header h1 { font-size: 2rem; }
@@ -342,10 +368,13 @@ $overall_pct = round((($password_score + $password2_score + $phishing_lvl1_score
 </head>
 <body>
     <div class="container">
+        <?php // Load the shared navigation bar at the top of the page ?>
         <?php include 'includes/navigation.php'; ?>
 
         <div class="main-content">
             <div class="game-container">
+
+                <?php // Page heading and subtitle shown above all the game cards ?>
                 <div class="game-header">
                     <h1>Cybersecurity Missions</h1>
                     <p>Complete missions and download your certificate anytime.</p>
@@ -353,7 +382,7 @@ $overall_pct = round((($password_score + $password2_score + $phishing_lvl1_score
 
                 <div class="cards-grid">
 
-                    <!-- Card 1: Password Fortress -->
+                    <?php // Card 1 - Password Fortress with buttons for both levels ?>
                     <div class="game-card">
                         <div class="game-content">
                             <img src="images/password.png" alt="Password Security Icon">
@@ -366,7 +395,7 @@ $overall_pct = round((($password_score + $password2_score + $phishing_lvl1_score
                         </div>
                     </div>
 
-                    <!-- Card 2: Phishing Detective -->
+                    <?php // Card 2 - Phishing Detective with buttons for both levels ?>
                     <div class="game-card">
                         <div class="game-content">
                             <img src="images/phishing.png" alt="Phishing Detection Icon">
@@ -379,18 +408,19 @@ $overall_pct = round((($password_score + $password2_score + $phishing_lvl1_score
                         </div>
                     </div>
 
-                    <!-- Card 3: Progress + Certificate -->
+                    <?php // Card 3 - Progress tracker showing scores for all games and a link to the certificate ?>
                     <div class="game-card">
                         <div class="progress-card-content">
                             <img src="images/about2.png" alt="" style="width:80px;height:80px;object-fit:contain;margin:0 auto 16px;">
                             <h2>Your Progress</h2>
 
+                            <?php // Badge showing how many of the four games the user has completed ?>
                             <div class="completed-badge">
                                 <div class="badge-dot"></div>
                                 <?php echo $games_completed; ?>/<?php echo $total_games; ?> games completed
                             </div>
 
-                            <!-- Overall bar -->
+                            <?php // Overall score bar showing the combined points across all four games ?>
                             <div class="overall-summary">
                                 <div class="overall-top">
                                     <span class="overall-label">Overall Score</span>
@@ -404,12 +434,14 @@ $overall_pct = round((($password_score + $password2_score + $phishing_lvl1_score
                                 <div class="overall-sub"><?php echo $overall_pct; ?>% complete</div>
                             </div>
 
-                            <!-- Password Fortress group -->
+                            <?php // Individual progress bars for the two Password Fortress levels ?>
                             <div class="game-group-label">Password Fortress</div>
 
+                            <?php // Progress bar for Password Fortress Level 1 - Learn Security ?>
                             <div class="level-container">
                                 <div class="level-header">
                                     <div class="level-name">Learn Security</div>
+                                    <?php // Score turns green if the user has scored above zero ?>
                                     <div class="level-score <?php echo $password_score > 0 ? 'done' : 'undone'; ?>">
                                         <?php echo $password_score; ?>/10
                                     </div>
@@ -419,9 +451,11 @@ $overall_pct = round((($password_score + $password2_score + $phishing_lvl1_score
                                 </div>
                             </div>
 
+                            <?php // Progress bar for Password Fortress Level 2 - Deeper Security ?>
                             <div class="level-container">
                                 <div class="level-header">
                                     <div class="level-name">Deeper Security</div>
+                                    <?php // Score turns green if the user has scored above zero ?>
                                     <div class="level-score <?php echo $password2_score > 0 ? 'done' : 'undone'; ?>">
                                         <?php echo $password2_score; ?>/10
                                     </div>
@@ -431,12 +465,14 @@ $overall_pct = round((($password_score + $password2_score + $phishing_lvl1_score
                                 </div>
                             </div>
 
-                            <!-- Phishing Detective group -->
+                            <?php // Individual progress bars for the two Phishing Detective levels ?>
                             <div class="game-group-label">Phishing Detective</div>
 
+                            <?php // Progress bar for Phishing Detective Level 1 - Read Emails ?>
                             <div class="level-container">
                                 <div class="level-header">
                                     <div class="level-name">Read Emails</div>
+                                    <?php // Score turns green if the user has scored above zero ?>
                                     <div class="level-score <?php echo $phishing_lvl1_score > 0 ? 'done' : 'undone'; ?>">
                                         <?php echo $phishing_lvl1_score; ?>/10
                                     </div>
@@ -446,9 +482,11 @@ $overall_pct = round((($password_score + $password2_score + $phishing_lvl1_score
                                 </div>
                             </div>
 
+                            <?php // Progress bar for Phishing Detective Level 2 - Hunt Errors ?>
                             <div class="level-container">
                                 <div class="level-header">
                                     <div class="level-name">Hunt Errors</div>
+                                    <?php // Score turns green if the user has scored above zero ?>
                                     <div class="level-score <?php echo $phishing_lvl2_score > 0 ? 'done' : 'undone'; ?>">
                                         <?php echo $phishing_lvl2_score; ?>/10
                                     </div>
@@ -458,6 +496,7 @@ $overall_pct = round((($password_score + $password2_score + $phishing_lvl1_score
                                 </div>
                             </div>
 
+                            <?php // Button at the bottom that takes the user to their certificate page ?>
                             <a href="certificate.php" class="certificate-btn">Download Certificate</a>
                         </div>
                     </div>
@@ -466,6 +505,7 @@ $overall_pct = round((($password_score + $password2_score + $phishing_lvl1_score
             </div>
         </div>
 
+        <?php // Load the shared footer at the bottom of the page ?>
         <?php include 'includes/footer.php'; ?>
     </div>
 </body>
