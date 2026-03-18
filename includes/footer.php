@@ -1,8 +1,6 @@
 <?php
-// Footer Component for CybAware
 ?>
 
-<!-- Footer - Left and Right Alignment -->
 <div class="simple-footer">
     <div class="footer-content">
         <div class="copyright">
