@@ -6,7 +6,7 @@ if (session_status() === PHP_SESSION_NONE) {
 ?>
 
 <style>
-/* Removes default list item height and spacing for the avatar nav item */
+<?php // Removes default list item height and spacing for the avatar nav item ?>
 #avatar-li {
     height: 0 !important;
     overflow: visible !important;
@@ -14,12 +14,12 @@ if (session_status() === PHP_SESSION_NONE) {
     margin-top: 0 !important;
     margin-bottom: 0 !important;
 }
-/* Keeps the avatar positioned correctly relative to the nav */
+<?php // Keeps the avatar positioned correctly relative to the nav ?>
 #nav-avatar {
     position: relative;
     top: 0;
 }
-/* Hides the avatar completely on mobile screens */
+<?php // Hides the avatar completely on mobile screens ?>
 @media (max-width: 768px) {
     #avatar-li {
         display: none !important;
