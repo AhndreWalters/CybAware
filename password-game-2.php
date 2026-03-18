@@ -10,17 +10,15 @@ require_once "config/database.php";
 
 $user_id         = $_SESSION['id'];
 $game_completed  = false;
-$total_questions = 10; // 5 departments x 2 points each
+$total_questions = 10;
 $score           = 0;
 
-// Reset
 if(isset($_GET['reset'])) {
     unset($_SESSION['pg2_score'], $_SESSION['pg2_done'], $_SESSION['pg2_dept_results']);
     header("location: password-game-2.php");
     exit;
 }
 
-// Initialize session
 if(!isset($_SESSION['pg2_score'])) $_SESSION['pg2_score'] = 0;
 if(!isset($_SESSION['pg2_done']))  $_SESSION['pg2_done']  = false;
 
@@ -36,7 +34,6 @@ $departments = [
     5 => ['name' => 'Sales, Finance & Marketing',  'desc' => 'Financial data, sales reports, and strategies'],
 ];
 
-// Password scorer
 function scorePassword($password) {
     $score = 0;
     if(strlen($password) >= 12) $score += 25;
@@ -53,7 +50,6 @@ function scorePassword($password) {
     return max(0, min(100, round($score)));
 }
 
-// Handle fortress POST
 if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['phase']) && $_POST['phase'] == 'fortress') {
     if(!$fortress_done) {
         $dept_results = [];
@@ -63,7 +59,6 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['phase']) && $_POST['pha
             $pw       = isset($_POST['dept'.$i]) ? trim($_POST['dept'.$i]) : '';
             $strength = scorePassword($pw);
 
-            // 2 points for strong (80+), 1 point for fair (50-79), 0 for weak
             if($strength >= 80)      $pts = 2;
             elseif($strength >= 50)  $pts = 1;
             else                     $pts = 0;
@@ -86,7 +81,6 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['phase']) && $_POST['pha
         $dept_results  = $dept_results;
         $game_completed = true;
 
-        // Save to DB
         $sql = "INSERT INTO game_scores (user_id, game_type, score, total_questions, completed_at)
                 VALUES (?, 'password_fortress_2', ?, ?, NOW())
                 ON DUPLICATE KEY UPDATE score = VALUES(score), completed_at = NOW()";
