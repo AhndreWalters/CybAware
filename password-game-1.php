@@ -1,19 +1,24 @@
 <?php
+// Start the session so we can access the logged in user's data
 session_start();
 
+// If the user is not logged in, redirect them to the login page and stop the script
 if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){
     header("location: login.php");
     exit;
 }
 
+// Load the database connection
 require_once "config/database.php";
 
+// Load the user's current score and question number from the session, defaulting to 0 and 1 if not set
 $score            = isset($_SESSION['password_score'])    ? $_SESSION['password_score']    : 0;
 $current_question = isset($_SESSION['password_question']) ? $_SESSION['password_question'] : 1;
 $total_questions  = 10;
 $feedback         = "";
 $game_completed   = false;
 
+// If the reset parameter is in the URL, clear the saved score and question then restart the game
 if(isset($_GET['reset'])) {
     unset($_SESSION['password_score']);
     unset($_SESSION['password_question']);
@@ -21,11 +26,13 @@ if(isset($_GET['reset'])) {
     exit;
 }
 
+// Only process an answer if the form has been submitted
 if($_SERVER["REQUEST_METHOD"] == "POST") {
     if(isset($_POST['answer'])) {
         $user_answer = $_POST['answer'];
         $question_id = (int)$_POST['question_id'];
 
+        // The correct answer for each of the ten questions keyed by question number
         $correct_answers = [
             1  => "StrongPass2024!",
             2  => "Phishing",
@@ -39,11 +46,14 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
             10 => "Brute force attack"
         ];
 
+        // Check if the submitted answer matches the correct answer for this question
         if(isset($correct_answers[$question_id]) && $user_answer === $correct_answers[$question_id]) {
+            // Correct answer - increment the score and store it in the session
             $score++;
             $_SESSION['password_score'] = $score;
             $feedback = "<div class='feedback correct'><span>Correct!</span></div>";
         } else {
+            // Hints shown for specific questions when the user gets the answer wrong
             $hints = [
                 4  => "Password length is the most critical factor against brute force attacks.",
                 5  => "A strong password needs uppercase, lowercase, numbers, and symbols — at least 12 characters.",
@@ -53,17 +63,21 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
                 9  => "Reusing passwords means one breach can compromise all your accounts.",
                 10 => "Brute force attacks try every possible combination to crack a password."
             ];
+            // Add the hint below the incorrect feedback if one exists for this question
             $hint = isset($hints[$question_id]) ? "<div class='hint-box'><strong>Hint:</strong> " . $hints[$question_id] . "</div>" : "";
             $feedback = "<div class='feedback incorrect'><span>Incorrect</span></div>" . $hint;
         }
 
+        // Move to the next question and save the updated question number to the session
         $current_question = $question_id + 1;
         $_SESSION['password_question'] = $current_question;
 
+        // If the user has answered all questions, mark the game as complete and save the score to the database
         if($current_question > $total_questions) {
             $game_completed = true;
             $user_id = $_SESSION['id'];
 
+            // Create the game_scores table if it does not already exist
             mysqli_query($link, "CREATE TABLE IF NOT EXISTS game_scores (
                 id INT AUTO_INCREMENT PRIMARY KEY,
                 user_id INT NOT NULL,
@@ -73,22 +87,24 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
                 completed_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )");
 
+            // Insert the score into the database or update it if a record already exists for this user and game
             $sql = "INSERT INTO game_scores (user_id, game_type, score, total_questions, completed_at)
                     VALUES (?, 'password_fortress', ?, ?, NOW())
-                    
-        ON DUPLICATE KEY UPDATE score = VALUES(score), completed_at = NOW()";
+                    ON DUPLICATE KEY UPDATE score = VALUES(score), completed_at = NOW()";
             if($stmt = mysqli_prepare($link, $sql)) {
                 mysqli_stmt_bind_param($stmt, "iii", $user_id, $score, $total_questions);
                 mysqli_stmt_execute($stmt);
                 mysqli_stmt_close($stmt);
             }
 
+            // Clear the score and question from the session now that the game is finished
             unset($_SESSION['password_score']);
             unset($_SESSION['password_question']);
         }
     }
 }
 
+// Safety check - if the question counter has passed the total outside of the POST block, mark the game complete and clear the session
 if($current_question > $total_questions && !$game_completed) {
     $game_completed = true;
     unset($_SESSION['password_score']);
@@ -102,8 +118,12 @@ if($current_question > $total_questions && !$game_completed) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="shortcut icon" href="images/password.png" type="image/x-icon">
     <title>Password Fortress | CybAware</title>
+
+    <?php // Load the main site stylesheet ?>
     <link rel="stylesheet" href="css/styles.css">
+
     <style>
+        <?php // Centres the game content and stacks everything vertically ?>
         .game-interface {
             max-width: 800px;
             margin: 0 auto;
@@ -114,12 +134,13 @@ if($current_question > $total_questions && !$game_completed) {
             align-items: center;
         }
 
+        <?php // Makes every direct child of the game interface take the full available width ?>
         .game-interface > * {
             width: 100%;
             box-sizing: border-box;
         }
 
-        /* ── Header ── */
+        <?php // Centres the game title and subtitle above the question card ?>
         .game-header {
             text-align: center;
             margin-bottom: 30px;
@@ -137,13 +158,14 @@ if($current_question > $total_questions && !$game_completed) {
             font-size: 1.1rem;
         }
 
-        /* ── Progress ── */
+        <?php // Wrapper for the progress bar and the question/score labels above it ?>
         .progress-container {
             margin-bottom: 25px;
             width: 100%;
             box-sizing: border-box;
         }
 
+        <?php // Row with the current question number on the left and the score on the right ?>
         .progress-info {
             display: flex;
             justify-content: space-between;
@@ -152,6 +174,7 @@ if($current_question > $total_questions && !$game_completed) {
             color: #6b7280;
         }
 
+        <?php // Grey track that the blue progress fill sits inside ?>
         .progress-bar {
             height: 6px;
             background: #e5e7eb;
@@ -159,13 +182,14 @@ if($current_question > $total_questions && !$game_completed) {
             overflow: hidden;
         }
 
+        <?php // Blue fill that grows as the user progresses through the questions ?>
         .progress-fill {
             height: 100%;
             background: #1e40af;
             transition: width 0.3s ease;
         }
 
-        /* ── Feedback ── */
+        <?php // Base styles for the correct and incorrect feedback banners ?>
         .feedback {
             padding: 16px;
             border-radius: 6px;
@@ -176,18 +200,21 @@ if($current_question > $total_questions && !$game_completed) {
             border: 1px solid transparent;
         }
 
+        <?php // Green banner shown when the user answers correctly ?>
         .feedback.correct {
             background: #f0fdf4;
             color: #065f46;
             border-color: #10b981;
         }
 
+        <?php // Red banner shown when the user answers incorrectly ?>
         .feedback.incorrect {
             background: #fef2f2;
             color: #991b1b;
             border-color: #ef4444;
         }
 
+        <?php // Yellow hint box shown beneath the incorrect feedback on certain questions ?>
         .hint-box {
             background: #fef3c7;
             border: 1px solid #f59e0b;
@@ -198,7 +225,7 @@ if($current_question > $total_questions && !$game_completed) {
             color: #92400e;
         }
 
-        /* ── Question card (mirrors email-container from phishing game) ── */
+        <?php // White card that contains the question header and answer options ?>
         .question-container {
             background: white;
             border-radius: 8px;
@@ -211,6 +238,7 @@ if($current_question > $total_questions && !$game_completed) {
             box-sizing: border-box;
         }
 
+        <?php // Light grey area at the top of the card showing the question number and text ?>
         .question-header {
             background: #f8fafc;
             padding: 20px 25px;
@@ -234,17 +262,19 @@ if($current_question > $total_questions && !$game_completed) {
             line-height: 1.5;
         }
 
+        <?php // White padded area beneath the question header that holds the answer options ?>
         .question-body {
             padding: 25px;
         }
 
-        /* ── Options (match phishing game option-btn style) ── */
+        <?php // Stacks the answer option buttons vertically with a gap between each one ?>
         .options-container {
             display: flex;
             flex-direction: column;
             gap: 12px;
         }
 
+        <?php // Individual answer option button with a border and hover lift effect ?>
         .option {
             width: 100%;
             padding: 16px 20px;
@@ -270,12 +300,14 @@ if($current_question > $total_questions && !$game_completed) {
             background: #f8fafc;
         }
 
+        <?php // Highlights the selected option with a blue border and background ?>
         .option.selected {
             background: #eff6ff;
             border-color: #1e40af;
             color: #1e40af;
         }
 
+        <?php // Small square badge showing the letter label for each answer option ?>
         .option-letter {
             background: #f3f4f6;
             border-radius: 4px;
@@ -290,6 +322,7 @@ if($current_question > $total_questions && !$game_completed) {
             flex-shrink: 0;
         }
 
+        <?php // Turns the letter badge navy when the option is selected ?>
         .option.selected .option-letter {
             background: #1e40af;
             color: white;
@@ -300,9 +333,10 @@ if($current_question > $total_questions && !$game_completed) {
             flex: 1;
         }
 
+        <?php // Hides the radio inputs since answer selection is handled by JavaScript ?>
         input[type="radio"] { display: none; }
 
-        /* ── Instruction note ── */
+        <?php // Blue bordered instruction note shown above the password tester on question 5 ?>
         .instruction-note {
             background: #eff6ff;
             border: 1px solid #bfdbfe;
@@ -317,7 +351,7 @@ if($current_question > $total_questions && !$game_completed) {
 
         .instruction-note strong { color: #1e40af; }
 
-        /* ── Password tester ── */
+        <?php // Grey container that wraps the password input and strength meter on question 5 ?>
         .password-test-container {
             background: #f9fafb;
             border: 1px solid #e5e7eb;
@@ -325,6 +359,7 @@ if($current_question > $total_questions && !$game_completed) {
             padding: 20px;
         }
 
+        <?php // Text input where the user types a password to test its strength ?>
         .password-input {
             width: 100%;
             padding: 14px;
@@ -344,6 +379,7 @@ if($current_question > $total_questions && !$game_completed) {
             box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
         }
 
+        <?php // Wrapper for the strength label, bar and text beneath the password input ?>
         .strength-indicator { margin-top: 5px; }
 
         .strength-label {
@@ -353,6 +389,7 @@ if($current_question > $total_questions && !$game_completed) {
             display: block;
         }
 
+        <?php // Grey track that the coloured strength fill sits inside ?>
         .strength-meter {
             height: 6px;
             background: #e5e7eb;
@@ -361,6 +398,7 @@ if($current_question > $total_questions && !$game_completed) {
             overflow: hidden;
         }
 
+        <?php // Coloured fill bar that grows and changes colour based on password strength ?>
         .strength-bar {
             height: 100%;
             width: 0%;
@@ -368,18 +406,20 @@ if($current_question > $total_questions && !$game_completed) {
             transition: width 0.3s ease, background-color 0.3s ease;
         }
 
+        <?php // Colour classes applied to the strength description text ?>
         .strength-text { font-size: 14px; font-weight: 500; color: #6b7280; }
         .strength-weak   { color: #dc2626; }
         .strength-fair   { color: #d97706; }
         .strength-strong { color: #059669; }
 
-        /* ── Game controls ── */
+        <?php // Centres the submit button below the question card ?>
         .game-controls {
             text-align: center;
             margin-top: 10px;
             width: 100%;
         }
 
+        <?php // Blue submit button used to confirm an answer and move to the next question ?>
         .submit-btn {
             padding: 16px 50px;
             background: #1e40af;
@@ -402,6 +442,7 @@ if($current_question > $total_questions && !$game_completed) {
             box-shadow: 0 6px 12px rgba(30, 64, 175, 0.3);
         }
 
+        <?php // Greyed out disabled state shown before the user has selected an answer ?>
         .submit-btn:disabled {
             background: #94a3b8;
             cursor: not-allowed;
@@ -409,7 +450,7 @@ if($current_question > $total_questions && !$game_completed) {
             box-shadow: none;
         }
 
-        /* ── Completion ── */
+        <?php // Centred white card shown when the user has answered all questions ?>
         .completion-screen {
             text-align: center;
             padding: 40px;
@@ -427,6 +468,7 @@ if($current_question > $total_questions && !$game_completed) {
             margin-bottom: 15px;
         }
 
+        <?php // Bold text showing the final score on the completion screen ?>
         .score-result {
             font-size: 1.3rem;
             color: #334155;
@@ -434,6 +476,7 @@ if($current_question > $total_questions && !$game_completed) {
             font-weight: 600;
         }
 
+        <?php // Row of action buttons at the bottom of the completion screen ?>
         .completion-actions {
             display: flex;
             gap: 15px;
@@ -443,6 +486,7 @@ if($current_question > $total_questions && !$game_completed) {
             width: 100%;
         }
 
+        <?php // Primary blue action button used on the completion screen ?>
         .action-btn {
             padding: 14px 35px;
             background: #1e40af;
@@ -466,6 +510,7 @@ if($current_question > $total_questions && !$game_completed) {
             box-shadow: 0 4px 8px rgba(30, 64, 175, 0.2);
         }
 
+        <?php // Secondary outlined button variant used for less important actions on the completion screen ?>
         .action-btn.secondary {
             background: white;
             color: #64748b;
@@ -479,6 +524,7 @@ if($current_question > $total_questions && !$game_completed) {
             box-shadow: none;
         }
 
+        <?php // Light blue note at the bottom of the completion screen explaining what to do next to earn the certificate ?>
         .certificate-note {
             margin-top: 20px;
             padding: 15px;
@@ -490,7 +536,7 @@ if($current_question > $total_questions && !$game_completed) {
             text-align: center;
         }
 
-        /* ── Responsive ── */
+        <?php // On small screens the game padding reduces, the button goes full width and the completion actions stack vertically ?>
         @media (max-width: 768px) {
             .game-interface { padding: 15px; }
             .game-header h1 { font-size: 1.6rem; }
@@ -504,16 +550,19 @@ if($current_question > $total_questions && !$game_completed) {
 </head>
 <body>
     <div class="container">
+        <?php // Load the shared navigation bar at the top of the page ?>
         <?php include 'includes/navigation.php'; ?>
 
         <div class="main-content">
             <div class="game-interface">
 
+                <?php // Game title and subtitle shown above the progress bar ?>
                 <div class="game-header">
                     <h1>Password Fortress | Learn Security</h1>
                     <p>Test your knowledge of password security best practices</p>
                 </div>
 
+                <?php // Progress bar showing how far through the ten questions the user is ?>
                 <div class="progress-container">
                     <div class="progress-info">
                         <span>Question <?php echo min($current_question, $total_questions); ?> of <?php echo $total_questions; ?></span>
@@ -524,27 +573,33 @@ if($current_question > $total_questions && !$game_completed) {
                     </div>
                 </div>
 
+                <?php // Output the correct or incorrect feedback banner from the previous answer ?>
                 <?php echo $feedback; ?>
 
+                <?php // Show the completion screen if all questions have been answered, otherwise show the current question ?>
                 <?php if($game_completed): ?>
 
+                    <?php // Completion screen with the final score, a performance message and action buttons ?>
                     <div class="completion-screen">
                         <h2>Assessment Complete</h2>
                         <div class="score-result">
                             You scored <?php echo $score; ?> out of <?php echo $total_questions; ?> points.
                         </div>
                         <?php
+                        // Show a different performance message depending on the percentage scored
                         $percentage = ($score / $total_questions) * 100;
                         if($percentage >= 90)      echo '<p style="color:#059669;font-weight:600;font-size:1.1rem;margin-bottom:20px;">Outstanding! You have excellent password security knowledge.</p>';
                         elseif($percentage >= 70)  echo '<p style="color:#1e40af;font-weight:600;font-size:1.1rem;margin-bottom:20px;">Good work! You have a solid grasp of password security principles.</p>';
                         elseif($percentage >= 50)  echo '<p style="color:#d97706;font-weight:600;font-size:1.1rem;margin-bottom:20px;">Not bad, but review some password security fundamentals.</p>';
                         else                       echo '<p style="color:#dc2626;font-weight:600;font-size:1.1rem;margin-bottom:20px;">Needs improvement. Review password security basics and try again.</p>';
                         ?>
+                        <?php // Buttons to go back to the games list, view the certificate, or replay this game ?>
                         <div class="completion-actions">
                             <a href="game.php" class="action-btn secondary">Back to Games</a>
                             <a href="certificate.php" class="action-btn">View Certificate</a>
                             <a href="password-game-1.php?reset=1" class="action-btn">Play Again</a>
                         </div>
+                        <?php // Reminder telling the user what they need to complete to unlock the full certificate ?>
                         <div class="certificate-note">
                             <strong>Progress:</strong> You have completed Password Fortress. Complete all Phishing Detective levels to unlock your cybersecurity awareness certificate.
                         </div>
@@ -552,7 +607,9 @@ if($current_question > $total_questions && !$game_completed) {
 
                 <?php else: ?>
 
+                    <?php // Question form that submits the selected answer back to this page ?>
                     <form method="POST" action="password-game-1.php" id="gameForm">
+                        <?php // Hidden fields that carry the current question number and selected answer on submission ?>
                         <input type="hidden" name="question_id" value="<?php echo (int)$current_question; ?>">
                         <input type="hidden" name="answer" id="selectedAnswer" value="">
 
@@ -560,6 +617,7 @@ if($current_question > $total_questions && !$game_completed) {
                             <div class="question-header">
                                 <div class="question-number">Question <?php echo $current_question; ?> of <?php echo $total_questions; ?></div>
 
+                                <?php // Display the correct question text for whichever question the user is currently on ?>
                                 <?php if($current_question == 1): ?>
                                     <div class="question-text">Which of the following passwords would be considered the most secure?</div>
                                 <?php elseif($current_question == 2): ?>
@@ -584,6 +642,7 @@ if($current_question > $total_questions && !$game_completed) {
                             </div>
 
                             <div class="question-body">
+                                <?php // Display the correct set of answer options for whichever question the user is on ?>
                                 <?php if($current_question == 1): ?>
                                     <div class="options-container">
                                         <button type="button" class="option" onclick="selectAnswer('password123', this)"><div class="option-letter">A</div><div class="option-text">password123</div></button>
@@ -619,6 +678,7 @@ if($current_question > $total_questions && !$game_completed) {
                                     <div style="margin-top:16px;" class="hint-box"><strong>Hint:</strong> Password length is the most critical factor against brute force attacks.</div>
 
                                 <?php elseif($current_question == 5): ?>
+                                    <?php // Question 5 is interactive - the user types a password and sees a live strength rating ?>
                                     <div class="instruction-note">
                                         <strong>Goal:</strong> Create a password that scores "Strong" — it needs uppercase, lowercase, numbers, and symbols, and should be at least 12 characters long.
                                     </div>
@@ -679,6 +739,7 @@ if($current_question > $total_questions && !$game_completed) {
                             </div>
                         </div>
 
+                        <?php // Submit button - says Complete Assessment on the last question and Next Question on all others ?>
                         <div class="game-controls">
                             <button type="submit" class="submit-btn" id="submitBtn" disabled>
                                 <?php echo $current_question == $total_questions ? 'Complete Assessment' : 'Next Question'; ?>
@@ -691,6 +752,7 @@ if($current_question > $total_questions && !$game_completed) {
             </div>
         </div>
 
+        <?php // Load the shared footer at the bottom of the page ?>
         <?php include 'includes/footer.php'; ?>
     </div>
 
@@ -698,21 +760,29 @@ if($current_question > $total_questions && !$game_completed) {
     document.addEventListener('DOMContentLoaded', function () {
         const submitBtn      = document.getElementById('submitBtn');
         const selectedAnswer = document.getElementById('selectedAnswer');
+
+        // Pass the current question number and total from PHP into JavaScript
         const currentQuestion = <?php echo (int)$current_question; ?>;
         const totalQuestions  = <?php echo (int)$total_questions; ?>;
 
+        // If the game is already complete or the button does not exist, stop here
         if(currentQuestion > totalQuestions || !submitBtn) return;
 
+        // Start with the submit button disabled until the user picks an answer
         submitBtn.disabled = true;
 
+        // Remove the selected highlight from all options, highlight the clicked one and store the answer value
         function selectAnswer(answer, btn) {
             document.querySelectorAll('.option').forEach(function(o) { o.classList.remove('selected'); });
             btn.classList.add('selected');
             selectedAnswer.value = answer;
             submitBtn.disabled = false;
         }
+
+        // Expose selectAnswer globally so the inline onclick attributes on the buttons can call it
         window.selectAnswer = selectAnswer;
 
+        // Block form submission if no answer has been selected on non-password questions
         document.getElementById('gameForm')?.addEventListener('submit', function(e) {
             if(!selectedAnswer.value && currentQuestion !== 5) {
                 e.preventDefault();
@@ -720,9 +790,11 @@ if($current_question > $total_questions && !$game_completed) {
             }
         });
 
+        // Special handling for question 5 which uses a live password strength tester instead of multiple choice options
         if(currentQuestion === 5) {
             const passwordInput = document.getElementById('passwordTest');
 
+            // Calculate a strength rating based on the length and character variety of the password
             function calculateStrength(password) {
                 if(!password) return { width: 0, text: 'Enter a password to see strength analysis', cls: '', answer: '', color: '#e5e7eb' };
                 let s = 0;
@@ -733,6 +805,7 @@ if($current_question > $total_questions && !$game_completed) {
                 if(/[0-9]/.test(password))          s++;
                 if(/[^A-Za-z0-9]/.test(password))   s++;
 
+                // Convert the score to a percentage width and return the matching label and colour
                 const width = Math.round((s / 6) * 100);
                 if(s <= 2) return { width, text: 'Weak — easily compromised',        cls: 'strength-weak',   answer: 'Weak',   color: '#dc2626' };
                 if(s <= 4) return { width, text: 'Fair — could be stronger',          cls: 'strength-fair',   answer: 'Fair',   color: '#d97706' };
@@ -740,17 +813,25 @@ if($current_question > $total_questions && !$game_completed) {
             }
 
             if(passwordInput) {
+                // Update the strength bar and text every time the user types in the password field
                 passwordInput.addEventListener('input', function() {
                     const r   = calculateStrength(this.value);
                     const bar = document.getElementById('strengthBar');
                     const txt = document.getElementById('strengthText');
+
+                    // Update the visual strength bar width and colour
                     if(bar) { bar.style.width = r.width + '%'; bar.style.backgroundColor = r.color; }
+
+                    // Update the strength description text beneath the bar
                     if(txt) { txt.textContent = r.text; txt.className = 'strength-text ' + r.cls; }
+
+                    // Store the strength rating as the answer and enable the submit button if something has been typed
                     selectedAnswer.value = r.answer;
                     submitBtn.disabled   = this.value.trim() === '';
                 });
             }
 
+            // Block submission on question 5 if the password field is still empty
             document.getElementById('gameForm')?.addEventListener('submit', function(e) {
                 if(!passwordInput || passwordInput.value.trim() === '') {
                     e.preventDefault();
@@ -759,10 +840,15 @@ if($current_question > $total_questions && !$game_completed) {
             });
         }
 
+        // Allow the user to select answers using keyboard shortcuts - number keys or letter keys A to D
         document.addEventListener('keydown', function(e) {
             if(currentQuestion === 5) return;
             const opts = document.querySelectorAll('.option');
+
+            // Map number and letter keys to the four answer option indices
             const map  = { '1': 0, 'a': 0, '2': 1, 'b': 1, '3': 2, 'c': 2, '4': 3, 'd': 3 };
+
+            // All possible answer values for every question in order so keyboard selection can find the right one
             const vals = ['password123','StrongPass2024!','123456','qwerty',
                           'Encryption','Phishing','Firewall','VPN',
                           'Every day','Every 3-6 months','Never','Only when hacked',
@@ -772,9 +858,12 @@ if($current_question > $total_questions && !$game_completed) {
                           'In plain text in a database','Sent via email to the admin','Encoded in Base64','It is stored as an irreversible hash',
                           'Wait for the company to fix it','Delete your account','Use a unique password for every account','Run a virus scan',
                           'Man-in-the-middle attack','SQL injection','Denial of Service attack','Brute force attack'];
+
+            // Click the matching option button if a valid key was pressed
             if(map[e.key] !== undefined && opts[map[e.key]]) {
                 opts[map[e.key]].click();
             } else if(e.key === 'Enter' && selectedAnswer.value) {
+                // Press Enter to submit once an answer has been selected
                 submitBtn?.click();
             }
         });
