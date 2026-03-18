@@ -256,10 +256,7 @@ if (session_status() === PHP_SESSION_NONE) {
                 <div class="terms-page-header">
                     <h1>Website Terms of Use</h1><br>
                     <div class="terms-meta">
-                        <span class="terms-badge">Legal</span>
                         <span class="terms-date">Last Updated: January 2026</span>
-                        <button class="terms-ctrl-btn primary" onclick="toggleAll(true)" style="margin-left: auto;">Expand All</button>
-                        <button class="terms-ctrl-btn secondary" onclick="toggleAll(false)">Collapse All</button>
                     </div>
                     <p class="terms-intro">Please read these terms and conditions carefully before using this site. These terms tell you the rules for using CybAware.</p>
                 </div>
