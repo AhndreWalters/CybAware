@@ -7,18 +7,26 @@ if (session_status() === PHP_SESSION_NONE) {
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
     <link rel="shortcut icon" href="images/cybawarelogo.png" type="image/x-icon">
     <title>Terms & Service | CybAware</title>
     <link rel="stylesheet" href="css/styles.css">
     <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        html, body {
+            max-width: 100%;
+            overflow-x: hidden;
+        }
+
         .terms-wrapper {
             max-width: 780px;
             margin: 48px auto 72px;
             padding: 0 24px;
         }
 
-        /* ── Page header ── */
         .terms-page-header {
             margin-bottom: 32px;
             padding-bottom: 24px;
@@ -30,9 +38,10 @@ if (session_status() === PHP_SESSION_NONE) {
             color: #0f172a;
             letter-spacing: -0.02em;
             margin: 0 0 10px;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
         }
 
-        /* Badge + date + buttons all on one line */
         .terms-meta {
             display: flex;
             align-items: center;
@@ -93,9 +102,10 @@ if (session_status() === PHP_SESSION_NONE) {
             color: #475569;
             line-height: 1.75;
             margin: 14px 0 0;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
         }
 
-        /* ── Accordion sections ── */
         .terms-section {
             margin-bottom: 10px;
             border: 1px solid #e2e8f0;
@@ -157,6 +167,9 @@ if (session_status() === PHP_SESSION_NONE) {
             font-weight: 600;
             color: #0f172a;
             line-height: 1.4;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            min-width: 0;
         }
 
         .terms-section.open .terms-section-title { color: #1e40af; }
@@ -176,6 +189,8 @@ if (session_status() === PHP_SESSION_NONE) {
             display: none;
             padding: 4px 22px 22px 66px;
             background: #ffffff;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
         }
 
         .terms-section.open .terms-section-body {
@@ -223,11 +238,11 @@ if (session_status() === PHP_SESSION_NONE) {
             text-decoration: none;
             border-bottom: 1.5px solid #bfdbfe;
             transition: border-color 0.15s;
+            word-break: break-all;
         }
 
         .terms-section-body a:hover { border-color: #1e40af; }
 
-        /* ── Footer note ── */
         .terms-footer-note {
             margin-top: 28px;
             padding: 16px 20px;
@@ -238,11 +253,28 @@ if (session_status() === PHP_SESSION_NONE) {
             color: #475569;
             font-style: italic;
             line-height: 1.6;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
         }
 
-        @media (max-width: 480px) {
-            .terms-wrapper { padding: 0 16px; }
-            .terms-section-body { padding-left: 22px; }
+        @media (max-width: 768px) {
+            .terms-wrapper {
+                margin: 24px auto 48px;
+                padding: 0 16px;
+            }
+
+            .terms-section-body {
+                padding-left: 22px;
+            }
+
+            .terms-section-header {
+                padding: 14px 16px;
+                gap: 10px;
+            }
+
+            .terms-meta {
+                gap: 8px;
+            }
         }
     </style>
 </head>
@@ -256,7 +288,6 @@ if (session_status() === PHP_SESSION_NONE) {
                 <div class="terms-page-header">
                     <h1>Website Terms of Use</h1><br>
                     <div class="terms-meta">
-                        <span class="terms-date">Last Updated: January 2026</span>
                     </div>
                     <p class="terms-intro">Please read these terms and conditions carefully before using this site. These terms tell you the rules for using CybAware.</p>
                 </div>
@@ -416,13 +447,13 @@ if (session_status() === PHP_SESSION_NONE) {
                         </div>
                     </div>
 
-                </div><!-- /#termsSections -->
+                </div>
 
                 <div class="terms-footer-note">
                     These terms are based on standard educational project terms and have been adapted for the CybAware cybersecurity awareness project.
                 </div>
 
-            </div><!-- /.terms-wrapper -->
+            </div>
         </div>
 
         <?php include 'includes/footer.php'; ?>
