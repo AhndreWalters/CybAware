@@ -1,7 +1,6 @@
 <?php
 session_start();
 
-// Check if user is logged in
 if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){
     header("location: login.php");
     exit;
@@ -9,14 +8,12 @@ if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){
 
 require_once "config/database.php";
 
-// Initialize game variables
 $score = isset($_SESSION['phishing_score']) ? $_SESSION['phishing_score'] : 0;
 $current_question = isset($_SESSION['phishing_question']) ? $_SESSION['phishing_question'] : 1;
 $total_questions = 10;
 $feedback = "";
 $game_completed = false;
 
-// Game data - Realistic looking emails
 $emails = [
     1 => [
         'sender' => 'security@paypal-support.com',
@@ -326,7 +323,6 @@ $emails = [
     ]
 ];
 
-// Process form submission
 if($_SERVER["REQUEST_METHOD"] == "POST") {
     if(isset($_POST['answer']) && isset($_POST['question_id'])) {
         $user_answer = $_POST['answer'];
@@ -344,17 +340,14 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
                 $feedback = "<div class='feedback incorrect'><span style='color: #dc2626;'>Incorrect</span></div>";
             }
             
-            // Always show hint after answering
             $feedback .= "<div class='hint-box'><strong>Hint:</strong> " . htmlspecialchars($hint) . "</div>";
             
-            // Store feedback in session so it shows on the NEXT question's page load
             $_SESSION['phishing_feedback'] = $feedback;
             $_SESSION['phishing_answered_question'] = $question_id;
             
             $current_question = $question_id + 1;
             $_SESSION['phishing_question'] = $current_question;
             
-            // Check if game is completed
             if($current_question > $total_questions) {
                 $game_completed = true;
                 
@@ -378,14 +371,12 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 }
 
-// Load feedback from session if it was set on the previous submit
 if(empty($feedback) && isset($_SESSION['phishing_feedback'])) {
     $feedback = $_SESSION['phishing_feedback'];
     unset($_SESSION['phishing_feedback']);
     unset($_SESSION['phishing_answered_question']);
 }
 
-// Reset game if needed
 if(isset($_GET['reset'])) {
     unset($_SESSION['phishing_score']);
     unset($_SESSION['phishing_question']);
