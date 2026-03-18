@@ -7,15 +7,18 @@
     <title>About | CybAware</title>
     <link rel="stylesheet" href="css/styles.css">
     <style>
+        <?php // Makes all elements include padding and border inside their width so layout stays consistent ?>
         * {
             box-sizing: border-box;
         }
 
+        <?php // Stops the page from scrolling sideways on any screen size ?>
         html, body {
             max-width: 100%;
             overflow-x: hidden;
         }
 
+        <?php // Each about section sits side by side with a gap between the text and image ?>
         .about-section {
             display: flex;
             align-items: center;
@@ -23,14 +26,17 @@
             margin-bottom: 3rem;
         }
 
+        <?php // Odd sections have the text on the left and image on the right ?>
         .about-section:nth-child(odd) {
             flex-direction: row;
         }
 
+        <?php // Even sections flip the layout so the image is on the left and text on the right ?>
         .about-section:nth-child(even) {
             flex-direction: row-reverse;
         }
 
+        <?php // The text block stretches to fill the remaining space and wraps long words so nothing overflows ?>
         .about-text {
             flex: 1;
             min-width: 0;
@@ -38,16 +44,19 @@
             overflow-wrap: break-word;
         }
 
+        <?php // Stops the image from shrinking when the text needs more space ?>
         .about-image {
             flex-shrink: 0;
         }
 
+        <?php // Makes images scale down if needed while keeping their original proportions ?>
         .about-image img {
             max-width: 100%;
             height: auto;
             display: block;
         }
 
+        <?php // On mobile, all sections stack vertically regardless of whether they are odd or even ?>
         @media (max-width: 768px) {
             .about-section,
             .about-section:nth-child(odd),
@@ -55,6 +64,7 @@
                 flex-direction: column;
             }
 
+            <?php // On mobile the image takes the full width and centres itself ?>
             .about-image {
                 width: 100%;
                 text-align: center;
@@ -68,10 +78,14 @@
 </head>
 <body>
     <div class="container">
+
+        <?php // Load the shared navigation bar at the top of the page ?>
         <?php include 'includes/navigation.php'; ?>
 
         <div class="main-content">
             <div class="about-container">
+
+                <?php // Section 1 - introduces what CybAware is and why it was built ?>
                 <div class="about-section">
                     <div class="about-text">
                         <h2>About CybAware</h2>
@@ -84,6 +98,7 @@
                     </div>
                 </div>
 
+                <?php // Section 2 - describes the two game missions: Password Fortress and Phishing Detective ?>
                 <div class="about-section">
                     <div class="about-text">
                         <h2>Our Interactive Missions</h2>
@@ -97,6 +112,7 @@
                     </div>
                 </div>
 
+                <?php // Section 3 - covers the development background, team members and technologies used ?>
                 <div class="about-section">
                     <div class="about-text">
                         <h2>Project Development & Team</h2>
@@ -109,6 +125,7 @@
                     </div>
                 </div>
 
+                <?php // Section 4 - a thank you message from the team to everyone who supported the project ?>
                 <div class="about-section">
                     <div class="about-text">
                         <h2>Message from the CybAware Team</h2>
@@ -116,20 +133,25 @@
                         <p>While this project represents the culmination of our academic journey at T.A. Marryshow Community College, we hope it marks just the beginning of increased cybersecurity awareness in our community. We're incredibly proud of what we've achieved - from initial concept to functional game - and we hope CybAware serves as a valuable resource for students learning about digital safety.</p>
                         <p>We recognize that educational projects like ours are part of a larger ecosystem of cybersecurity learning tools. We encourage all users to continue their cybersecurity education journey, building upon the foundations established through CybAware's interactive missions.</p>
                         <p>Thank you for engaging with our project, for providing valuable feedback during testing, and for joining us in making cybersecurity education more accessible and engaging.</p>
+                        <?php // Signature block showing the team members names ?>
                         <p class="signature">With gratitude,<br><strong>The CybAware Development Team</strong><br>Ahndre Walters & Joshua Evelyn</p>
                     </div>
                     <div class="about-image">
                         <img src="images/about4.png" alt="CybAware Team Appreciation" style="width: 300px;">
                     </div>
                 </div>
+
             </div>
         </div>
         
+        <?php // Load the shared footer at the bottom of the page ?>
         <?php include 'includes/footer.php'; ?>
         
+        <?php // Invisible overlay that darkens the page when the mobile menu is open ?>
         <div class="menu-overlay" id="menuOverlay"></div>
     </div>
 
+    <?php // Load the JavaScript file that controls the navigation menu behaviour ?>
     <script src="js/navigation.js"></script>
 </body>
 </html>
