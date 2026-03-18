@@ -312,8 +312,8 @@ nav {
 }
 
 .login-title,
-.contact-header h1 {
-    color: #1e40af;
+.contact-container .contact-header h1 {
+    color: #1e40af !important;
     text-align: center;
     margin-bottom: 10px;
     font-size: 2rem;
@@ -361,7 +361,7 @@ nav {
 
 .about-text h1,
 .about-text h2 {
-    color: #0f172a;
+    color: #1e40af;
     margin-bottom: 25px;
     line-height: 1.3;
 }
@@ -424,8 +424,8 @@ nav {
     padding: 40px 20px;
 }
 
-.contact-header h1 {
-    color: #0f172a;
+.contact-container .contact-header h1 {
+    color: #1e40af;
     font-size: 2.8rem;
     margin-bottom: 15px;
 }
