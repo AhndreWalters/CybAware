@@ -44,7 +44,7 @@ if (session_status() === PHP_SESSION_NONE) {
         .terms-page-header h1 {
             font-size: clamp(1.75rem, 4vw, 2.4rem);
             font-weight: 700;
-            color: #0f172a;
+            color: #1e40af;
             letter-spacing: -0.02em;
             margin: 0 0 10px;
             word-wrap: break-word;
