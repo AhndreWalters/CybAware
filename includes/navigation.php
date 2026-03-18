@@ -1,9 +1,12 @@
 <?php
+// Start a new session only if one isn't already running
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 ?>
+
 <style>
+/* Removes default list item height and spacing for the avatar nav item */
 #avatar-li {
     height: 0 !important;
     overflow: visible !important;
@@ -11,17 +14,23 @@ if (session_status() === PHP_SESSION_NONE) {
     margin-top: 0 !important;
     margin-bottom: 0 !important;
 }
+/* Keeps the avatar positioned correctly relative to the nav */
 #nav-avatar {
     position: relative;
     top: 0;
 }
+/* Hides the avatar completely on mobile screens */
 @media (max-width: 768px) {
     #avatar-li {
         display: none !important;
     }
 }
 </style>
+
+<?php // Main navigation bar containing the logo, nav links and mobile menu button ?>
 <nav>
+
+    <?php // Logo section - clicking it takes the user back to the homepage ?>
     <div class="logo">
         <a href="index.php">
             <div class="logo-text">
@@ -30,23 +39,30 @@ if (session_status() === PHP_SESSION_NONE) {
         </a>
     </div>
     
+    <?php // List of navigation links shown across the top of every page ?>
     <ul class="nav-links" id="navLinks">
         <li><a href="about.php">About</a></li>
         <li><a href="game.php">Game</a></li>
         <li><a href="contact.php">Contact</a></li>
+
+        <?php // If the user is logged in, show their first name with a logout link ?>
         <?php if(isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true): ?>
             <li><a href="logout.php" style="font-weight: 600;">
                 <span style="color: white; position: relative; display: inline-block;">
                     <?php echo htmlspecialchars($_SESSION["first_name"]); ?> (Logout)
+                    <?php // Green curved underline drawn using an inline SVG ?>
                     <svg style="position: absolute; bottom: -6px; left: 0; width: 100%; height: 8px;" viewBox="0 0 100 8" preserveAspectRatio="none">
                         <path d="M0,5 Q50,1 100,5" stroke="#4ade80" stroke-width="2.5" fill="none" stroke-linecap="round"/>
                     </svg>
                 </span>
             </a></li>
+
+        <?php // If the user is not logged in, show a Sign In link instead ?>
         <?php else: ?>
             <li><a href="login.php">
                 <span style="color: white; position: relative; display: inline-block;">
                     Sign In
+                    <?php // Green curved underline drawn using an inline SVG ?>
                     <svg style="position: absolute; bottom: -6px; left: 0; width: 100%; height: 8px;" viewBox="0 0 100 8" preserveAspectRatio="none">
                         <path d="M0,5 Q50,1 100,5" stroke="#4ade80" stroke-width="2.5" fill="none" stroke-linecap="round"/>
                     </svg>
@@ -54,6 +70,7 @@ if (session_status() === PHP_SESSION_NONE) {
             </a></li>
         <?php endif; ?>
 
+        <?php // Avatar icon in the nav bar - clicking it opens the character picker modal ?>
         <li id="avatar-li" style="display:flex; align-items:center; margin-left:-4px; line-height:0; padding:0; align-self:center;">
             <div id="nav-avatar" title="Change character" style="
                 width: 44px;
@@ -68,32 +85,46 @@ if (session_status() === PHP_SESSION_NONE) {
                 margin-top: 0;
                 vertical-align: middle;
             ">
+                <?php // Empty SVG that gets filled in by JavaScript with the selected character ?>
                 <svg id="avatar-svg" viewBox="0 0 44 44" width="40" height="40" xmlns="http://www.w3.org/2000/svg" overflow="visible" style="display:block;"></svg>
             </div>
         </li>
     </ul>
     
+    <?php // Hamburger menu button shown on mobile - toggles the nav links open and closed ?>
     <div class="mobile-menu-btn" id="mobileMenuBtn">☰</div>
 </nav>
 
+<?php // Background music that loops automatically and starts playing on first user click ?>
 <audio src="music/eliveta-technology.mp3" loop autoplay></audio>
 <script>
+// Get the background music audio element
 const music = document.getElementById('bg-music');
+
+// Set the volume to 30% so it doesn't overpower the page
 music.volume = 0.3;
+
+// Wait for the user to click anywhere on the page before starting the music
+// This is required because browsers block audio from auto-playing without user interaction
 document.addEventListener('click', function startMusic() {
     music.play().catch(() => {});
     document.removeEventListener('click', startMusic);
 }, { once: true });
 
+// Once the audio is ready to play, restore the saved playback position from sessionStorage
 music.addEventListener('canplay', () => {
     const saved = parseFloat(sessionStorage.getItem('music_time') || 0);
     if (saved) music.currentTime = saved;
 });
+
+// Every second, save the current playback time to sessionStorage
+// This means the music continues from where it left off when navigating between pages
 setInterval(() => {
     if (!music.paused) sessionStorage.setItem('music_time', music.currentTime);
 }, 1000);
 </script>
 
+<?php // Full screen overlay modal that lets the user pick their character avatar ?>
 <div id="char-picker" style="
     display: none;
     position: fixed;
@@ -104,6 +135,7 @@ setInterval(() => {
     align-items: center;
     justify-content: center;
 ">
+    <?php // The white modal card that sits in the centre of the overlay ?>
     <div style="
         background: #ffffff;
         border: 1px solid #e2e8f0;
@@ -115,9 +147,14 @@ setInterval(() => {
         max-height: 90vh;
         overflow-y: auto;
     ">
+        <?php // Modal title and subtitle shown at the top of the picker ?>
         <h3 style="color:#1e293b; margin:0 0 4px; font-size:1.1rem; font-weight:700; text-align:center;">Choose Your Character</h3>
         <p style="color:#94a3b8; font-size:0.8rem; text-align:center; margin:0 0 20px;">Your avatar watches the cursor 👁</p>
+
+        <?php // Grid of character options - populated dynamically by JavaScript ?>
         <div id="char-grid" style="display:grid; grid-template-columns:repeat(5,1fr); gap:10px;"></div>
+
+        <?php // Close button at the bottom of the modal ?>
         <button id="close-picker" style="
             margin-top: 20px;
             width: 100%;
@@ -133,8 +170,10 @@ setInterval(() => {
 </div>
 
 <script>
+// Wrap everything in an immediately invoked function to avoid polluting the global scope
 (function () {
 
+// Array of all available characters - each one has SVG body shapes, eye position and colour info
 const CHARS = [
     {
         id: 'robot', label: 'Neon Bot',
@@ -337,13 +376,20 @@ const CHARS = [
     },
 ];
 
+// Key used to save and load the selected character from localStorage
 const KEY = 'cyb_char';
+
+// Load the previously selected character, defaulting to robot if none is saved
 let currentId = localStorage.getItem(KEY) || 'robot';
+
+// Track the current mouse position so the avatar eye can follow the cursor
 let mouseX = window.innerWidth / 2;
 let mouseY = window.innerHeight / 2;
 
+// Find and return the character object that matches the given ID
 function getChar(id) { return CHARS.find(c => c.id === id) || CHARS[0]; }
 
+// Draw the selected character into the nav avatar SVG element
 function renderAvatar(id) {
     const ch  = getChar(id);
     const svg = document.getElementById('avatar-svg');
@@ -353,35 +399,48 @@ function renderAvatar(id) {
         `<circle id="nav-pupil" cx="${ch.eyeCx}" cy="${ch.eyeCy}" r="${ch.eyeR}" fill="${ch.eyeColor}"/>`;
 }
 
+// Move the avatar's pupil towards the current mouse position to create a looking effect
 function updateEye() {
     const pupil = document.getElementById('nav-pupil');
     const svg   = document.getElementById('avatar-svg');
     if (!pupil || !svg) return;
-
     const ch   = getChar(currentId);
+
+    // Get the position of the avatar on screen so we can calculate direction to the mouse
     const rect = svg.getBoundingClientRect();
     const cx   = rect.left + rect.width  / 2;
     const cy   = rect.top  + rect.height / 2;
+
+    // Work out the direction and distance from the avatar to the mouse
     const dx   = mouseX - cx;
     const dy   = mouseY - cy;
     const dist = Math.sqrt(dx * dx + dy * dy) || 1;
+
+    // Limit how far the pupil can move so it stays inside the eye
     const max  = ch.eyeMaxMove || 1.8;
     const t    = Math.min(max / dist, 1);
-    const svgS = 44 / (rect.width || 44);
 
+    // Convert screen pixels to SVG units so the movement looks correct at any screen size
+    const svgS = 44 / (rect.width || 44);
     pupil.setAttribute('cx', ch.eyeCx + dx * t * svgS);
     pupil.setAttribute('cy', ch.eyeCy + dy * t * svgS);
 }
 
+// Update the stored mouse position and move the eye every time the mouse moves
 document.addEventListener('mousemove', e => { mouseX = e.clientX; mouseY = e.clientY; updateEye(); });
 
+// Build and display the character selection grid inside the picker modal
 function buildGrid() {
     const grid = document.getElementById('char-grid');
     if (!grid) return;
     grid.innerHTML = '';
+
+    // Loop through each character and create a button card for it
     CHARS.forEach(ch => {
         const isActive = ch.id === currentId;
         const btn = document.createElement('button');
+
+        // Highlight the currently selected character with a blue border
         btn.style.cssText = `
             background:${isActive ? '#dbeafe' : '#f8fafc'};
             border:2px solid ${isActive ? '#1e40af' : '#e2e8f0'};
@@ -389,6 +448,8 @@ function buildGrid() {
             cursor:pointer; display:flex; flex-direction:column;
             align-items:center; gap:5px; transition:border-color 0.15s, background 0.15s;
         `;
+
+        // Show the character SVG and label inside the button
         btn.innerHTML = `
             <svg viewBox="0 0 44 44" width="46" height="46" xmlns="http://www.w3.org/2000/svg">
                 ${ch.body}${ch.eyeBg}
@@ -396,8 +457,12 @@ function buildGrid() {
             </svg>
             <span style="color:#475569;font-size:0.68rem;font-weight:600;">${ch.label}</span>
         `;
+
+        // Subtle hover effect to show the button is interactive
         btn.addEventListener('mouseenter', () => { if (!isActive) btn.style.borderColor = '#94a3b8'; });
         btn.addEventListener('mouseleave', () => { if (!isActive) btn.style.borderColor = '#e2e8f0'; });
+
+        // When a character is selected, save it, re-render the nav avatar and close the modal
         btn.addEventListener('click', () => {
             currentId = ch.id;
             localStorage.setItem(KEY, ch.id);
@@ -408,14 +473,25 @@ function buildGrid() {
     });
 }
 
+// Show the character picker modal
 function openPicker()  { buildGrid(); document.getElementById('char-picker').style.display = 'flex'; }
+
+// Hide the character picker modal
 function closePicker() { document.getElementById('char-picker').style.display = 'none'; }
 
+// Open the picker when the nav avatar is clicked
 document.getElementById('nav-avatar').addEventListener('click', openPicker);
+
+// Close the picker when the close button is clicked
 document.getElementById('close-picker').addEventListener('click', closePicker);
+
+// Close the picker if the user clicks on the dark backdrop behind the modal
 document.getElementById('char-picker').addEventListener('click', e => { if (e.target === e.currentTarget) closePicker(); });
 
+// Run setup tasks once the full page DOM has loaded
 document.addEventListener('DOMContentLoaded', function () {
+
+    // Draw the saved character into the nav avatar and point the eye in the right direction
     renderAvatar(currentId);
     updateEye();
 
@@ -423,12 +499,17 @@ document.addEventListener('DOMContentLoaded', function () {
     const navLinks      = document.getElementById('navLinks');
 
     if (mobileMenuBtn && navLinks) {
+
+        // Toggle the mobile nav open or closed when the hamburger button is tapped
         mobileMenuBtn.addEventListener('click', function (e) {
             e.stopPropagation();
             navLinks.classList.toggle('active');
+
+            // Switch the icon between hamburger and close depending on nav state
             mobileMenuBtn.textContent = navLinks.classList.contains('active') ? '✕' : '☰';
         });
 
+        // Close the mobile nav automatically when a link inside it is tapped
         navLinks.querySelectorAll('a').forEach(link => {
             link.addEventListener('click', function () {
                 if (window.innerWidth <= 768) {
@@ -438,6 +519,7 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         });
 
+        // Close the mobile nav if the user taps anywhere outside of it on mobile
         document.addEventListener('click', function (e) {
             if (navLinks.classList.contains('active') &&
                 !navLinks.contains(e.target) &&
@@ -449,6 +531,5 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 });
-
 })();
 </script>
