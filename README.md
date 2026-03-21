@@ -4,6 +4,10 @@ Final project for the Project Design & Management course at T.A. Marryshow Commu
 
 <img width="1200" height="947" alt="image" src="https://github.com/user-attachments/assets/5f9c5cd6-c9b1-445e-95a5-c71d3b5459ac" />
 
+<img width="960" height="947" alt="image" src="https://github.com/user-attachments/assets/c8ccf39b-6745-42b6-8de9-a3b3bffe3712" />
+
+<img width="1440" height="1015" alt="image" src="https://github.com/user-attachments/assets/d496e591-106b-4e79-bbfe-d49cc8a60df3" />
+
 ## About
 
 CybAware is a browser-based educational game that teaches students and young adults in Grenada how to stay safe online. Players create an account, complete four game levels across two missions, and earn a personalized Certificate of Achievement.
