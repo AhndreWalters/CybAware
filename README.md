@@ -121,4 +121,4 @@ For questions or feedback, reach out at cybaware@proton.me
 
 ## License
 
-<strong>[&copy; 2026 Ahndre Walters and Joshua Evelyn]() · CybAware · TAMCC Project Design & Management Course · College Course Capstone Project</strong>
+<strong>[&copy; 2026 Ahndre Walters and Joshua Evelyn](https://github.com/AhndreWalters/CybAware/blob/main/LICENSE) · CybAware · TAMCC Project Design & Management Course · College Course Capstone Project</strong>
