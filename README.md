@@ -2,6 +2,8 @@
 
 Final project for the Project Design & Management course at T.A. Marryshow Community College. An interactive, web-based educational game developed to raise cybersecurity awareness, featuring gamified lessons on password safety and phishing detection, built with HTML5, CSS3, JavaScript, and PHP.
 
+<img width="1200" height="947" alt="image" src="https://github.com/user-attachments/assets/5f9c5cd6-c9b1-445e-95a5-c71d3b5459ac" />
+
 ## About
 
 CybAware is a browser-based educational game that teaches students and young adults in Grenada how to stay safe online. Players create an account, complete four game levels across two missions, and earn a personalized Certificate of Achievement.
