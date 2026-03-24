@@ -60,7 +60,7 @@ $cert_id = 'CYB-' . strtoupper(substr(md5($user_id . $date . 'cybaware'), 0, 10)
             padding: 0 20px 56px;
         }
 
-        <?php // Centres the page title above the certificate ?>
+        <?php // Page title styled to match the game-header on game.php ?>
         .page-title {
             text-align: center;
             margin-bottom: 40px;
@@ -79,25 +79,36 @@ $cert_id = 'CYB-' . strtoupper(substr(md5($user_id . $date . 'cybaware'), 0, 10)
 
         <?php // Yellow warning banner shown when the user hasn't completed all games yet ?>
         .status-banner {
-            background: #fffbeb; border: 1px solid #fcd34d; border-radius: 4px;
-            padding: 11px 20px; text-align: center; margin-bottom: 20px;
-            font-family: 'Source Sans 3', sans-serif; font-size: 0.9rem; color: #92400e;
+            background: #fffbeb;
+            border: 1px solid #fcd34d;
+            border-radius: 4px;
+            padding: 11px 20px;
+            text-align: center;
+            margin-bottom: 28px;
+            font-family: 'Source Sans 3', sans-serif;
+            font-size: 0.9rem;
+            color: #92400e;
         }
         .status-banner strong { color: #78350f; }
 
-        <?php // Scales the certificate to fit the available width while keeping the correct proportions ?>
-        .cert-preview-scaler {
-            width: 100%;
-            padding-bottom: calc(750 / 1060 * 100%);
-            position: relative;
-        }
-        .cert-preview-scaler-inner { position: absolute; inset: 0; overflow: visible; }
+        <?php
+        ?>
 
-        <?php // The outermost navy blue border frame of the certificate ?>
+        <?php // Stable centred container for the certificate ?>
+        .cert-stage {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            width: 100%;
+            margin-bottom: 32px;
+        }
+
+        <?php // The outermost navy blue border frame of the certificate (fixed canvas size) ?>
         .cert-frame {
-            position: absolute; top: 0; left: 0;
-            width: 1060px; height: 750px;
-            transform-origin: top left;
+            width: 1060px;
+            height: 750px;
+            flex-shrink: 0;
+            transform-origin: top center;
             box-sizing: border-box;
             background: #1a2940;
             padding: 10px;
@@ -105,38 +116,57 @@ $cert_id = 'CYB-' . strtoupper(substr(md5($user_id . $date . 'cybaware'), 0, 10)
         }
 
         <?php // White gap between the navy outer frame and the inner navy rule ?>
-        .cert-frame-gap { background: #fff; padding: 4px; height: 100%; box-sizing: border-box; }
+        .cert-frame-gap {
+            background: #fff;
+            padding: 4px;
+            height: 100%;
+            box-sizing: border-box;
+        }
 
         <?php // Thin navy inner rule that sits just inside the white gap ?>
-        .cert-frame-line { background: #1a2940; padding: 1.5px; height: 100%; box-sizing: border-box; }
+        .cert-frame-line {
+            background: #1a2940;
+            padding: 1.5px;
+            height: 100%;
+            box-sizing: border-box;
+        }
 
         <?php // The main white certificate surface that holds all the content ?>
         .certificate-shell {
             position: relative;
             background: #ffffff;
-            height: 100%; box-sizing: border-box;
+            height: 100%;
+            box-sizing: border-box;
             padding: 34px 56px 26px;
-            display: flex; flex-direction: column;
+            display: flex;
+            flex-direction: column;
             overflow: hidden;
         }
 
         <?php // Subtle noise texture layered on top of the white background to give a paper feel ?>
         .certificate-shell::before {
             content: '';
-            position: absolute; inset: 0;
+            position: absolute;
+            inset: 0;
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='400'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='400' height='400' filter='url(%23n)' opacity='0.018'/%3E%3C/svg%3E");
-            pointer-events: none; z-index: 0;
+            pointer-events: none;
+            z-index: 0;
         }
 
         <?php // Faint large CA watermark printed behind all the certificate content ?>
         .cert-watermark {
-            position: absolute; top: 50%; left: 50%;
+            position: absolute;
+            top: 50%;
+            left: 50%;
             transform: translate(-50%, -50%);
             font-family: 'Playfair Display', serif;
-            font-size: 14rem; font-weight: 700;
+            font-size: 14rem;
+            font-weight: 700;
             color: rgba(26,41,64,0.03);
-            white-space: nowrap; pointer-events: none;
-            z-index: 0; user-select: none;
+            white-space: nowrap;
+            pointer-events: none;
+            z-index: 0;
+            user-select: none;
         }
 
         <?php // Vertical navy gradient bars running down the left and right edges of the certificate ?>
@@ -149,8 +179,11 @@ $cert_id = 'CYB-' . strtoupper(substr(md5($user_id . $date . 'cybaware'), 0, 10)
 
         <?php // Inner content wrapper that sits above the decorative layers and spaces the sections evenly ?>
         .certificate-inner {
-            position: relative; z-index: 2;
-            flex: 1; display: flex; flex-direction: column;
+            position: relative;
+            z-index: 2;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
             justify-content: space-between;
         }
 
@@ -163,76 +196,106 @@ $cert_id = 'CYB-' . strtoupper(substr(md5($user_id . $date . 'cybaware'), 0, 10)
         <?php // Header section containing the organisation name and subtitle ?>
         .cert-header { text-align: center; }
         .cert-header-row { display: flex; align-items: center; justify-content: center; gap: 22px; }
-        .cert-shield-wrap { flex-shrink: 0; }
         .cert-org {
             font-family: 'Playfair Display', serif;
-            font-size: 2.75rem; font-weight: 700;
-            color: #1a2940; letter-spacing: 6px; line-height: 1;
+            font-size: 2.75rem;
+            font-weight: 700;
+            color: #1a2940;
+            letter-spacing: 6px;
+            line-height: 1;
         }
         .cert-org-sub {
             font-family: 'Source Sans 3', sans-serif;
-            font-size: 0.6rem; font-weight: 600;
-            color: #c8a84c; letter-spacing: 5px;
-            text-transform: uppercase; margin-top: 4px;
+            font-size: 0.6rem;
+            font-weight: 600;
+            color: #c8a84c;
+            letter-spacing: 5px;
+            text-transform: uppercase;
+            margin-top: 4px;
         }
 
         <?php // Small uppercase label above the certificate title and the large italic title itself ?>
         .cert-title-eyebrow {
             font-family: 'Source Sans 3', sans-serif;
-            font-size: 0.6rem; font-weight: 600;
-            letter-spacing: 6px; color: #7a8fa8;
-            text-transform: uppercase; text-align: center;
+            font-size: 0.6rem;
+            font-weight: 600;
+            letter-spacing: 6px;
+            color: #7a8fa8;
+            text-transform: uppercase;
+            text-align: center;
         }
         .cert-title-main {
             font-family: 'Playfair Display', serif;
-            font-size: 2.5rem; font-weight: 400; font-style: italic;
-            color: #1a2940; letter-spacing: 2px; line-height: 1;
+            font-size: 2.5rem;
+            font-weight: 400;
+            font-style: italic;
+            color: #1a2940;
+            letter-spacing: 2px;
+            line-height: 1;
             text-align: center;
         }
 
         <?php // Container for the recipient name with gold top line and grey bottom line decorations ?>
         .cert-presented { text-align: center; }
         .cert-name-wrap {
-            display: inline-block; position: relative;
+            display: inline-block;
+            position: relative;
             padding: 8px 52px 10px;
         }
         .cert-name-wrap::before {
-            content: ''; position: absolute;
-            top: 0; left: 0; right: 0; height: 2px;
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 2px;
             background: linear-gradient(to right, transparent 0%, #c8a84c 15%, #e8cc76 50%, #c8a84c 85%, transparent 100%);
         }
         .cert-name-wrap::after {
-            content: ''; position: absolute;
-            bottom: 0; left: 0; right: 0; height: 1px;
+            content: '';
+            position: absolute;
+            bottom: 0; left: 0; right: 0;
+            height: 1px;
             background: linear-gradient(to right, transparent 0%, #d0d8e4 20%, #d0d8e4 80%, transparent 100%);
         }
 
         <?php // The recipient's name displayed in large serif font ?>
         .cert-name {
             font-family: 'Playfair Display', serif;
-            font-size: 2.3rem; font-weight: 600;
-            color: #1a2940; letter-spacing: 1px; line-height: 1.1;
-            display: block; word-break: break-word;
+            font-size: 2.3rem;
+            font-weight: 600;
+            color: #1a2940;
+            letter-spacing: 1px;
+            line-height: 1.1;
+            display: block;
+            word-break: break-word;
         }
 
         <?php // The descriptive body paragraph explaining what was achieved ?>
         .cert-body { text-align: center; }
         .cert-body-text {
             font-family: 'Libre Baskerville', serif;
-            font-size: 0.865rem; color: #4a5568;
-            font-style: italic; line-height: 1.8;
-            max-width: 580px; margin: 0 auto;
+            font-size: 0.865rem;
+            color: #4a5568;
+            font-style: italic;
+            line-height: 1.8;
+            max-width: 580px;
+            margin: 0 auto;
         }
         .cert-body-text strong { font-style: normal; font-weight: 700; color: #1a2940; }
 
         <?php // Row of competency badges shown only when the full certificate is earned ?>
         .cert-competencies { display: flex; justify-content: center; margin-top: 9px; }
         .cert-competency {
-            display: flex; align-items: center; gap: 6px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
             font-family: 'Source Sans 3', sans-serif;
-            font-size: 0.65rem; font-weight: 600;
-            color: #4a6080; letter-spacing: 1.5px; text-transform: uppercase;
-            padding: 0 16px; border-right: 1px solid #d0d8e4;
+            font-size: 0.65rem;
+            font-weight: 600;
+            color: #4a6080;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            padding: 0 16px;
+            border-right: 1px solid #d0d8e4;
         }
         .cert-competency:last-child { border-right: none; }
         .cert-competency svg { color: #c8a84c; flex-shrink: 0; }
@@ -242,52 +305,82 @@ $cert_id = 'CYB-' . strtoupper(substr(md5($user_id . $date . 'cybaware'), 0, 10)
         .sig-block { text-align: center; }
         .sig-name {
             font-family: 'Playfair Display', serif;
-            font-size: 1.08rem; font-weight: 600;
-            color: #1a2940; letter-spacing: 0.5px;
+            font-size: 1.08rem;
+            font-weight: 600;
+            color: #1a2940;
+            letter-spacing: 0.5px;
         }
         .sig-line {
-            width: 150px; height: 1px;
+            width: 150px;
+            height: 1px;
             background: linear-gradient(to right, transparent, #1a2940 25%, #1a2940 75%, transparent);
             margin: 7px auto 5px;
         }
         .sig-title {
             font-family: 'Source Sans 3', sans-serif;
-            font-size: 0.58rem; font-weight: 600;
-            letter-spacing: 3.5px; text-transform: uppercase; color: #7a8fa8;
+            font-size: 0.58rem;
+            font-weight: 600;
+            letter-spacing: 3.5px;
+            text-transform: uppercase;
+            color: #7a8fa8;
         }
 
         <?php // Official seal in the centre of the footer built from nested circles with a gold ring ?>
         .cert-seal { text-align: center; flex-shrink: 0; }
         .seal-wrap { width: 108px; height: 108px; margin: 0 auto 8px; position: relative; }
         .seal-outer {
-            position: absolute; inset: 0; border-radius: 50%;
+            position: absolute;
+            inset: 0;
+            border-radius: 50%;
             background: #1a2940;
-            display: flex; align-items: center; justify-content: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
             box-shadow: 0 4px 16px rgba(26,41,64,0.3);
         }
         .seal-gold {
-            width: calc(100% - 10px); height: calc(100% - 10px);
+            width: calc(100% - 10px);
+            height: calc(100% - 10px);
             border-radius: 50%;
             background: linear-gradient(135deg, #c8a84c, #e8cc76, #b89030, #e8cc76, #c8a84c);
-            display: flex; align-items: center; justify-content: center; padding: 3px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 3px;
         }
         .seal-white {
-            width: 100%; height: 100%; border-radius: 50%;
-            background: #fff; display: flex; align-items: center; justify-content: center; padding: 2px;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2px;
         }
         .seal-core {
-            width: 100%; height: 100%; border-radius: 50%;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
             background: radial-gradient(circle at 40% 35%, #2d4a6e, #1a2940);
-            display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 2px;
         }
         .seal-label {
             font-family: 'Source Sans 3', sans-serif;
-            font-size: 0.55rem; font-weight: 700;
-            color: #ffffff; letter-spacing: 2px; text-transform: uppercase;
+            font-size: 0.55rem;
+            font-weight: 700;
+            color: #ffffff;
+            letter-spacing: 2px;
+            text-transform: uppercase;
         }
         .seal-sublabel {
             font-family: 'Playfair Display', serif;
-            font-size: 0.52rem; font-style: italic;
+            font-size: 0.52rem;
+            font-style: italic;
             color: rgba(200,168,76,0.9);
             letter-spacing: 1px;
         }
@@ -297,13 +390,20 @@ $cert_id = 'CYB-' . strtoupper(substr(md5($user_id . $date . 'cybaware'), 0, 10)
         .cert-meta { text-align: center; margin-top: 6px; }
         .cert-meta-label {
             font-family: 'Source Sans 3', sans-serif;
-            font-size: 0.56rem; font-weight: 600;
-            letter-spacing: 3px; text-transform: uppercase; color: #7a8fa8; margin-bottom: 2px;
+            font-size: 0.56rem;
+            font-weight: 600;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: #7a8fa8;
+            margin-bottom: 2px;
         }
         .cert-meta-value {
             font-family: 'Libre Baskerville', serif;
-            font-size: 0.8rem; color: #1a2940;
-            border-bottom: 1px solid #d0d8e4; padding-bottom: 2px; display: inline-block;
+            font-size: 0.8rem;
+            color: #1a2940;
+            border-bottom: 1px solid #d0d8e4;
+            padding-bottom: 2px;
+            display: inline-block;
         }
 
         <?php // Row showing the unique certificate ID with fading lines on either side ?>
@@ -313,21 +413,36 @@ $cert_id = 'CYB-' . strtoupper(substr(md5($user_id . $date . 'cybaware'), 0, 10)
         .cert-id { font-family: 'Source Sans 3', sans-serif; font-size: 0.54rem; color: #a0aec0; letter-spacing: 3px; text-transform: uppercase; }
 
         <?php // Row of action buttons shown below the certificate ?>
-        .cert-actions { display: flex; justify-content: center; gap: 14px; margin-top: 28px; flex-wrap: wrap; }
+        .cert-actions {
+            display: flex;
+            justify-content: center;
+            gap: 14px;
+            margin-top: 28px;
+            flex-wrap: wrap;
+        }
         .cert-btn {
-            padding: 12px 28px; border-radius: 4px;
+            padding: 12px 28px;
+            border-radius: 4px;
             font-family: 'Source Sans 3', sans-serif;
-            font-size: 0.88rem; font-weight: 600;
-            letter-spacing: 1px; text-transform: uppercase;
-            cursor: pointer; transition: all 0.2s ease;
-            text-decoration: none; display: inline-flex;
-            align-items: center; gap: 8px;
-            min-width: 155px; justify-content: center;
+            font-size: 0.88rem;
+            font-weight: 600;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            min-width: 155px;
+            justify-content: center;
         }
 
         <?php // Filled navy button used for the primary Save as PDF action ?>
         .cert-btn-primary {
-            background: #1a2940; color: #fff; border: none;
+            background: #1a2940;
+            color: #fff;
+            border: none;
             box-shadow: 0 4px 12px rgba(26,41,64,0.25);
         }
         .cert-btn-primary:hover { background: #243b5a; transform: translateY(-2px); box-shadow: 0 6px 18px rgba(26,41,64,0.35); }
@@ -336,9 +451,8 @@ $cert_id = 'CYB-' . strtoupper(substr(md5($user_id . $date . 'cybaware'), 0, 10)
         .cert-btn-outline { background: transparent; color: #1a2940; border: 1.5px solid #1a2940; }
         .cert-btn-outline:hover { background: rgba(26,41,64,0.05); transform: translateY(-2px); }
 
-        <?php // On small screens the footer stacks vertically and buttons go full width ?>
+        <?php // On small screens buttons go full width ?>
         @media (max-width: 600px) {
-            .cert-footer  { grid-template-columns: 1fr; gap: 18px; }
             .cert-actions { flex-direction: column; align-items: center; }
             .cert-btn     { width: 100%; max-width: 280px; }
         }
@@ -366,148 +480,147 @@ $cert_id = 'CYB-' . strtoupper(substr(md5($user_id . $date . 'cybaware'), 0, 10)
                 </div>
                 <?php endif; ?>
 
-                <?php // Responsive scaler wrapper that shrinks the fixed size certificate to fit the screen ?>
-                <div class="cert-preview-scaler">
-                  <div class="cert-preview-scaler-inner">
-                    <div class="cert-frame">
-                      <div class="cert-frame-gap">
-                        <div class="cert-frame-line">
-                          <div class="certificate-shell">
+                <?php
+                ?>
+                <div class="cert-stage" id="certStage">
+                    <div class="cert-frame" id="certFrame">
+                        <div class="cert-frame-gap">
+                            <div class="cert-frame-line">
+                                <div class="certificate-shell">
 
-                            <?php // Decorative background watermark, side bars and gold edge rules ?>
-                            <div class="cert-watermark">CA</div>
-                            <div class="cert-bar-left"></div>
-                            <div class="cert-bar-right"></div>
-                            <div class="cert-rule-top"></div>
-                            <div class="cert-rule-bottom"></div>
+                                    <?php // Decorative background watermark, side bars and gold edge rules ?>
+                                    <div class="cert-watermark">CA</div>
+                                    <div class="cert-bar-left"></div>
+                                    <div class="cert-bar-right"></div>
+                                    <div class="cert-rule-top"></div>
+                                    <div class="cert-rule-bottom"></div>
 
-                            <div class="certificate-inner">
+                                    <div class="certificate-inner">
 
-                                <?php // Organisation name and training program subtitle at the top of the certificate ?>
-                                <div class="cert-header">
-                                    <div class="cert-header-row">
-                                        <div>
-                                            <div class="cert-org">CybAware</div>
-                                            <div class="cert-org-sub">Cybersecurity Awareness Training</div>
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <?php // First decorative divider line with diamond shapes ?>
-                                <div class="rule-divider">
-                                    <div class="rule-line"></div>
-                                    <div class="rule-diamond-sm"></div><div class="rule-diamond"></div><div class="rule-diamond-sm"></div>
-                                    <div class="rule-line"></div>
-                                </div>
-
-                                <?php // Label telling the reader who the certificate is presented to ?>
-                                <div style="text-align:center;">
-                                    <div class="cert-title-eyebrow">This Certificate is Presented To</div>
-                                </div>
-
-                                <?php // The logged in user's full name printed on the certificate ?>
-                                <div class="cert-presented">
-                                    <div class="cert-name-wrap">
-                                        <span class="cert-name"><?php echo htmlspecialchars($_SESSION['full_name']); ?></span>
-                                    </div>
-                                </div>
-
-                                <?php // Shows Achievement if fully completed or Participation if still in progress ?>
-                                <div style="text-align:center;">
-                                    <div class="cert-title-eyebrow" style="margin-bottom:3px;">in recognition of</div>
-                                    <div class="cert-title-main"><?php echo $certificate_earned ? 'Achievement' : 'Participation'; ?></div>
-                                </div>
-
-                                <?php // Body text that changes depending on whether the certificate is fully earned or not ?>
-                                <div class="cert-body">
-                                    <div class="cert-body-text">
-                                        <?php if($certificate_earned): ?>
-                                            for successfully completing all required assessments within the<br>
-                                            <strong>CybAware Cybersecurity Awareness Training Program</strong>,<br>
-                                            demonstrating verified competency in digital security practices.
-                                        <?php else: ?>
-                                            for active participation in the<br>
-                                            <strong>CybAware Cybersecurity Awareness Training Program</strong>,<br>
-                                            having completed <?php echo $total_completed; ?> of <?php echo $total_games; ?> required assessment modules.
-                                        <?php endif; ?>
-                                    </div>
-
-                                    <?php // Competency badges only shown when all games are completed ?>
-                                    <?php if($certificate_earned): ?>
-                                    <div class="cert-competencies">
-                                        <div class="cert-competency">
-                                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                                            Password Security
-                                        </div>
-                                        <div class="cert-competency">
-                                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                                            Phishing Detection
-                                        </div>
-                                        <div class="cert-competency">
-                                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                                            Threat Awareness
-                                        </div>
-                                    </div>
-                                    <?php endif; ?>
-                                </div>
-
-                                <?php // Second decorative divider line separating the body from the footer ?>
-                                <div class="rule-divider">
-                                    <div class="rule-line"></div>
-                                    <div class="rule-diamond-sm"></div><div class="rule-diamond"></div><div class="rule-diamond-sm"></div>
-                                    <div class="rule-line"></div>
-                                </div>
-
-                                <?php // Footer with two developer signatures on either side and the official seal in the middle ?>
-                                <div class="cert-footer">
-                                    <div class="sig-block">
-                                        <div class="sig-name">Ahndre Walters</div>
-                                        <div class="sig-line"></div>
-                                        <div class="sig-title">Lead Developer</div>
-                                    </div>
-
-                                    <?php // Official seal showing CERTIFIED or PENDING depending on completion status ?>
-                                    <div class="cert-seal">
-                                        <div class="seal-wrap">
-                                            <div class="seal-outer">
-                                                <div class="seal-gold">
-                                                    <div class="seal-white">
-                                                        <div class="seal-core">
-                                                            <div class="seal-divider"></div>
-                                                            <div class="seal-label"><?php echo $certificate_earned ? 'CERTIFIED' : 'PENDING'; ?></div>
-                                                            <div class="seal-sublabel">CybAware</div>
-                                                        </div>
-                                                    </div>
+                                        <?php // Organisation name and training program subtitle at the top of the certificate ?>
+                                        <div class="cert-header">
+                                            <div class="cert-header-row">
+                                                <div>
+                                                    <div class="cert-org">CybAware</div>
+                                                    <div class="cert-org-sub">Cybersecurity Awareness Training</div>
                                                 </div>
                                             </div>
                                         </div>
-                                        <?php // Date the certificate was generated displayed beneath the seal ?>
-                                        <div class="cert-meta">
-                                            <div class="cert-meta-label">Date Issued</div>
-                                            <div class="cert-meta-value"><?php echo $date; ?></div>
+
+                                        <?php // First decorative divider line with diamond shapes ?>
+                                        <div class="rule-divider">
+                                            <div class="rule-line"></div>
+                                            <div class="rule-diamond-sm"></div><div class="rule-diamond"></div><div class="rule-diamond-sm"></div>
+                                            <div class="rule-line"></div>
                                         </div>
-                                    </div>
 
-                                    <div class="sig-block">
-                                        <div class="sig-name">Joshua Evelyn</div>
-                                        <div class="sig-line"></div>
-                                        <div class="sig-title">Lead Developer</div>
+                                        <?php // Label telling the reader who the certificate is presented to ?>
+                                        <div style="text-align:center;">
+                                            <div class="cert-title-eyebrow">This Certificate is Presented To</div>
+                                        </div>
+
+                                        <?php // The logged in user's full name printed on the certificate ?>
+                                        <div class="cert-presented">
+                                            <div class="cert-name-wrap">
+                                                <span class="cert-name"><?php echo htmlspecialchars($_SESSION['full_name']); ?></span>
+                                            </div>
+                                        </div>
+
+                                        <?php // Shows Achievement if fully completed or Participation if still in progress ?>
+                                        <div style="text-align:center;">
+                                            <div class="cert-title-eyebrow" style="margin-bottom:3px;">in recognition of</div>
+                                            <div class="cert-title-main"><?php echo $certificate_earned ? 'Achievement' : 'Participation'; ?></div>
+                                        </div>
+
+                                        <?php // Body text that changes depending on whether the certificate is fully earned or not ?>
+                                        <div class="cert-body">
+                                            <div class="cert-body-text">
+                                                <?php if($certificate_earned): ?>
+                                                    for successfully completing all required assessments within the<br>
+                                                    <strong>CybAware Cybersecurity Awareness Training Program</strong>,<br>
+                                                    demonstrating verified competency in digital security practices.
+                                                <?php else: ?>
+                                                    for active participation in the<br>
+                                                    <strong>CybAware Cybersecurity Awareness Training Program</strong>,<br>
+                                                    having completed <?php echo $total_completed; ?> of <?php echo $total_games; ?> required assessment modules.
+                                                <?php endif; ?>
+                                            </div>
+
+                                            <?php // Competency badges only shown when all games are completed ?>
+                                            <?php if($certificate_earned): ?>
+                                            <div class="cert-competencies">
+                                                <div class="cert-competency">
+                                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                                                    Password Security
+                                                </div>
+                                                <div class="cert-competency">
+                                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                                                    Phishing Detection
+                                                </div>
+                                                <div class="cert-competency">
+                                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                                                    Threat Awareness
+                                                </div>
+                                            </div>
+                                            <?php endif; ?>
+                                        </div>
+
+                                        <?php // Second decorative divider line separating the body from the footer ?>
+                                        <div class="rule-divider">
+                                            <div class="rule-line"></div>
+                                            <div class="rule-diamond-sm"></div><div class="rule-diamond"></div><div class="rule-diamond-sm"></div>
+                                            <div class="rule-line"></div>
+                                        </div>
+
+                                        <?php // Footer with two developer signatures on either side and the official seal in the middle ?>
+                                        <div class="cert-footer">
+                                            <div class="sig-block">
+                                                <div class="sig-name">Ahndre Walters</div>
+                                                <div class="sig-line"></div>
+                                                <div class="sig-title">Lead Developer</div>
+                                            </div>
+
+                                            <?php // Official seal showing CERTIFIED or PENDING depending on completion status ?>
+                                            <div class="cert-seal">
+                                                <div class="seal-wrap">
+                                                    <div class="seal-outer">
+                                                        <div class="seal-gold">
+                                                            <div class="seal-white">
+                                                                <div class="seal-core">
+                                                                    <div class="seal-divider"></div>
+                                                                    <div class="seal-label"><?php echo $certificate_earned ? 'CERTIFIED' : 'PENDING'; ?></div>
+                                                                    <div class="seal-sublabel">CybAware</div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <?php // Date the certificate was generated displayed beneath the seal ?>
+                                                <div class="cert-meta">
+                                                    <div class="cert-meta-label">Date Issued</div>
+                                                    <div class="cert-meta-value"><?php echo $date; ?></div>
+                                                </div>
+                                            </div>
+
+                                            <div class="sig-block">
+                                                <div class="sig-name">Joshua Evelyn</div>
+                                                <div class="sig-line"></div>
+                                                <div class="sig-title">Lead Developer</div>
+                                            </div>
+                                        </div>
+
+                                        <?php // Unique certificate ID shown at the very bottom of the certificate ?>
+                                        <div class="cert-id-row">
+                                            <div class="cert-id-dash"></div>
+                                            <div class="cert-id"><?php echo $cert_id; ?></div>
+                                            <div class="cert-id-dash right"></div>
+                                        </div>
+
                                     </div>
                                 </div>
-
-                                <?php // Unique certificate ID shown at the very bottom of the certificate ?>
-                                <div class="cert-id-row">
-                                    <div class="cert-id-dash"></div>
-                                    <div class="cert-id"><?php echo $cert_id; ?></div>
-                                    <div class="cert-id-dash right"></div>
-                                </div>
-
                             </div>
-                          </div>
                         </div>
-                      </div>
                     </div>
-                  </div>
                 </div>
 
                 <?php // Action buttons below the certificate for navigating away or saving as a PDF ?>
@@ -531,63 +644,88 @@ $cert_id = 'CYB-' . strtoupper(substr(md5($user_id . $date . 'cybaware'), 0, 10)
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script>
-        // Scale the certificate frame to fit the available space on the screen
+        var CERT_W = 1060;
+        var CERT_H = 750;
+
+        // Scale and centre the certificate so it fills the available width as
+        // large as possible, then set the stage height to match so the page
+        // layout never shifts or overlaps.
         function scaleCert() {
-            var inner = document.querySelector('.cert-preview-scaler-inner');
-            var frame = document.querySelector('.cert-frame');
-            if (!inner || !frame) return;
+            var stage = document.getElementById('certStage');
+            var frame = document.getElementById('certFrame');
+            if (!stage || !frame) return;
 
-            // Calculate the scale needed to fit the 1060x750 certificate into the container
-            var scale = Math.min(inner.offsetWidth / 1060, inner.offsetHeight / 750);
-            frame.style.transform = 'scale(' + scale + ')';
+            // Available width with a small inset so the cert never touches the edges
+            var availW = stage.offsetWidth - 16;
 
-            // Centre the certificate horizontally after scaling
-            frame.style.marginLeft = ((inner.offsetWidth - 1060 * scale) / 2) + 'px';
+            // Scale down only — never enlarge beyond the natural 1060px width
+            var scale = Math.min(1, availW / CERT_W);
+
+            // Apply scale from the top-centre origin so it stays horizontally centred
+            frame.style.transform       = 'scale(' + scale + ')';
+            frame.style.transformOrigin = 'top center';
+
+            // Give the stage an explicit height equal to the scaled certificate height
+            // so the buttons below never overlap or float unexpectedly
+            stage.style.height = (CERT_H * scale) + 'px';
         }
-        scaleCert();
 
-        // Rescale the certificate whenever the browser window is resized
+        // Run once on load and again whenever the window is resized
+        scaleCert();
         window.addEventListener('resize', scaleCert);
 
-        // Generates a PDF of the certificate and triggers a download when the Save as PDF button is clicked
+        // Generates a PDF of the certificate and triggers a download
         async function savePDF() {
-            var btn = document.getElementById('save-btn');
+            var btn  = document.getElementById('save-btn');
             var orig = btn.innerHTML;
 
             // Disable the button and show a loading message while the PDF is being created
-            btn.disabled = true; btn.innerHTML = 'Generating…';
+            btn.disabled = true;
+            btn.innerHTML = 'Generating…';
+
             try {
-                var frame = document.querySelector('.cert-frame');
+                var frame = document.getElementById('certFrame');
 
-                // Temporarily remove the scaling transform so html2canvas captures the full size certificate
-                var sT = frame.style.transform, sM = frame.style.marginLeft;
-                frame.style.transform = 'scale(1)'; frame.style.marginLeft = '0'; frame.style.position = 'relative';
+                // Temporarily reset the transform so html2canvas captures the full-size certificate
+                var savedTransform       = frame.style.transform;
+                var savedTransformOrigin = frame.style.transformOrigin;
+                frame.style.transform       = 'scale(1)';
+                frame.style.transformOrigin = 'top left';
 
-                // Take a high resolution screenshot of the certificate using html2canvas
+                // Take a high-resolution screenshot of the certificate
                 var canvas = await html2canvas(frame, {
                     scale: 2, useCORS: true, allowTaint: true,
-                    backgroundColor: '#ffffff', width: 1060, height: 750,
-                    windowWidth: 1060, windowHeight: 750, logging: false
+                    backgroundColor: '#ffffff',
+                    width: CERT_W, height: CERT_H,
+                    windowWidth: CERT_W, windowHeight: CERT_H,
+                    logging: false
                 });
 
-                // Restore the scaling transform after the screenshot is taken
-                frame.style.transform = sT; frame.style.marginLeft = sM; frame.style.position = 'absolute';
+                // Restore the scale transform after the screenshot is taken
+                frame.style.transform       = savedTransform;
+                frame.style.transformOrigin = savedTransformOrigin;
 
-                // Create an A4 landscape PDF and add the certificate screenshot to it
+                // Create an A4 landscape PDF and embed the certificate image
                 var { jsPDF } = window.jspdf;
                 var pdf = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
-                pdf.addImage(canvas.toDataURL('image/jpeg', 0.97), 'JPEG', 0, 0,
-                    pdf.internal.pageSize.getWidth(), pdf.internal.pageSize.getHeight());
+                pdf.addImage(
+                    canvas.toDataURL('image/jpeg', 0.97), 'JPEG',
+                    0, 0,
+                    pdf.internal.pageSize.getWidth(),
+                    pdf.internal.pageSize.getHeight()
+                );
 
-                // Save the PDF file using the unique certificate ID as the filename
+                // Trigger the download using the unique certificate ID as the filename
                 pdf.save('CybAware-Certificate-<?php echo $cert_id; ?>.pdf');
+
             } catch(err) {
-                // Show an error message if the PDF could not be generated
-                alert('Could not generate PDF. Please try again.'); console.error(err);
+                alert('Could not generate PDF. Please try again.');
+                console.error(err);
             }
 
-            // Re-enable the button and restore its original label
-            btn.disabled = false; btn.innerHTML = orig;
+            // Re-enable the button and restore its label
+            btn.disabled  = false;
+            btn.innerHTML = orig;
         }
     </script>
 </body>
