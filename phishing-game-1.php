@@ -105,7 +105,7 @@ $emails = [
                     </div>
                 </div>',
         'answer' => 'phishing',
-        'hint' => 'Two red flags: the sender domain is "account-update.com" — NOT "netflix.com". Real Netflix emails always come from @netflix.com. The 48-hour suspension threat is also a classic pressure tactic.'
+        'hint' => 'Two red flags: the sender domain is "account-update.com", NOT "netflix.com". Real Netflix emails always come from @netflix.com. The 48-hour suspension threat is also a classic pressure tactic.'
     ],
     4 => [
         'sender' => 'security@twitter.com',
@@ -170,7 +170,7 @@ $emails = [
                     </div>
                 </div>',
         'answer' => 'phishing',
-        'hint' => 'Multiple red flags: the domain is "microsoft-security.net" — Microsoft always uses @microsoft.com. Windows licenses don\'t expire this way, and threats of "permanent data loss" are classic scare tactics.'
+        'hint' => 'Multiple red flags: the domain is "microsoft-security.net", Microsoft always uses @microsoft.com. Windows licenses don\'t expire this way, and threats of "permanent data loss" are classic scare tactics.'
     ],
     6 => [
         'sender' => 'appleid@id-apple.com',
@@ -201,7 +201,7 @@ $emails = [
                 </div>
             </div>',
         'answer' => 'phishing',
-        'hint' => 'The sender domain is "id-apple.com" — Apple only ever emails from @apple.com. The reversed domain order (id-apple instead of apple-id) is a classic phishing trick to fool people at a glance.'
+        'hint' => 'The sender domain is "id-apple.com", Apple only ever emails from @apple.com. The reversed domain order (id-apple instead of apple-id) is a classic phishing trick to fool people at a glance.'
     ],
     7 => [
         'sender' => 'accounts.google.com',
@@ -258,7 +258,7 @@ $emails = [
                 </div>
             </div>',
         'answer' => 'phishing',
-        'hint' => 'The domain is "linkedin-professional.com" — LinkedIn only emails from @linkedin.com. The "48 hours only" urgency combined with a fake domain is a textbook phishing combination.'
+        'hint' => 'The domain is "linkedin-professional.com", LinkedIn only emails from @linkedin.com. The "48 hours only" urgency combined with a fake domain is a textbook phishing combination.'
     ],
     9 => [
         'sender' => 'noreply@github.com',
@@ -324,7 +324,7 @@ $emails = [
                 </div>
             </div>',
         'answer' => 'phishing',
-        'hint' => 'The domain "wellsfargo-security.com" is fake — real Wells Fargo emails come from @wellsfargo.com only. The extreme 1-hour countdown pressure and threat of account lockout are designed to stop you thinking clearly.'
+        'hint' => 'The domain "wellsfargo-security.com" is fake, real Wells Fargo emails come from @wellsfargo.com only. The extreme 1-hour countdown pressure and threat of account lockout are designed to stop you thinking clearly.'
     ]
 ];
 
