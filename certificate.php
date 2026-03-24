@@ -94,21 +94,22 @@ $cert_id = 'CYB-' . strtoupper(substr(md5($user_id . $date . 'cybaware'), 0, 10)
         <?php
         ?>
 
-        <?php // Stable centred container for the certificate ?>
+        <?php
+        ?>
         .cert-stage {
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
+            position: relative;
             width: 100%;
+            overflow: hidden;
             margin-bottom: 32px;
         }
 
         <?php // The outermost navy blue border frame of the certificate (fixed canvas size) ?>
         .cert-frame {
+            position: absolute;
+            top: 0;
             width: 1060px;
             height: 750px;
-            flex-shrink: 0;
-            transform-origin: top center;
+            transform-origin: top left;
             box-sizing: border-box;
             background: #1a2940;
             padding: 10px;
@@ -475,7 +476,7 @@ $cert_id = 'CYB-' . strtoupper(substr(md5($user_id . $date . 'cybaware'), 0, 10)
                 <?php // Show a warning banner if the user hasn't finished all required games yet ?>
                 <?php if(!$certificate_earned): ?>
                 <div class="status-banner">
-                    <strong>Certificate Pending -</strong>
+                    <strong>Certificate Pending —</strong>
                     You have completed <?php echo $total_completed; ?> of <?php echo $total_games; ?> required assessments. Complete all modules to earn your certificate.
                 </div>
                 <?php endif; ?>
@@ -647,26 +648,31 @@ $cert_id = 'CYB-' . strtoupper(substr(md5($user_id . $date . 'cybaware'), 0, 10)
         var CERT_W = 1060;
         var CERT_H = 750;
 
-        // Scale and centre the certificate so it fills the available width as
-        // large as possible, then set the stage height to match so the page
-        // layout never shifts or overlaps.
+        // Scale the certificate to fit the available width, then:
+        //   - set stage height so nothing below overlaps
+        //   - offset frame.left so it stays centred inside the clipping wrapper
+        // Using position:absolute + left offset instead of transform-origin:center
+        // because transform:scale() doesn't affect layout width, which causes
+        // horizontal scroll on mobile when transform-origin is top center.
         function scaleCert() {
             var stage = document.getElementById('certStage');
             var frame = document.getElementById('certFrame');
             if (!stage || !frame) return;
 
-            // Available width with a small inset so the cert never touches the edges
-            var availW = stage.offsetWidth - 16;
+            // Measure the true available width (no padding inset needed — overflow:hidden handles clipping)
+            var availW = stage.offsetWidth;
 
-            // Scale down only — never enlarge beyond the natural 1060px width
+            // Never scale above 1 (don't enlarge on very wide screens)
             var scale = Math.min(1, availW / CERT_W);
 
-            // Apply scale from the top-centre origin so it stays horizontally centred
-            frame.style.transform       = 'scale(' + scale + ')';
-            frame.style.transformOrigin = 'top center';
+            // Scale from top-left, then shift right by half the leftover space to centre it
+            var leftOffset = (availW - CERT_W * scale) / 2;
 
-            // Give the stage an explicit height equal to the scaled certificate height
-            // so the buttons below never overlap or float unexpectedly
+            frame.style.transform       = 'scale(' + scale + ')';
+            frame.style.transformOrigin = 'top left';
+            frame.style.left            = leftOffset + 'px';
+
+            // Set stage height to the scaled certificate height so the buttons below sit flush
             stage.style.height = (CERT_H * scale) + 'px';
         }
 
@@ -689,8 +695,10 @@ $cert_id = 'CYB-' . strtoupper(substr(md5($user_id . $date . 'cybaware'), 0, 10)
                 // Temporarily reset the transform so html2canvas captures the full-size certificate
                 var savedTransform       = frame.style.transform;
                 var savedTransformOrigin = frame.style.transformOrigin;
+                var savedLeft            = frame.style.left;
                 frame.style.transform       = 'scale(1)';
                 frame.style.transformOrigin = 'top left';
+                frame.style.left            = '0px';
 
                 // Take a high-resolution screenshot of the certificate
                 var canvas = await html2canvas(frame, {
@@ -704,6 +712,7 @@ $cert_id = 'CYB-' . strtoupper(substr(md5($user_id . $date . 'cybaware'), 0, 10)
                 // Restore the scale transform after the screenshot is taken
                 frame.style.transform       = savedTransform;
                 frame.style.transformOrigin = savedTransformOrigin;
+                frame.style.left            = savedLeft;
 
                 // Create an A4 landscape PDF and embed the certificate image
                 var { jsPDF } = window.jspdf;
