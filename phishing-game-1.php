@@ -328,82 +328,99 @@ $emails = [
     ]
 ];
 
-// Only process an answer if the form has been submitted with an answer and question ID
-if($_SERVER["REQUEST_METHOD"] == "POST") {
-    if(isset($_POST['answer']) && isset($_POST['question_id'])) {
-        $user_answer = $_POST['answer'];
-        $question_id = (int)$_POST['question_id'];
+// -----------------------------------------------------------------------
+// Handle the "Next Question" action - advances to the next question
+// -----------------------------------------------------------------------
+if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['action'] === 'next') {
+    $next_question = $current_question + 1;
 
-        // Check that the submitted question ID matches an email in the array
-        if(isset($emails[$question_id])) {
-            $correct_answer = $emails[$question_id]['answer'];
-            $hint = $emails[$question_id]['hint'];
+    if($next_question > $total_questions) {
+        // All questions answered - save score to DB and mark game complete
+        $game_completed = true;
+        $user_id = $_SESSION['id'];
+        $sql = "INSERT INTO game_scores (user_id, game_type, score, total_questions, completed_at)
+                VALUES (?, 'phishing_detective_lvl1', ?, ?, NOW())
+                ON DUPLICATE KEY UPDATE score = VALUES(score), completed_at = NOW()";
 
-            // Compare the user's answer to the correct answer and update the score if correct
-            if($user_answer === $correct_answer) {
-                $score++;
-                $_SESSION['phishing_score'] = $score;
-                $feedback = "<div class='feedback correct'><span style='color: #10b981;'>Correct</span></div>";
-            } else {
-                $feedback = "<div class='feedback incorrect'><span style='color: #dc2626;'>Incorrect</span></div>";
-            }
-
-            // Always show the hint below the feedback so the user learns from each answer
-            $feedback .= "<div class='hint-box'><strong>Hint:</strong> " . htmlspecialchars($hint) . "</div>";
-
-            // Store the feedback in the session so it survives the redirect
-            $_SESSION['phishing_feedback'] = $feedback;
-            $_SESSION['phishing_answered_question'] = $question_id;
-
-            // Move to the next question and save the updated number to the session
-            $current_question = $question_id + 1;
-            $_SESSION['phishing_question'] = $current_question;
-
-            // If all questions have been answered, save the score to the database and clear the session
-            if($current_question > $total_questions) {
-                $game_completed = true;
-
-                $user_id = $_SESSION['id'];
-                $sql = "INSERT INTO game_scores (user_id, game_type, score, total_questions, completed_at)
-                    VALUES (?, 'phishing_detective_lvl1', ?, ?, NOW())
-                    ON DUPLICATE KEY UPDATE score = VALUES(score), completed_at = NOW()";
-
-                if($stmt = mysqli_prepare($link, $sql)) {
-                    mysqli_stmt_bind_param($stmt, "iii", $user_id, $score, $total_questions);
-                    mysqli_stmt_execute($stmt);
-                    mysqli_stmt_close($stmt);
-                }
-
-                // Clear all phishing game session data now that the game is finished
-                unset($_SESSION['phishing_score']);
-                unset($_SESSION['phishing_question']);
-                unset($_SESSION['phishing_feedback']);
-                unset($_SESSION['phishing_answered_question']);
-            }
+        if($stmt = mysqli_prepare($link, $sql)) {
+            mysqli_stmt_bind_param($stmt, "iii", $user_id, $score, $total_questions);
+            mysqli_stmt_execute($stmt);
+            mysqli_stmt_close($stmt);
         }
+
+        // Clear all phishing game session data
+        unset($_SESSION['phishing_score']);
+        unset($_SESSION['phishing_question']);
+        unset($_SESSION['phishing_feedback']);
+        unset($_SESSION['phishing_answered']);
+    } else {
+        // Advance to the next question and clear the answered flag
+        $_SESSION['phishing_question'] = $next_question;
+        unset($_SESSION['phishing_answered']);
+        unset($_SESSION['phishing_feedback']);
     }
-}
 
-// If feedback from the previous answer is stored in the session, load it and clear it
-if(empty($feedback) && isset($_SESSION['phishing_feedback'])) {
-    $feedback = $_SESSION['phishing_feedback'];
-    unset($_SESSION['phishing_feedback']);
-    unset($_SESSION['phishing_answered_question']);
-}
-
-// If the reset parameter is in the URL, clear all game session data and restart from question 1
-if(isset($_GET['reset'])) {
-    unset($_SESSION['phishing_score']);
-    unset($_SESSION['phishing_question']);
-    unset($_SESSION['phishing_feedback']);
-    unset($_SESSION['phishing_answered_question']);
-    $score = 0;
-    $current_question = 1;
     header("location: phishing-game-1.php");
     exit;
 }
 
-// Cap the displayed question number at the total so it never shows higher than 10 of 10
+// -----------------------------------------------------------------------
+// Handle an answer submission - stay on the same question, show feedback
+// -----------------------------------------------------------------------
+if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['answer']) && isset($_POST['question_id'])) {
+    $user_answer = $_POST['answer'];
+    $question_id = (int)$_POST['question_id'];
+
+    // Only process if we haven't already answered this question
+    if(isset($emails[$question_id]) && !isset($_SESSION['phishing_answered'])) {
+        $correct_answer = $emails[$question_id]['answer'];
+        $hint = $emails[$question_id]['hint'];
+
+        if($user_answer === $correct_answer) {
+            $score++;
+            $_SESSION['phishing_score'] = $score;
+            $feedback = "<div class='feedback correct'><span style='color: #10b981;'>&#10003; Correct!</span></div>";
+        } else {
+            $feedback = "<div class='feedback incorrect'><span style='color: #dc2626;'>&#10007; Incorrect</span></div>";
+        }
+
+        $feedback .= "<div class='hint-box'><strong>Hint:</strong> " . htmlspecialchars($hint) . "</div>";
+
+        // Store feedback and mark this question as answered in the session
+        $_SESSION['phishing_feedback'] = $feedback;
+        $_SESSION['phishing_answered'] = true;
+    }
+}
+
+// -----------------------------------------------------------------------
+// If the reset parameter is in the URL, clear all game session data
+// -----------------------------------------------------------------------
+if(isset($_GET['reset'])) {
+    unset($_SESSION['phishing_score']);
+    unset($_SESSION['phishing_question']);
+    unset($_SESSION['phishing_feedback']);
+    unset($_SESSION['phishing_answered']);
+    header("location: phishing-game-1.php");
+    exit;
+}
+
+// -----------------------------------------------------------------------
+// Load state for rendering
+// -----------------------------------------------------------------------
+
+// Re-read score and question after any session updates above
+$score = isset($_SESSION['phishing_score']) ? $_SESSION['phishing_score'] : 0;
+$current_question = isset($_SESSION['phishing_question']) ? $_SESSION['phishing_question'] : 1;
+
+// Has the user already answered the current question this round?
+$already_answered = isset($_SESSION['phishing_answered']) && $_SESSION['phishing_answered'] === true;
+
+// Load feedback from session if it wasn't set during this request
+if(empty($feedback) && isset($_SESSION['phishing_feedback'])) {
+    $feedback = $_SESSION['phishing_feedback'];
+}
+
+// Cap the displayed question number at the total
 $display_question = min($current_question, $total_questions);
 
 // Load the email data for the current question if the game is still in progress
@@ -412,7 +429,7 @@ if(!$game_completed && isset($emails[$current_question])) {
     $current_email = $emails[$current_question];
 }
 
-// Safety check - if the question counter has passed the total outside of POST, mark the game complete
+// Safety check - if the question counter has gone past the total outside of POST, mark complete
 if($current_question > $total_questions && !$game_completed) {
     $game_completed = true;
 }
@@ -511,7 +528,7 @@ if($current_question > $total_questions && !$game_completed) {
             border-color: #ef4444;
         }
 
-        <?php // Yellow hint box shown below the feedback explaining what the correct answer was ?>
+        <?php // Yellow hint box shown below the email body explaining the correct answer ?>
         .hint-box {
             background: #fef3c7;
             border: 1px solid #f59e0b;
@@ -527,7 +544,7 @@ if($current_question > $total_questions && !$game_completed) {
             background: white;
             border-radius: 8px;
             padding: 0;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.1);
             border: 1px solid #e2e8f0;
             overflow: hidden;
@@ -712,7 +729,7 @@ if($current_question > $total_questions && !$game_completed) {
         .legit-btn:hover { background: #d1fae5; border-color: #059669; }
         .legit-btn.selected { background: #059669; color: white; border-color: #059669; }
 
-        <?php // Centres the submit button below the answer options ?>
+        <?php // Centres the submit / next button below the answer options ?>
         .game-controls {
             text-align: center;
             margin-top: 20px;
@@ -805,7 +822,7 @@ if($current_question > $total_questions && !$game_completed) {
             box-shadow: 0 4px 8px rgba(30, 64, 175, 0.2);
         }
 
-        <?php // Secondary outlined button variant used for less important actions on the completion screen ?>
+        <?php // Secondary outlined button variant on the completion screen ?>
         .action-btn.secondary {
             background: white;
             color: #64748b;
@@ -817,7 +834,7 @@ if($current_question > $total_questions && !$game_completed) {
             border-color: #cbd5e1;
         }
 
-        <?php // Light blue note at the bottom of the completion screen explaining what to complete next for the certificate ?>
+        <?php // Light blue note at the bottom of the completion screen ?>
         .certificate-note {
             margin-top: 20px;
             padding: 15px;
@@ -841,7 +858,7 @@ if($current_question > $total_questions && !$game_completed) {
             box-sizing: border-box;
         }
 
-        <?php // On small screens the layout adjusts so all elements stack vertically and fit the screen ?>
+        <?php // On small screens the layout adjusts so all elements stack vertically ?>
         @media (max-width: 768px) {
             .game-interface { padding: 15px; }
             .email-sender-row { flex-direction: column; align-items: flex-start; gap: 15px; }
@@ -880,21 +897,13 @@ if($current_question > $total_questions && !$game_completed) {
                 <?php // Progress bar showing how far through the ten emails the user is ?>
                 <div class="progress-container">
                     <div class="progress-info">
-                        <span>Question <?php echo min($current_question, $total_questions); ?> of <?php echo $total_questions; ?></span>
+                        <span>Question <?php echo $display_question; ?> of <?php echo $total_questions; ?></span>
                         <span>Score: <?php echo $score; ?>/<?php echo $total_questions; ?></span>
                     </div>
                     <div class="progress-bar">
                         <div class="progress-fill" style="width: <?php echo $game_completed ? '100' : (($current_question - 1) / $total_questions * 100); ?>%;"></div>
                     </div>
                 </div>
-
-                <?php
-                // Extract and display only the correct or incorrect feedback banner above the email card
-                if(!empty($feedback)) {
-                    preg_match('/<div class=\'feedback[^\']*\'.*?<\/div>/s', $feedback, $topFeedback);
-                    if(!empty($topFeedback)) echo $topFeedback[0];
-                }
-                ?>
 
                 <?php // Show the completion screen if all emails have been judged, otherwise show the current email ?>
                 <?php if($game_completed): ?>
@@ -932,81 +941,104 @@ if($current_question > $total_questions && !$game_completed) {
 
                 <?php else: ?>
                     <?php if($current_email): ?>
-                        <?php // Email analysis form that submits the user's Legitimate or Phishing verdict back to this page ?>
-                        <form method="POST" action="phishing-game-1.php" id="gameForm">
-                            <?php // Hidden fields that carry the current question number and selected answer on submission ?>
-                            <input type="hidden" name="question_id" value="<?php echo $current_question; ?>">
-                            <input type="hidden" name="answer" id="selectedAnswer" value="">
 
-                            <?php // The email card showing the subject, sender details and full email body ?>
-                            <div class="email-container">
-                                <div class="email-header">
-
-                                    <?php // Subject line row at the top of the email header ?>
-                                    <div class="email-subject-row">
-                                        <div class="email-subject-label">Subject:</div>
-                                        <div class="email-subject-value"><?php echo htmlspecialchars($current_email['subject']); ?></div>
-                                    </div>
-
-                                    <?php // Sender row showing the avatar, display name, email address and timestamp ?>
-                                    <div class="email-sender-row">
-                                        <div class="sender-info-container">
-                                            <div class="sender-avatar">
-                                                <?php echo strtoupper(substr($current_email['sender_name'], 0, 1)); ?>
-                                            </div>
-                                            <div class="sender-details">
-                                                <div class="sender-name-email">
-                                                    <div class="sender-display-name"><?php echo htmlspecialchars($current_email['sender_name']); ?></div>
-                                                    <?php // The sender email address is the key clue for spotting phishing emails ?>
-                                                    <div class="sender-email-address"><?php echo htmlspecialchars($current_email['sender']); ?></div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                        <div class="email-time">
-                                            <?php echo date('l, F j, Y') . ' at ' . date('g:i A'); ?>
-                                        </div>
-                                    </div>
-
-                                    <?php // To row showing the logged in user's email address as the recipient ?>
-                                    <div class="email-to-row">
-                                        <div class="email-to-label">To:</div>
-                                        <div class="email-to-value">
-                                            Me (<?php echo htmlspecialchars($_SESSION['email'] ?? 'you@example.com'); ?>)
-                                        </div>
-                                    </div>
-                                </div>
-
-                                <?php // The full HTML body of the email rendered below the header ?>
-                                <div class="email-body">
-                                    <?php echo $current_email['body']; ?>
-                                </div>
-                            </div>
-
+                        <?php // Show the correct/incorrect feedback banner above the email if already answered ?>
+                        <?php if(!empty($feedback)): ?>
                             <?php
-                            // Extract and display the hint box below the email body if feedback is available
-                            if(!empty($feedback)) {
-                                preg_match('/<div class=\'hint-box\'.*?<\/div>/s', $feedback, $hintMatch);
-                                if(!empty($hintMatch)) echo $hintMatch[0];
-                            }
+                            preg_match('/<div class=\'feedback[^\']*\'.*?<\/div>/s', $feedback, $topFeedback);
+                            if(!empty($topFeedback)) echo $topFeedback[0];
                             ?>
+                        <?php endif; ?>
 
-                            <?php // Two answer buttons letting the user judge the email as legitimate or a phishing attempt ?>
-                            <div class="options-container">
-                                <button type="button" class="option-btn legit-btn" onclick="selectAnswer('legitimate', this)">
-                                    Legitimate Email
-                                </button>
-                                <button type="button" class="option-btn phishing-btn" onclick="selectAnswer('phishing', this)">
-                                    Phishing Attempt
-                                </button>
+                        <?php // The email card showing the subject, sender details and full email body ?>
+                        <div class="email-container">
+                            <div class="email-header">
+
+                                <?php // Subject line row at the top of the email header ?>
+                                <div class="email-subject-row">
+                                    <div class="email-subject-label">Subject:</div>
+                                    <div class="email-subject-value"><?php echo htmlspecialchars($current_email['subject']); ?></div>
+                                </div>
+
+                                <?php // Sender row showing the avatar, display name, email address and timestamp ?>
+                                <div class="email-sender-row">
+                                    <div class="sender-info-container">
+                                        <div class="sender-avatar">
+                                            <?php echo strtoupper(substr($current_email['sender_name'], 0, 1)); ?>
+                                        </div>
+                                        <div class="sender-details">
+                                            <div class="sender-name-email">
+                                                <div class="sender-display-name"><?php echo htmlspecialchars($current_email['sender_name']); ?></div>
+                                                <?php // The sender email address is the key clue for spotting phishing emails ?>
+                                                <div class="sender-email-address"><?php echo htmlspecialchars($current_email['sender']); ?></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="email-time">
+                                        <?php echo date('l, F j, Y') . ' at ' . date('g:i A'); ?>
+                                    </div>
+                                </div>
+
+                                <?php // To row showing the logged in user's email address as the recipient ?>
+                                <div class="email-to-row">
+                                    <div class="email-to-label">To:</div>
+                                    <div class="email-to-value">
+                                        Me (<?php echo htmlspecialchars($_SESSION['email'] ?? 'you@example.com'); ?>)
+                                    </div>
+                                </div>
                             </div>
 
-                            <?php // Submit button - says Complete Assessment on the last email and Submit Answer on all others ?>
-                            <div class="game-controls">
-                                <button type="submit" class="submit-btn" id="submitBtn" disabled>
-                                    <?php echo $current_question == $total_questions ? 'Complete Assessment' : 'Submit Answer'; ?>
-                                </button>
+                            <?php // The full HTML body of the email rendered below the header ?>
+                            <div class="email-body">
+                                <?php echo $current_email['body']; ?>
                             </div>
-                        </form>
+                        </div>
+
+                        <?php // Show the hint below the email body after the user has answered ?>
+                        <?php if(!empty($feedback) && $already_answered): ?>
+                            <?php
+                            preg_match('/<div class=\'hint-box\'.*?<\/div>/s', $feedback, $hintMatch);
+                            if(!empty($hintMatch)) echo $hintMatch[0];
+                            ?>
+                        <?php endif; ?>
+
+                        <?php if($already_answered): ?>
+                            <?php // User has answered - show the Next Question button ?>
+                            <form method="POST" action="phishing-game-1.php">
+                                <input type="hidden" name="action" value="next">
+                                <div class="game-controls">
+                                    <button type="submit" class="submit-btn">
+                                        <?php echo $current_question == $total_questions ? 'See Results &#8594;' : 'Next Question &#8594;'; ?>
+                                    </button>
+                                </div>
+                            </form>
+
+                        <?php else: ?>
+                            <?php // User hasn't answered yet - show the answer form ?>
+                            <form method="POST" action="phishing-game-1.php" id="gameForm">
+                                <?php // Hidden fields that carry the current question number and selected answer on submission ?>
+                                <input type="hidden" name="question_id" value="<?php echo $current_question; ?>">
+                                <input type="hidden" name="answer" id="selectedAnswer" value="">
+
+                                <?php // Two answer buttons letting the user judge the email ?>
+                                <div class="options-container">
+                                    <button type="button" class="option-btn legit-btn" onclick="selectAnswer('legitimate', this)">
+                                        Legitimate Email
+                                    </button>
+                                    <button type="button" class="option-btn phishing-btn" onclick="selectAnswer('phishing', this)">
+                                        Phishing Attempt
+                                    </button>
+                                </div>
+
+                                <?php // Submit button - says Complete Assessment on the last email ?>
+                                <div class="game-controls">
+                                    <button type="submit" class="submit-btn" id="submitBtn" disabled>
+                                        <?php echo $current_question == $total_questions ? 'Complete Assessment' : 'Submit Answer'; ?>
+                                    </button>
+                                </div>
+                            </form>
+
+                        <?php endif; ?>
 
                     <?php else: ?>
                         <?php // Fallback shown if the email data fails to load for any reason ?>
@@ -1018,6 +1050,7 @@ if($current_question > $total_questions && !$game_completed) {
                         </div>
                     <?php endif; ?>
                 <?php endif; ?>
+
             </div>
         </div>
 
@@ -1057,7 +1090,6 @@ if($current_question > $total_questions && !$game_completed) {
             } else if((e.key === '2' || e.key === 'p') && phishingBtn) {
                 selectAnswer('phishing', phishingBtn);
             } else if(e.key === 'Enter' && selectedAnswer) {
-                // Press Enter to submit once an answer has been selected
                 document.getElementById('submitBtn')?.click();
             }
         });
