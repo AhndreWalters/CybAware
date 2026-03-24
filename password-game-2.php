@@ -732,7 +732,7 @@ if($fortress_done && !$game_completed) {
                     <div class="completion-screen">
                         <h2>Assessment Complete</h2>
                         <div class="score-result">You scored <?php echo $score; ?> out of <?php echo $total_questions; ?> points.</div>
-                        <div class="score-sub">Each department was worth 2 points — 2 for Strong (80+), 1 for Fair (50–79), 0 for Weak.</div>
+                        <div class="score-sub">Each department was worth 2 points - 2 for Strong (80+), 1 for Fair (50–79), 0 for Weak.</div>
                         <?php
                         // Show a different performance message depending on the percentage scored
                         $pct = ($score / $total_questions) * 100;
@@ -758,7 +758,7 @@ if($fortress_done && !$game_completed) {
                     <?php // Progress bar showing 0% before any passwords have been submitted ?>
                     <div class="progress-container">
                         <div class="progress-info">
-                            <span>5 Departments — 2 points each</span>
+                            <span>5 Departments - 2 points each</span>
                             <span>Score: 0/<?php echo $total_questions; ?></span>
                         </div>
                         <div class="progress-bar"><div class="progress-fill" style="width:0%;"></div></div>
@@ -820,7 +820,7 @@ if($fortress_done && !$game_completed) {
 
                         <?php // Tip giving the user an example of what a strong password looks like ?>
                         <div class="hint-tip">
-                            <strong>Tip:</strong> Use at least 12 characters with uppercase, lowercase, numbers, and symbols — for example: <code>Cyber$ecure2024!</code>
+                            <strong>Tip:</strong> Use at least 12 characters with uppercase, lowercase, numbers, and symbols, for example: <code>Cyber$ecure2024!</code>
                         </div>
 
                         <?php // Row with the Reset All and Submit Assessment buttons ?>
@@ -882,10 +882,10 @@ if($fortress_done && !$game_completed) {
         const sc = scorePassword(val);
 
         // Apply the correct colour class and points label based on the strength score
-        if(sc >= 80)      { bar.className='strength-bar strong'; label.style.color='#059669'; label.textContent='Strong — 2 pts'; }
-        else if(sc >= 50) { bar.className='strength-bar fair';   label.style.color='#f59e0b'; label.textContent='Fair — 1 pt'; }
-        else if(sc >= 25) { bar.className='strength-bar good';   label.style.color='#d97706'; label.textContent='Weak — 0 pts'; }
-        else              { bar.className='strength-bar weak';   label.style.color='#dc2626'; label.textContent='Weak — 0 pts'; }
+        if(sc >= 80)      { bar.className='strength-bar strong'; label.style.color='#059669'; label.textContent='Strong - 2 pts'; }
+        else if(sc >= 50) { bar.className='strength-bar fair';   label.style.color='#f59e0b'; label.textContent='Fair - 1 pt'; }
+        else if(sc >= 25) { bar.className='strength-bar good';   label.style.color='#d97706'; label.textContent='Weak - 0 pts'; }
+        else              { bar.className='strength-bar weak';   label.style.color='#dc2626'; label.textContent='Weak - 0 pts'; }
     }
 
     // Check all inputs for duplicate values and highlight any that match another field
