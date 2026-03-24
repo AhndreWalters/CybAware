@@ -59,9 +59,12 @@ CybAware/
 ├── music/
 ├── sql/
 │   └── CybAwareDB.sql
+├── .env
+├── .gitignore
 ├── about.php
 ├── certificate.php
 ├── contact.php
+├── Dockerfile
 ├── game.php
 ├── index.php
 ├── login.php
