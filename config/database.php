@@ -1,15 +1,17 @@
 <?php
-$env = parse_ini_file(dirname(__DIR__) . '/.env');
+// Database connection constants
+define('DB_SERVER', 'cybaware-mysql-db-cybaware.l.aivencloud.com');
+define('DB_NAME', 'CybAwareDB');
+define('DB_USERNAME', 'avnadmin');
+define('DB_PASSWORD', 'AVNS_CtY4DwoGW-hpgGDEtqs');
+define('DB_PORT', '27855');
+ 
 
-$link = mysqli_connect(
-    $env['DB_SERVER'],
-    $env['DB_USERNAME'],
-    $env['DB_PASSWORD'],
-    $env['DB_NAME'],
-    $env['DB_PORT']
-);
+// Establish connection to the MySQL database using the defined constants
+$link = mysqli_connect(DB_SERVER, DB_USERNAME, DB_PASSWORD, DB_NAME, DB_PORT);
+ 
 
-if ($link === false) {
-    die("ERROR: Could not connect. " . mysqli_connect_error());
+// Check if the connection failed and terminate the script with an error message if so
+if($link === false){
+die("ERROR: Could not connect. " . mysqli_connect_error());
 }
-?>
