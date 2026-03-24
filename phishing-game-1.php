@@ -328,9 +328,7 @@ $emails = [
     ]
 ];
 
-// -----------------------------------------------------------------------
 // Handle the "Next Question" action - advances to the next question
-// -----------------------------------------------------------------------
 if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['action'] === 'next') {
     $next_question = $current_question + 1;
 
@@ -364,9 +362,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['ac
     exit;
 }
 
-// -----------------------------------------------------------------------
 // Handle an answer submission - stay on the same question, show feedback
-// -----------------------------------------------------------------------
 if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['answer']) && isset($_POST['question_id'])) {
     $user_answer = $_POST['answer'];
     $question_id = (int)$_POST['question_id'];
@@ -392,9 +388,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['answer']) && isset($_PO
     }
 }
 
-// -----------------------------------------------------------------------
 // If the reset parameter is in the URL, clear all game session data
-// -----------------------------------------------------------------------
 if(isset($_GET['reset'])) {
     unset($_SESSION['phishing_score']);
     unset($_SESSION['phishing_question']);
@@ -404,9 +398,7 @@ if(isset($_GET['reset'])) {
     exit;
 }
 
-// -----------------------------------------------------------------------
 // Load state for rendering
-// -----------------------------------------------------------------------
 
 // Re-read score and question after any session updates above
 $score = isset($_SESSION['phishing_score']) ? $_SESSION['phishing_score'] : 0;
