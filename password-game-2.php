@@ -773,7 +773,7 @@ if($fortress_done && !$game_completed) {
                     <?php // Legend explaining what each strength rating means in terms of points ?>
                     <div class="scoring-legend">
                         <div class="legend-item"><div class="legend-dot dot-strong"></div>Strong (80+) - 2 points</div>
-                        <div class="legend-item"><div class="legend-dot dot-fair"></div>Fair (50–79) - 1 point</div>
+                        <div class="legend-item"><div class="legend-dot dot-fair"></div>Fair (50 - 79) - 1 point</div>
                         <div class="legend-item"><div class="legend-dot dot-weak"></div>Weak (below 50) - 0 points</div>
                     </div>
 
