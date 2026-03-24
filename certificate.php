@@ -663,7 +663,7 @@ $cert_id = 'CYB-' . strtoupper(substr(md5($user_id . $date . 'cybaware'), 0, 10)
             var availW = stage.offsetWidth;
 
             // Never scale above 1 (don't enlarge on very wide screens)
-            var scale = Math.min(1, availW / CERT_W);
+            var scale = Math.min(0.75, availW / CERT_W);
 
             // Scale from top-left, then shift right by half the leftover space to centre it
             var leftOffset = (availW - CERT_W * scale) / 2;
