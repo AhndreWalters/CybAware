@@ -61,11 +61,20 @@ $cert_id = 'CYB-' . strtoupper(substr(md5($user_id . $date . 'cybaware'), 0, 10)
         }
 
         <?php // Centres the page title above the certificate ?>
-        .page-title { text-align: center; margin-bottom: 20px; }
+        .page-title {
+            text-align: center;
+            margin-bottom: 40px;
+        }
         .page-title h1 {
-            font-family: 'Source Sans 3', sans-serif;
-            font-size: 0.72rem; font-weight: 600;
-            color: #8a9bb0; letter-spacing: 5px; text-transform: uppercase;
+            color: #1e40af;
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+        }
+        .page-title p {
+            color: #64748b;
+            font-size: 1.1rem;
+            max-width: 700px;
+            margin: 0 auto;
         }
 
         <?php // Yellow warning banner shown when the user hasn't completed all games yet ?>
@@ -344,7 +353,10 @@ $cert_id = 'CYB-' . strtoupper(substr(md5($user_id . $date . 'cybaware'), 0, 10)
             <div class="cert-page-wrapper">
 
                 <?php // Page heading shown above the certificate preview ?>
-                <div class="page-title"><h1>Cybersecurity Awareness Certificate</h1></div>
+                <div class="page-title">
+                    <h1>Cybersecurity Awareness Certificate</h1>
+                    <p>Complete all missions to earn your official certificate.</p>
+                </div>
 
                 <?php // Show a warning banner if the user hasn't finished all required games yet ?>
                 <?php if(!$certificate_earned): ?>
