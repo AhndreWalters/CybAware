@@ -560,7 +560,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action'])) {
                 <?php // Game title and instructions telling the user what to do ?>
                 <div class="game-header">
                     <h1>Phishing Detective | Hunt Errors</h1>
-                    <p>This email contains 10 hidden phishing signs/errors. There are NO visual indicators — you must find them by reading carefully. Click directly on suspicious text. Correct clicks show a green strikethrough. Wrong clicks show red.</p>
+                    <p>This email contains 10 hidden phishing signs/errors. There are NO visual indicators, you must find them by reading carefully. Click directly on suspicious text. Correct clicks show a green strikethrough. Wrong clicks show red.</p>
                 </div>
 
                 <?php // Progress bar showing how many of the ten clues the user has found so far ?>
@@ -651,16 +651,16 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action'])) {
                             <p>Dear Valued Customer,</p>
 
                             <?php // Clue 1 - spelling error: exsiting ?>
-                            <p>We have some <span class="clue" data-id="1" data-category="Spelling Error" data-info="'exsiting' is misspelled — the correct word is 'exciting'.">exsiting</span> news to share with you today!</p>
+                            <p>We have some <span class="clue" data-id="1" data-category="Spelling Error" data-info="'exsiting' is misspelled, the correct word is 'exciting'.">exsiting</span> news to share with you today!</p>
 
                             <?php // Clues 2 and 3 - spelling errors: extreamly and appreciashion ?>
-                            <p>You have been selected as a winner in our recent lucky draw. We are <span class="clue" data-id="2" data-category="Spelling Error" data-info="'extreamly' is misspelled — the correct word is 'extremely'.">extreamly</span> thrilled to reward you as a token of our <span class="clue" data-id="3" data-category="Spelling Error" data-info="'appreciashion' is misspelled — the correct word is 'appreciation'.">appreciashion</span> for your continued loyalty to Rams Supermarket.</p>
+                            <p>You have been selected as a winner in our recent lucky draw. We are <span class="clue" data-id="2" data-category="Spelling Error" data-info="'extreamly' is misspelled, the correct word is 'extremely'.">extreamly</span> thrilled to reward you as a token of our <span class="clue" data-id="3" data-category="Spelling Error" data-info="'appreciashion' is misspelled, the correct word is 'appreciation'.">appreciashion</span> for your continued loyalty to Rams Supermarket.</p>
 
                             <?php // Clues 4 and 5 - character substitutions: F00D and ident!fication ?>
-                            <p>You have won a voucher for Free <span class="clue" data-id="4" data-category="Character Substitution" data-info="'F00D' uses the digit zero (0) instead of the letter O — a common phishing trick used to bypass spam filters.">F00D</span> to the value of $500. To claim your prize, please bring a valid form of <span class="clue" data-id="5" data-category="Character Substitution" data-info="'ident!fication' replaces the letter 'i' with an exclamation mark (!) — another character substitution trick.">ident!fication</span> along with a printed copy of this notification to the Customer Service desk at any Rams Supermarket branch.</p>
+                            <p>You have won a voucher for Free <span class="clue" data-id="4" data-category="Character Substitution" data-info="'F00D' uses the digit zero (0) instead of the letter O, a common phishing trick used to bypass spam filters.">F00D</span> to the value of $500. To claim your prize, please bring a valid form of <span class="clue" data-id="5" data-category="Character Substitution" data-info="'ident!fication' replaces the letter 'i' with an exclamation mark (!), another character substitution trick.">ident!fication</span> along with a printed copy of this notification to the Customer Service desk at any Rams Supermarket branch.</p>
 
                             <?php // Clue 6 - date error: February 29, 2026 does not exist ?>
-                            <p>Please ensure you collect your prize before <span class="clue" data-id="6" data-category="Date Error" data-info="February 29, 2026 does not exist — 2026 is not a leap year. This is a fabricated deadline designed to create urgency.">February 29, 2026</span>, as uncollected prizes will be forfeited after this date.</p>
+                            <p>Please ensure you collect your prize before <span class="clue" data-id="6" data-category="Date Error" data-info="February 29, 2026 does not exist, 2026 is not a leap year. This is a fabricated deadline designed to create urgency.">February 29, 2026</span>, as uncollected prizes will be forfeited after this date.</p>
 
                             <?php // Clue 7 - contradictory security notice asking for banking info and passwords ?>
                             <p><span class="clue" data-id="7" data-category="Contradictory Security Notice" data-info="Legitimate companies NEVER ask for banking details, passwords, or payment to release a prize. This sentence is a reverse psychology trick designed to lower your guard.">Please be advised that Rams Supermarket will ask for your banking information, passwords, and any form of payment to release a prize.</span> If you have any concerns, we encourage you to visit us in-store to speak with a representative directly.</p>
@@ -669,10 +669,10 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action'])) {
                             <p>To receive your prize, <span class="clue" data-id="8" data-category="Suspicious Link" data-info="'rams-supermarket-prize-claim.com' is not an official Rams Supermarket domain. Phishing emails use lookalike domains to steal personal information.">click here: www.rams-supermarket-prize-claim.com/claim-now</span> and enter your personal details to verify your identity.</p>
 
                             <?php // Clues 9 and 10 - spelling errors: availble and transfered ?>
-                            <p>This offer is only <span class="clue" data-id="9" data-category="Spelling Error" data-info="'availble' is misspelled — the correct word is 'available'.">availble</span> to selected customers and cannot be <span class="clue" data-id="10" data-category="Spelling Error" data-info="'transfered' is misspelled — the correct spelling is 'transferred' (double r).">transfered</span> to another person.</p>
+                            <p>This offer is only <span class="clue" data-id="9" data-category="Spelling Error" data-info="'availble' is misspelled, the correct word is 'available'.">availble</span> to selected customers and cannot be <span class="clue" data-id="10" data-category="Spelling Error" data-info="'transfered' is misspelled, the correct spelling is 'transferred' (double r).">transfered</span> to another person.</p>
 
                             <?php // Clue 11 - grammar error (bonus clue, not scored) ?>
-                            <p>Congratulations once again! <span class="clue" data-id="11" data-category="Grammar Error" data-info="'continued supporting' should be 'continued support', and 'looking forward' should be 'look forward' — both are grammar errors in a single sentence.">We appreciate your continued supporting and looking forward to seeing you soon.</span></p>
+                            <p>Congratulations once again! <span class="clue" data-id="11" data-category="Grammar Error" data-info="'continued supporting' should be 'continued support', and 'looking forward' should be 'look forward',both are grammar errors in a single sentence.">We appreciate your continued supporting and looking forward to seeing you soon.</span></p>
 
                             <p>Best regards,</p>
                             <p><strong>The Management Team</strong><br>Rams Supermarket</p>
@@ -713,16 +713,16 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action'])) {
     <script>
         // Full list of all eleven clues including the bonus grammar clue - used to build the hints and results sections
         const clues = [
-            { id: 1,  category: "Spelling Error",                info: "'exsiting' is misspelled — the correct word is 'exciting'." },
-            { id: 2,  category: "Spelling Error",                info: "'extreamly' is misspelled — the correct word is 'extremely'." },
-            { id: 3,  category: "Spelling Error",                info: "'appreciashion' is misspelled — the correct word is 'appreciation'." },
-            { id: 4,  category: "Character Substitution",        info: "'F00D' uses the digit zero (0) instead of the letter O — used to bypass spam filters." },
+            { id: 1,  category: "Spelling Error",                info: "'exsiting' is misspelled, the correct word is 'exciting'." },
+            { id: 2,  category: "Spelling Error",                info: "'extreamly' is misspelled, the correct word is 'extremely'." },
+            { id: 3,  category: "Spelling Error",                info: "'appreciashion' is misspelled, the correct word is 'appreciation'." },
+            { id: 4,  category: "Character Substitution",        info: "'F00D' uses the digit zero (0) instead of the letter O, used to bypass spam filters." },
             { id: 5,  category: "Character Substitution",        info: "'ident!fication' replaces the letter 'i' with an exclamation mark (!)." },
-            { id: 6,  category: "Date Error",                    info: "February 29, 2026 does not exist — 2026 is not a leap year." },
+            { id: 6,  category: "Date Error",                    info: "February 29, 2026 does not exist, 2026 is not a leap year." },
             { id: 7,  category: "Contradictory Security Notice", info: "Legitimate companies NEVER ask for banking info, passwords, or payment to release a prize." },
             { id: 8,  category: "Suspicious Link",               info: "'rams-supermarket-prize-claim.com' is not an official Rams Supermarket domain." },
-            { id: 9,  category: "Spelling Error",                info: "'availble' is misspelled — the correct word is 'available'." },
-            { id: 10, category: "Spelling Error",                info: "'transfered' is misspelled — the correct spelling is 'transferred' (double r)." },
+            { id: 9,  category: "Spelling Error",                info: "'availble' is misspelled, the correct word is 'available'." },
+            { id: 10, category: "Spelling Error",                info: "'transfered' is misspelled, the correct spelling is 'transferred' (double r)." },
             { id: 11, category: "Grammar Error",                 info: "'continued supporting' should be 'continued support', and 'looking forward' should be 'look forward'." }
         ];
 
