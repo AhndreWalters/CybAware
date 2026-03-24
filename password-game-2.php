@@ -767,14 +767,14 @@ if($fortress_done && !$game_completed) {
                     <?php // Mission brief explaining the task and the maximum score available ?>
                     <div class="mission-brief">
                         As <strong>Chief Security Engineer</strong>, create a unique master password for each department below.
-                        Each password is worth up to <strong>2 points</strong> — 2 for Strong, 1 for Fair, 0 for Weak — for a maximum of <strong>10 points</strong>.
+                        Each password is worth up to <strong>2 points</strong>, 2 for Strong, 1 for Fair, 0 for Weak, for a maximum of <strong>10 points</strong>.
                     </div>
 
                     <?php // Legend explaining what each strength rating means in terms of points ?>
                     <div class="scoring-legend">
-                        <div class="legend-item"><div class="legend-dot dot-strong"></div>Strong (80+) — 2 points</div>
-                        <div class="legend-item"><div class="legend-dot dot-fair"></div>Fair (50–79) — 1 point</div>
-                        <div class="legend-item"><div class="legend-dot dot-weak"></div>Weak (below 50) — 0 points</div>
+                        <div class="legend-item"><div class="legend-dot dot-strong"></div>Strong (80+) - 2 points</div>
+                        <div class="legend-item"><div class="legend-dot dot-fair"></div>Fair (50–79) - 1 point</div>
+                        <div class="legend-item"><div class="legend-dot dot-weak"></div>Weak (below 50) - 0 points</div>
                     </div>
 
                     <?php // Form that submits all five department passwords for scoring ?>
