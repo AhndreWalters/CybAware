@@ -476,7 +476,7 @@ $cert_id = 'CYB-' . strtoupper(substr(md5($user_id . $date . 'cybaware'), 0, 10)
                 <?php // Show a warning banner if the user hasn't finished all required games yet ?>
                 <?php if(!$certificate_earned): ?>
                 <div class="status-banner">
-                    <strong>Certificate Pending —</strong>
+                    <strong>Certificate Pending -</strong>
                     You have completed <?php echo $total_completed; ?> of <?php echo $total_games; ?> required assessments. Complete all modules to earn your certificate.
                 </div>
                 <?php endif; ?>
