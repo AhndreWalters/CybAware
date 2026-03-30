@@ -647,13 +647,6 @@ $cert_id = 'CYB-' . strtoupper(substr(md5($user_id . $date . 'cybaware'), 0, 10)
     <script>
         var CERT_W = 1060;
         var CERT_H = 750;
-
-        // Scale the certificate to fit the available width, then:
-        //   - set stage height so nothing below overlaps
-        //   - offset frame.left so it stays centred inside the clipping wrapper
-        // Using position:absolute + left offset instead of transform-origin:center
-        // because transform:scale() doesn't affect layout width, which causes
-        // horizontal scroll on mobile when transform-origin is top center.
         function scaleCert() {
             var stage = document.getElementById('certStage');
             var frame = document.getElementById('certFrame');
