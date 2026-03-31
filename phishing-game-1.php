@@ -1000,7 +1000,7 @@ if($current_question > $total_questions && !$game_completed) {
                                 <input type="hidden" name="action" value="next">
                                 <div class="game-controls">
                                     <button type="submit" class="submit-btn">
-                                        <?php echo $current_question == $total_questions ? 'See Results &#8594;' : 'Next Question'; ?>
+                                        <?php echo $current_question == $total_questions ? 'See Results' : 'Next Question'; ?>
                                     </button>
                                 </div>
                             </form>
