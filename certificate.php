@@ -1,22 +1,18 @@
 <?php
-// Start the session so we can access the logged in user's data
 session_start();
 
-// If the user is not logged in, send them to the login page and stop the script
 if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){
     header("location: login.php");
     exit;
 }
 
-// Load the database connection
 require_once "config/database.php";
 
-// Get the current user's ID from the session
 $user_id          = $_SESSION['id'];
+$full_name        = isset($_SESSION['full_name']) ? $_SESSION['full_name'] : 'Participant'; // ← GUARD THIS
 $total_completed  = 0;
 $total_games      = 4;
 
-// Query the database to get all game scores for this user
 $sql = "SELECT game_type, score FROM game_scores WHERE user_id = ?";
 if($stmt = mysqli_prepare($link, $sql)) {
     mysqli_stmt_bind_param($stmt, "i", $user_id);
@@ -24,7 +20,6 @@ if($stmt = mysqli_prepare($link, $sql)) {
     mysqli_stmt_store_result($stmt);
     mysqli_stmt_bind_result($stmt, $game_type, $score);
 
-    // Loop through each score and count how many valid games the user has completed
     while(mysqli_stmt_fetch($stmt)) {
         if(in_array($game_type, ['password_fortress','password_fortress_2','phishing_detective_lvl1','phishing_detective_lvl2']) && $score > 0)
             $total_completed++;
@@ -32,14 +27,11 @@ if($stmt = mysqli_prepare($link, $sql)) {
     mysqli_stmt_close($stmt);
 }
 
-// Check if the user has completed all required games to earn the certificate
 $certificate_earned = ($total_completed == $total_games);
-
-// Get today's date for display on the certificate
 $date    = date('F d, Y');
-
-// Generate a unique certificate ID based on the user ID and date
 $cert_id = 'CYB-' . strtoupper(substr(md5($user_id . $date . 'cybaware'), 0, 10));
+
+session_write_close(); // ← ADD THIS - locks session before page renders, prevents corruption
 ?>
 <!DOCTYPE html>
 <html lang="en">
