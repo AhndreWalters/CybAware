@@ -146,6 +146,87 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action'])) {
             transition: width 0.3s ease;
         }
 
+        <?php // Attempts counter bar shown below the progress bar ?>
+        .attempts-container {
+            margin-bottom: 20px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        <?php // Row showing attempts used on the left and remaining on the right ?>
+        .attempts-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        <?php // Label for attempts used - colour changes to red when running low ?>
+        .attempts-label {
+            color: #6b7280;
+            font-weight: 500;
+        }
+
+        <?php // Badge showing remaining attempts - turns orange then red as attempts run out ?>
+        .attempts-remaining {
+            font-weight: 700;
+            font-size: 13px;
+            padding: 3px 10px;
+            border-radius: 12px;
+            background: #d1fae5;
+            color: #065f46;
+            transition: background 0.3s, color 0.3s;
+        }
+
+        .attempts-remaining.warning {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .attempts-remaining.danger {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .attempts-remaining.exhausted {
+            background: #dc2626;
+            color: white;
+        }
+
+        <?php // Track for the attempts bar ?>
+        .attempts-bar {
+            height: 6px;
+            background: #e5e7eb;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        <?php // Fill for the attempts bar - shrinks as attempts are used, turns red when low ?>
+        .attempts-fill {
+            height: 100%;
+            background: #10b981;
+            transition: width 0.3s ease, background 0.3s ease;
+            width: 100%;
+        }
+
+        .attempts-fill.warning { background: #f59e0b; }
+        .attempts-fill.danger  { background: #dc2626; }
+
+        <?php // Red banner shown when all 15 attempts have been used up ?>
+        .attempts-exhausted-banner {
+            background: #fee2e2;
+            border: 1px solid #dc2626;
+            border-radius: 6px;
+            padding: 12px 16px;
+            margin-bottom: 16px;
+            color: #991b1b;
+            font-weight: 600;
+            font-size: 0.95rem;
+            text-align: center;
+            display: none;
+        }
+
         <?php // White card that displays the phishing email the user must analyse ?>
         .email-container {
             background: white;
@@ -288,6 +369,12 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action'])) {
             cursor: default;
         }
 
+        <?php // When attempts are exhausted, show a not-allowed cursor on the email body ?>
+        .email-body.locked {
+            cursor: not-allowed;
+            opacity: 0.85;
+        }
+
         .email-body p { margin-bottom: 16px; color: #333; }
         .email-body strong { color: #1a2980; font-weight: 600; }
 
@@ -301,6 +388,11 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action'])) {
             display: inline;
             font-style: inherit;
             font-weight: inherit;
+        }
+
+        <?php // When locked, clues show a not-allowed cursor too ?>
+        .email-body.locked .clue:not(.found) {
+            cursor: not-allowed;
         }
 
         <?php // Style applied to a clue once the user has correctly clicked it - green strikethrough with a tick ?>
@@ -560,7 +652,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action'])) {
                 <?php // Game title and instructions telling the user what to do ?>
                 <div class="game-header">
                     <h1>Phishing Detective | Hunt Errors</h1>
-                    <p>This email contains 10 hidden phishing signs/errors. There are NO visual indicators, you must find them by reading carefully. Click directly on suspicious text. Correct clicks show a green strikethrough. Wrong clicks show red.</p>
+                    <p>This email contains 10 hidden phishing signs/errors. There are NO visual indicators — you must find them by reading carefully. Click directly on suspicious text. Correct clicks show a green strikethrough. Wrong clicks show red. <strong>You have 15 attempts in total</strong> — use them wisely!</p>
                 </div>
 
                 <?php // Progress bar showing how many of the ten clues the user has found so far ?>
@@ -573,6 +665,24 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action'])) {
                         <div class="progress-fill" id="progress-fill" style="width: <?php echo $game_completed ? '100' : (($clues_found / 10) * 100); ?>%;"></div>
                     </div>
                 </div>
+
+                <?php // Attempts counter bar - only shown during active gameplay ?>
+                <?php if(!$game_completed): ?>
+                <div class="attempts-container">
+                    <div class="attempts-info">
+                        <span class="attempts-label">Attempts Used: <span id="attempts-used">0</span> of 15</span>
+                        <span class="attempts-remaining" id="attempts-remaining-badge">15 remaining</span>
+                    </div>
+                    <div class="attempts-bar">
+                        <div class="attempts-fill" id="attempts-fill"></div>
+                    </div>
+                </div>
+
+                <?php // Red banner revealed when all 15 attempts are exhausted ?>
+                <div class="attempts-exhausted-banner" id="exhausted-banner">
+                    ⛔ You have used all 15 attempts. No more clicks are allowed — please submit your score below.
+                </div>
+                <?php endif; ?>
 
                 <?php // Show the completion screen if the game is already done, otherwise show the email challenge ?>
                 <?php if($game_completed): ?>
@@ -647,7 +757,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action'])) {
                         </div>
 
                         <?php // The full email body - each phishing error is wrapped in a span.clue the user can click ?>
-                        <div class="email-body">
+                        <div class="email-body" id="email-body">
                             <p>Dear Valued Customer,</p>
 
                             <?php // Clue 1 - spelling error: exsiting ?>
@@ -672,7 +782,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action'])) {
                             <p>This offer is only <span class="clue" data-id="9" data-category="Spelling Error" data-info="'availble' is misspelled, the correct word is 'available'.">availble</span> to selected customers and cannot be <span class="clue" data-id="10" data-category="Spelling Error" data-info="'transfered' is misspelled, the correct spelling is 'transferred' (double r).">transfered</span> to another person.</p>
 
                             <?php // Clue 11 - grammar error (bonus clue, not scored) ?>
-                            <p>Congratulations once again! <span class="clue" data-id="11" data-category="Grammar Error" data-info="'continued supporting' should be 'continued support', and 'looking forward' should be 'look forward',both are grammar errors in a single sentence.">We appreciate your continued supporting and looking forward to seeing you soon.</span></p>
+                            <p>Congratulations once again! <span class="clue" data-id="11" data-category="Grammar Error" data-info="'continued supporting' should be 'continued support', and 'looking forward' should be 'look forward', both are grammar errors in a single sentence.">We appreciate your continued supporting and looking forward to seeing you soon.</span></p>
 
                             <p>Best regards,</p>
                             <p><strong>The Management Team</strong><br>Rams Supermarket</p>
@@ -685,7 +795,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action'])) {
                         <div id="hints-list"></div>
                     </div>
 
-                    <?php // Results breakdown section shown by JavaScript once all ten scorable clues are found ?>
+                    <?php // Results breakdown section shown by JavaScript once all ten scorable clues are found or attempts run out ?>
                     <div id="results-section" class="results-section" style="display: none;">
                         <h3 style="color: #1e40af; margin-bottom: 15px;">📋 Analysis Complete!</h3>
                         <div id="results-message" style="margin-bottom: 20px;"></div>
@@ -728,22 +838,29 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action'])) {
 
         // Only clues 1 to 10 count towards the score - clue 11 is a bonus that does not add points
         const scorableIds = new Set([1,2,3,4,5,6,7,8,9,10]);
-        const totalClues = 10;
+        const totalClues   = 10;
+        const maxAttempts  = 15;
 
         // Load the current score and found clues from PHP into JavaScript
-        let score = <?php echo $current_score; ?>;
+        let score      = <?php echo $current_score; ?>;
         let foundClues = new Set(<?php echo $clues_found > 0 ? json_encode(range(1, $clues_found)) : '[]'; ?>);
+        let attempts   = 0;      // total clicks made this session (correct + wrong)
+        let gameLocked = false;  // true once all attempts are exhausted
 
         // Get references to the key UI elements used throughout the game
-        const submitBtn     = document.getElementById('submit-btn');
-        const resultsSection= document.getElementById('results-section');
-        const resultsMessage= document.getElementById('results-message');
-        const errorsList    = document.getElementById('errors-list');
-        const flashOverlay  = document.getElementById('flash-overlay');
-        const emailBody     = document.querySelector('.email-body');
-        const progressFill  = document.getElementById('progress-fill');
-        const hintsBox      = document.getElementById('hints-box');
-        const hintsList     = document.getElementById('hints-list');
+        const submitBtn        = document.getElementById('submit-btn');
+        const resultsSection   = document.getElementById('results-section');
+        const resultsMessage   = document.getElementById('results-message');
+        const errorsList       = document.getElementById('errors-list');
+        const flashOverlay     = document.getElementById('flash-overlay');
+        const emailBody        = document.getElementById('email-body');
+        const progressFill     = document.getElementById('progress-fill');
+        const hintsBox         = document.getElementById('hints-box');
+        const hintsList        = document.getElementById('hints-list');
+        const attemptsUsedEl   = document.getElementById('attempts-used');
+        const attemptsBadge    = document.getElementById('attempts-remaining-badge');
+        const attemptsFill     = document.getElementById('attempts-fill');
+        const exhaustedBanner  = document.getElementById('exhausted-banner');
 
         // Set up event listeners on all clue spans and the email body background
         function initGame() {
@@ -755,26 +872,38 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action'])) {
                 clueEl.addEventListener('click', handleClueClick);
             });
 
-            // Flash red when the user clicks anywhere in the email body that is not a clue
+            // Flash red when the user clicks anywhere in the email body that is not an unfound clue
             emailBody.addEventListener('click', (event) => {
+                if (gameLocked) return;
                 const el = event.target;
                 if (!el.classList.contains('clue') || el.classList.contains('found')) {
-                    flashScreen('red');
+                    // Count clicking on already-found clues or blank areas as a wasted attempt
+                    if (!el.classList.contains('clue') || el.classList.contains('found')) {
+                        registerAttempt(false);
+                        flashScreen('red');
+                    }
                 }
             });
 
             submitBtn.addEventListener('click', submitScore);
             updateSubmitButton();
+            updateAttemptsUI(); // initialise the attempts bar at 15 remaining
         }
 
         // Handle a click on a clue span - mark it found, update the score and check if all clues are found
         function handleClueClick(event) {
             event.stopPropagation();
+            if (gameLocked) return; // block interaction after limit reached
+
             const clueEl = event.currentTarget;
             const clueId = parseInt(clueEl.getAttribute('data-id'));
 
-            // Ignore clicks on clues that have already been found
-            if (foundClues.has(clueId)) return;
+            // Clicking an already-found clue costs an attempt and shows red
+            if (foundClues.has(clueId)) {
+                registerAttempt(false);
+                flashScreen('red');
+                return;
+            }
 
             // Mark this clue as found and apply the green strikethrough style to all matching spans
             foundClues.add(clueId);
@@ -783,18 +912,75 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action'])) {
             // Only add a point if this clue is one of the ten scorable ones
             if (scorableIds.has(clueId)) score += 1;
 
-            // Flash green, update the submit button state, update the progress bar and add the hint
             flashScreen('green');
-            updateSubmitButton();
-            updateProgressBar();
             addHint(clueId);
+            registerAttempt(true); // counts the attempt and updates the UI
+            updateProgressBar();
 
-            // If all ten scorable clues have been found, show the results breakdown and the celebration popup
+            // If all ten scorable clues have been found, show the results breakdown and celebrate
             const scorableFound = [...foundClues].filter(id => scorableIds.has(id)).length;
             if (scorableFound === totalClues) {
                 showResults();
                 celebrateAllCluesFound();
             }
+        }
+
+        // Increment the attempt counter, update the UI, and lock the game if the limit is reached
+        function registerAttempt(wasCorrect) {
+            attempts++;
+            updateAttemptsUI();
+
+            if (attempts >= maxAttempts) {
+                lockGame();
+            }
+        }
+
+        // Refresh the attempts bar, badge colour and counter label to reflect current usage
+        function updateAttemptsUI() {
+            if (!attemptsUsedEl) return; // guard for completion screen where elements don't exist
+
+            const remaining = maxAttempts - attempts;
+            attemptsUsedEl.textContent = attempts;
+
+            // Update the remaining badge text and colour tier
+            attemptsBadge.textContent = remaining + ' remaining';
+            attemptsBadge.className = 'attempts-remaining';
+            if (remaining === 0) {
+                attemptsBadge.classList.add('exhausted');
+            } else if (remaining <= 3) {
+                attemptsBadge.classList.add('danger');
+            } else if (remaining <= 6) {
+                attemptsBadge.classList.add('warning');
+            }
+
+            // Shrink the fill bar proportionally and change its colour when running low
+            const pct = (remaining / maxAttempts) * 100;
+            attemptsFill.style.width = pct + '%';
+            attemptsFill.className = 'attempts-fill';
+            if (remaining === 0) {
+                attemptsFill.classList.add('danger');
+            } else if (remaining <= 3) {
+                attemptsFill.classList.add('danger');
+            } else if (remaining <= 6) {
+                attemptsFill.classList.add('warning');
+            }
+        }
+
+        // Disable all further clue interaction and show the exhausted banner and results summary
+        function lockGame() {
+            gameLocked = true;
+
+            // Add the locked class to the email body for visual feedback
+            emailBody.classList.add('locked');
+
+            // Show the red exhausted banner
+            if (exhaustedBanner) exhaustedBanner.style.display = 'block';
+
+            // Always enable the submit button once locked so the user can save whatever they got
+            if (submitBtn) submitBtn.disabled = false;
+
+            // Show the full results breakdown so the user can see what they missed
+            showResults();
         }
 
         // Add an explanation entry to the hints box for the clue that was just found
@@ -821,9 +1007,9 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action'])) {
             }, 300);
         }
 
-        // Disable the submit button if no clues have been found yet
+        // Disable the submit button if no clues have been found yet and the game is not locked
         function updateSubmitButton() {
-            if (submitBtn) submitBtn.disabled = foundClues.size === 0;
+            if (submitBtn) submitBtn.disabled = (foundClues.size === 0 && !gameLocked);
         }
 
         // Update the progress bar width and the clues found label after each successful clue click
@@ -839,8 +1025,9 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action'])) {
             }
         }
 
-        // Build and display the full results breakdown once all scorable clues have been found
+        // Build and display the full results breakdown once all scorable clues are found or attempts run out
         function showResults() {
+            if (!resultsSection) return;
             resultsSection.style.display = 'block';
             resultsSection.scrollIntoView({ behavior: 'smooth' });
 
@@ -852,7 +1039,12 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action'])) {
             else if (score >= 4) { message = `You found ${score} out of ${totalClues} phishing signs.`; grade = 'C'; }
             else                 { message = `You found ${score} out of ${totalClues} phishing signs. Keep practicing!`; grade = 'D'; }
 
-            resultsMessage.innerHTML = `<strong>Grade: ${grade}</strong><br>${message}`;
+            // Add a note if the game was stopped by the attempt limit
+            const attemptNote = gameLocked && score < totalClues
+                ? `<br><span style="color:#dc2626; font-size:0.9rem;">You used all ${maxAttempts} attempts before finding all errors.</span>`
+                : '';
+
+            resultsMessage.innerHTML = `<strong>Grade: ${grade}</strong><br>${message}${attemptNote}`;
 
             // Build a result card for each of the ten scorable clues showing whether the user found it or missed it
             errorsList.innerHTML = '';
@@ -896,7 +1088,10 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action'])) {
 
         // Send the final score to the server using a fetch AJAX call and redirect to the completion screen on success
         async function submitScore() {
-            if (foundClues.size === 0) { alert('Please find at least one clue before submitting!'); return; }
+            if (foundClues.size === 0 && !gameLocked) {
+                alert('Please find at least one clue before submitting!');
+                return;
+            }
 
             // Disable the button and show a saving message while the request is in progress
             submitBtn.disabled = true;
