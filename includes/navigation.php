@@ -1,20 +1,9 @@
 <?php
-// MUST be the absolute first line - NO characters, spaces, or newlines before this!
-// Start output buffering to prevent any header issues
-if (ob_get_level() == 0) {
-    ob_start();
-}
-
-// Start session if not already started - this MUST happen before ANY output
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-
-// No HTML output should happen before this point
+if (ob_get_level() == 0) { ob_start(); }
+if (session_status() === PHP_SESSION_NONE) { session_start(); }
 ?>
 <!DOCTYPE html>
 <style>
-/* Removes default list item height and spacing for the avatar nav item */
 #avatar-li {
     height: 0 !important;
     overflow: visible !important;
