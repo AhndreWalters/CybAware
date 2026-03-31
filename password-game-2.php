@@ -102,9 +102,9 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['phase']) && $_POST['pha
         $_SESSION['pg2_done']         = true;
         $_SESSION['pg2_dept_results'] = $dept_results;
 
-        $score         = $total_score;
-        $fortress_done = true;
-        $dept_results  = $dept_results;
+        $score          = $total_score;
+        $fortress_done  = true;
+        $dept_results   = $dept_results;
         $game_completed = true;
 
         // Insert or update the score in the database for this user and game type
@@ -136,7 +136,7 @@ if($fortress_done && !$game_completed) {
     <link rel="stylesheet" href="css/styles.css">
 
     <style>
-        <?php // Centres the game content and stacks everything vertically ?>
+        /* Centres the game content and stacks everything vertically */
         .game-interface {
             max-width: 800px;
             margin: 0 auto;
@@ -147,13 +147,13 @@ if($fortress_done && !$game_completed) {
             align-items: center;
         }
 
-        <?php // Makes every direct child of the game interface take the full available width ?>
+        /* Makes every direct child of the game interface take the full available width */
         .game-interface > * {
             width: 100%;
             box-sizing: border-box;
         }
 
-        <?php // Centres the game title and subtitle above the department cards ?>
+        /* Centres the game title and subtitle above the department cards */
         .game-header {
             text-align: center;
             margin-bottom: 30px;
@@ -171,14 +171,14 @@ if($fortress_done && !$game_completed) {
             font-size: 1.1rem;
         }
 
-        <?php // Wrapper for the progress bar and the labels above it ?>
+        /* Wrapper for the progress bar and the labels above it */
         .progress-container {
             margin-bottom: 25px;
             width: 100%;
             box-sizing: border-box;
         }
 
-        <?php // Row with the status label on the left and the score on the right ?>
+        /* Row with the status label on the left and the score on the right */
         .progress-info {
             display: flex;
             justify-content: space-between;
@@ -187,7 +187,7 @@ if($fortress_done && !$game_completed) {
             color: #6b7280;
         }
 
-        <?php // Grey track that the blue progress fill sits inside ?>
+        /* Grey track that the blue progress fill sits inside */
         .progress-bar {
             height: 6px;
             background: #e5e7eb;
@@ -195,14 +195,14 @@ if($fortress_done && !$game_completed) {
             overflow: hidden;
         }
 
-        <?php // Blue fill that grows to show how far through the game the user is ?>
+        /* Blue fill that grows to show how far through the game the user is */
         .progress-fill {
             height: 100%;
             background: #1e40af;
             transition: width 0.3s ease;
         }
 
-        <?php // Yellow hint box used to show extra guidance to the user ?>
+        /* Yellow hint box used to show extra guidance to the user */
         .hint-box {
             background: #fef3c7;
             border: 1px solid #f59e0b;
@@ -213,7 +213,7 @@ if($fortress_done && !$game_completed) {
             color: #92400e;
         }
 
-        <?php // Blue bordered mission brief box shown above the department cards ?>
+        /* Blue bordered mission brief box shown above the department cards */
         .mission-brief {
             background: #eff6ff;
             border: 1px solid #bfdbfe;
@@ -228,7 +228,7 @@ if($fortress_done && !$game_completed) {
 
         .mission-brief strong { color: #1e40af; }
 
-        <?php // Row of three legend items explaining what Strong, Fair and Weak ratings mean ?>
+        /* Row of three legend items explaining what Strong, Fair and Weak ratings mean */
         .scoring-legend {
             display: flex;
             gap: 12px;
@@ -236,7 +236,7 @@ if($fortress_done && !$game_completed) {
             flex-wrap: wrap;
         }
 
-        <?php // Individual legend item with a coloured dot and a points label ?>
+        /* Individual legend item with a coloured dot and a points label */
         .legend-item {
             display: flex;
             align-items: center;
@@ -251,7 +251,7 @@ if($fortress_done && !$game_completed) {
             min-width: 140px;
         }
 
-        <?php // Small circular dot used in the legend items to indicate strength level by colour ?>
+        /* Small circular dot used in the legend items to indicate strength level by colour */
         .legend-dot {
             width: 10px;
             height: 10px;
@@ -263,7 +263,7 @@ if($fortress_done && !$game_completed) {
         .dot-fair   { background: #f59e0b; }
         .dot-weak   { background: #ef4444; }
 
-        <?php // White card for each department with a header showing the name and a body containing the password input ?>
+        /* White card for each department with a header showing the name and a body containing the password input */
         .department-card {
             background: white;
             border-radius: 8px;
@@ -279,7 +279,7 @@ if($fortress_done && !$game_completed) {
 
         .department-card:hover { border-color: #93c5fd; }
 
-        <?php // Light grey header bar at the top of each department card ?>
+        /* Light grey header bar at the top of each department card */
         .dept-header {
             background: #f8fafc;
             padding: 20px 25px;
@@ -289,7 +289,7 @@ if($fortress_done && !$game_completed) {
             gap: 15px;
         }
 
-        <?php // Circular blue avatar showing the first letter of the department name ?>
+        /* Circular blue avatar showing the first letter of the department name */
         .dept-avatar {
             width: 40px;
             height: 40px;
@@ -319,7 +319,7 @@ if($fortress_done && !$game_completed) {
             margin: 0;
         }
 
-        <?php // Small blue pill badge in the top right of each card showing the points available ?>
+        /* Small blue pill badge in the top right of each card showing the points available */
         .dept-points {
             font-size: 12px;
             font-weight: 700;
@@ -333,10 +333,10 @@ if($fortress_done && !$game_completed) {
 
         .dept-body { padding: 20px 25px; }
 
-        <?php // Wrapper for the password input and the show/hide toggle button ?>
+        /* Wrapper for the password input and the show/hide toggle button */
         .input-group { position: relative; }
 
-        <?php // Password text input field inside each department card ?>
+        /* Password text input field inside each department card */
         .input-group input {
             width: 100%;
             padding: 14px 44px 14px 16px;
@@ -356,13 +356,13 @@ if($fortress_done && !$game_completed) {
             box-shadow: 0 0 0 3px rgba(59,130,246,0.1);
         }
 
-        <?php // Red border applied to an input when the same password has been entered in another department ?>
+        /* Red border applied to an input when the same password has been entered in another department */
         .input-group input.duplicate {
             border-color: #ef4444;
             box-shadow: 0 0 0 3px rgba(239,68,68,0.1);
         }
 
-        <?php // Eye icon button that toggles the password field between hidden and visible text ?>
+        /* Eye icon button that toggles the password field between hidden and visible text */
         .toggle-password {
             position: absolute;
             right: 14px;
@@ -379,7 +379,7 @@ if($fortress_done && !$game_completed) {
 
         .toggle-password:hover { color: #1e40af; }
 
-        <?php // Row containing the strength bar track and the strength label text ?>
+        /* Row containing the strength bar track and the strength label text */
         .strength-row {
             display: flex;
             align-items: center;
@@ -387,7 +387,7 @@ if($fortress_done && !$game_completed) {
             margin-top: 10px;
         }
 
-        <?php // Grey track that the coloured strength fill sits inside ?>
+        /* Grey track that the coloured strength fill sits inside */
         .strength-meter {
             flex: 1;
             height: 5px;
@@ -396,7 +396,7 @@ if($fortress_done && !$game_completed) {
             overflow: hidden;
         }
 
-        <?php // Coloured fill bar that changes colour and width based on password strength ?>
+        /* Coloured fill bar that changes colour and width based on password strength */
         .strength-bar {
             height: 100%;
             width: 0%;
@@ -404,12 +404,13 @@ if($fortress_done && !$game_completed) {
             transition: width 0.4s ease, background-color 0.4s ease;
         }
 
+        /* Width and colour states driven by the class applied in JavaScript */
         .strength-bar.weak   { background: #ef4444; width: 25%; }
         .strength-bar.fair   { background: #f59e0b; width: 55%; }
         .strength-bar.good   { background: #eab308; width: 75%; }
         .strength-bar.strong { background: #10b981; width: 100%; }
 
-        <?php // Small label showing the strength rating and points to the right of the strength bar ?>
+        /* Small label showing the strength rating and points to the right of the strength bar */
         .strength-label {
             font-size: 12px;
             color: #6b7280;
@@ -418,7 +419,7 @@ if($fortress_done && !$game_completed) {
             text-align: right;
         }
 
-        <?php // Red warning box shown when two or more departments have the same password ?>
+        /* Red warning box shown when two or more departments have the same password */
         .dup-warning {
             background: #fef2f2;
             border: 1px solid #fecaca;
@@ -430,10 +431,10 @@ if($fortress_done && !$game_completed) {
             display: none;
         }
 
-        <?php // Makes the duplicate warning visible when duplicates are detected ?>
+        /* Makes the duplicate warning visible when duplicates are detected */
         .dup-warning.show { display: block; }
 
-        <?php // Yellow tip box shown above the submit button with a strong password example ?>
+        /* Yellow tip box shown above the submit button with a strong password example */
         .hint-tip {
             background: #fefce8;
             border: 1px solid #fde68a;
@@ -444,7 +445,7 @@ if($fortress_done && !$game_completed) {
             margin-bottom: 20px;
         }
 
-        <?php // Row with the Reset All button on the left and the Submit button on the right ?>
+        /* Row with the Reset All button on the left and the Submit button on the right */
         .form-actions {
             display: flex;
             justify-content: space-between;
@@ -455,7 +456,7 @@ if($fortress_done && !$game_completed) {
             box-sizing: border-box;
         }
 
-        <?php // Blue submit button used to send all five department passwords for scoring ?>
+        /* Blue submit button used to send all five department passwords for scoring */
         .submit-btn {
             padding: 16px 50px;
             background: #1e40af;
@@ -478,7 +479,7 @@ if($fortress_done && !$game_completed) {
             box-shadow: 0 6px 12px rgba(30, 64, 175, 0.3);
         }
 
-        <?php // Greyed out disabled state shown before all five passwords have been filled in ?>
+        /* Greyed out disabled state shown before all five passwords have been filled in */
         .submit-btn:disabled {
             background: #94a3b8;
             cursor: not-allowed;
@@ -486,7 +487,7 @@ if($fortress_done && !$game_completed) {
             box-shadow: none;
         }
 
-        <?php // Outlined secondary button used for the Reset All action ?>
+        /* Outlined secondary button used for the Reset All action */
         .btn-secondary {
             padding: 14px 24px;
             background: white;
@@ -504,7 +505,7 @@ if($fortress_done && !$game_completed) {
             border-color: #cbd5e1;
         }
 
-        <?php // White card that shows the per-department audit results after submission ?>
+        /* White card that shows the per-department audit results after submission */
         .fortress-results {
             background: white;
             border-radius: 8px;
@@ -515,7 +516,7 @@ if($fortress_done && !$game_completed) {
             overflow: hidden;
         }
 
-        <?php // Header row at the top of the results card showing the title and total points ?>
+        /* Header row at the top of the results card showing the title and total points */
         .fortress-results-header {
             background: #f8fafc;
             padding: 16px 25px;
@@ -528,7 +529,7 @@ if($fortress_done && !$game_completed) {
             align-items: center;
         }
 
-        <?php // Individual row showing the result for one department ?>
+        /* Individual row showing the result for one department */
         .dept-result-row {
             display: flex;
             justify-content: space-between;
@@ -546,7 +547,7 @@ if($fortress_done && !$game_completed) {
 
         .dept-result-right { display: flex; align-items: center; gap: 10px; }
 
-        <?php // Coloured pill badge showing the strength rating for each department in the results list ?>
+        /* Coloured pill badge showing the strength rating for each department in the results list */
         .badge {
             display: inline-block;
             padding: 4px 12px;
@@ -559,7 +560,7 @@ if($fortress_done && !$game_completed) {
         .badge-fair   { background: #fef3c7; color: #92400e; }
         .badge-weak   { background: #fee2e2; color: #991b1b; }
 
-        <?php // Points earned label shown to the right of the badge in each result row ?>
+        /* Points earned label shown to the right of the badge in each result row */
         .pts-badge {
             font-size: 13px;
             font-weight: 700;
@@ -568,7 +569,7 @@ if($fortress_done && !$game_completed) {
             text-align: right;
         }
 
-        <?php // Centred white card shown after the results table with the final score and action buttons ?>
+        /* Centred white card shown after the results table with the final score and action buttons */
         .completion-screen {
             text-align: center;
             padding: 40px;
@@ -586,7 +587,7 @@ if($fortress_done && !$game_completed) {
             margin-bottom: 10px;
         }
 
-        <?php // Bold text showing the final score on the completion screen ?>
+        /* Bold text showing the final score on the completion screen */
         .score-result {
             font-size: 1.3rem;
             color: #334155;
@@ -594,14 +595,14 @@ if($fortress_done && !$game_completed) {
             font-weight: 600;
         }
 
-        <?php // Smaller grey text beneath the score explaining the points breakdown ?>
+        /* Smaller grey text beneath the score explaining the points breakdown */
         .score-sub {
             font-size: 13px;
             color: #9ca3af;
             margin-bottom: 25px;
         }
 
-        <?php // Row of action buttons at the bottom of the completion screen ?>
+        /* Row of action buttons at the bottom of the completion screen */
         .completion-actions {
             display: flex;
             gap: 15px;
@@ -611,7 +612,7 @@ if($fortress_done && !$game_completed) {
             width: 100%;
         }
 
-        <?php // Primary blue action button on the completion screen ?>
+        /* Primary blue action button on the completion screen */
         .action-btn {
             padding: 14px 35px;
             background: #1e40af;
@@ -635,7 +636,7 @@ if($fortress_done && !$game_completed) {
             box-shadow: 0 4px 8px rgba(30, 64, 175, 0.2);
         }
 
-        <?php // Secondary outlined button variant used for less important actions on the completion screen ?>
+        /* Secondary outlined button variant used for less important actions on the completion screen */
         .action-btn.secondary {
             background: white;
             color: #64748b;
@@ -649,7 +650,7 @@ if($fortress_done && !$game_completed) {
             box-shadow: none;
         }
 
-        <?php // Light blue note at the bottom of the completion screen reminding the user to complete all games for the certificate ?>
+        /* Light blue note at the bottom of the completion screen reminding the user to complete all games for the certificate */
         .certificate-note {
             margin-top: 20px;
             padding: 15px;
@@ -661,7 +662,7 @@ if($fortress_done && !$game_completed) {
             text-align: center;
         }
 
-        <?php // On small screens the layout stacks vertically and buttons go full width ?>
+        /* On small screens the layout stacks vertically and buttons go full width */
         @media (max-width: 768px) {
             .game-interface { padding: 15px; }
             .game-header h1 { font-size: 1.6rem; }
@@ -876,10 +877,19 @@ if($fortress_done && !$game_completed) {
         const label = card.querySelector('.strength-label');
         const val   = input.value;
 
-        // Reset the bar if the field is empty
-        if(!val.length) { bar.className='strength-bar'; bar.style.width='0%'; label.textContent=''; return; }
+        // Reset the bar if the field is empty - remove all state classes and clear the label
+        if(!val.length) {
+            bar.className     = 'strength-bar';
+            bar.style.width   = '';
+            label.textContent = '';
+            label.style.color = '';
+            return;
+        }
 
         const sc = scorePassword(val);
+
+        // Clear any inline width set during a previous reset so the CSS class width takes over cleanly
+        bar.style.width = '';
 
         // Apply the correct colour class and points label based on the strength score
         if(sc >= 80)      { bar.className='strength-bar strong'; label.style.color='#059669'; label.textContent='Strong - 2 pts'; }
@@ -930,11 +940,15 @@ if($fortress_done && !$game_completed) {
         resetBtn.addEventListener('click', () => {
             deptInputs.forEach(i => {
                 i.value = '';
+                i.type  = 'password';
                 i.classList.remove('duplicate');
-                const card = i.closest('.department-card');
-                card.querySelector('.strength-bar').className = 'strength-bar';
-                card.querySelector('.strength-bar').style.width = '0%';
-                card.querySelector('.strength-label').textContent = '';
+
+                // Delegate the reset to updateCard so the empty-state logic runs consistently
+                updateCard(i);
+
+                // Reset the toggle eye icon back to the closed-eye symbol
+                const toggle = i.closest('.dept-body').querySelector('.toggle-password');
+                if(toggle) toggle.textContent = '\u{1F441}';
             });
 
             // Hide the duplicate warning and disable the submit button after the reset
