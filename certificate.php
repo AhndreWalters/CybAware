@@ -515,7 +515,7 @@ session_write_close(); // ← ADD THIS - locks session before page renders, prev
                                         <?php // The logged in user's full name printed on the certificate ?>
                                         <div class="cert-presented">
                                             <div class="cert-name-wrap">
-                                                <span class="cert-name"><?php echo htmlspecialchars($_SESSION['full_name']); ?></span>
+                                                <span class="cert-name"><?php echo htmlspecialchars($full_name); ?></span>
                                             </div>
                                         </div>
 
