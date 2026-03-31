@@ -56,10 +56,10 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
             // Hints shown for specific questions when the user gets the answer wrong
             $hints = [
                 4  => "Password length is the most critical factor against brute force attacks.",
-                5  => "A strong password needs uppercase, lowercase, numbers, and symbols — at least 12 characters.",
+                5  => "A strong password needs uppercase, lowercase, numbers, and symbols, at least 12 characters.",
                 6  => "Password managers securely store and generate complex passwords for you.",
                 7  => "2FA adds a second verification step beyond just your password.",
-                8  => "Passwords should never be stored in plain text — only as secure hashes.",
+                8  => "Passwords should never be stored in plain text, only as secure hashes.",
                 9  => "Reusing passwords means one breach can compromise all your accounts.",
                 10 => "Brute force attacks try every possible combination to crack a password."
             ];
@@ -717,7 +717,7 @@ if($current_question > $total_questions && !$game_completed) {
                                         <button type="button" class="option" onclick="selectAnswer('Encoded in Base64', this)"><div class="option-letter">C</div><div class="option-text">Encoded in Base64 format</div></button>
                                         <button type="button" class="option" onclick="selectAnswer('It is stored as an irreversible hash', this)"><div class="option-letter">D</div><div class="option-text">It is stored as an irreversible hash</div></button>
                                     </div>
-                                    <div style="margin-top:16px;" class="hint-box"><strong>Hint:</strong> A secure website never stores your actual password — only a one-way transformed version that cannot be reversed.</div>
+                                    <div style="margin-top:16px;" class="hint-box"><strong>Hint:</strong> A secure website never stores your actual password, only a one-way transformed version that cannot be reversed.</div>
 
                                 <?php elseif($current_question == 9): ?>
                                     <div class="options-container">
@@ -734,7 +734,7 @@ if($current_question > $total_questions && !$game_completed) {
                                         <button type="button" class="option" onclick="selectAnswer('Denial of Service attack', this)"><div class="option-letter">C</div><div class="option-text">Denial of Service (DoS) attack</div></button>
                                         <button type="button" class="option" onclick="selectAnswer('Brute force attack', this)"><div class="option-letter">D</div><div class="option-text">Brute force attack</div></button>
                                     </div>
-                                    <div style="margin-top:16px;" class="hint-box"><strong>Hint:</strong> Each extra character multiplies the number of combinations an attacker must try — this is why longer passwords are exponentially stronger.</div>
+                                    <div style="margin-top:16px;" class="hint-box"><strong>Hint:</strong> Each extra character multiplies the number of combinations an attacker must try, this is why longer passwords are exponentially stronger.</div>
                                 <?php endif; ?>
                             </div>
                         </div>
@@ -807,9 +807,9 @@ if($current_question > $total_questions && !$game_completed) {
 
                 // Convert the score to a percentage width and return the matching label and colour
                 const width = Math.round((s / 6) * 100);
-                if(s <= 2) return { width, text: 'Weak — easily compromised',        cls: 'strength-weak',   answer: 'Weak',   color: '#dc2626' };
-                if(s <= 4) return { width, text: 'Fair — could be stronger',          cls: 'strength-fair',   answer: 'Fair',   color: '#d97706' };
-                           return { width, text: 'Strong — meets security standards', cls: 'strength-strong', answer: 'Strong', color: '#059669' };
+                if(s <= 2) return { width, text: 'Weak - easily compromised',        cls: 'strength-weak',   answer: 'Weak',   color: '#dc2626' };
+                if(s <= 4) return { width, text: 'Fair - could be stronger',          cls: 'strength-fair',   answer: 'Fair',   color: '#d97706' };
+                           return { width, text: 'Strong - meets security standards', cls: 'strength-strong', answer: 'Strong', color: '#059669' };
             }
 
             if(passwordInput) {
