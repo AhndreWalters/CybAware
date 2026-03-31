@@ -55,6 +55,12 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action'])) {
         $completed = ($new_score >= 10) ? 1 : 0;
         $new_clues = min(10, $new_score);
 
+        // Store the exact clue IDs the player found so the completion screen can show the breakdown
+        $found_ids_raw = isset($_POST['found_ids']) ? $_POST['found_ids'] : '';
+        $found_ids = array_filter(array_map('intval', explode(',', $found_ids_raw)));
+        $_SESSION['pg2_found_ids'] = $found_ids;
+        $_SESSION['pg2_attempts']  = isset($_POST['attempts']) ? (int)$_POST['attempts'] : 0;
+
         // Insert the score or update it if a record already exists for this user and game
         $upsert_sql = "INSERT INTO game_scores (user_id, game_type, score, total_questions, completed_at) 
                       VALUES (?, 'phishing_detective_lvl2', ?, 10, NOW())
@@ -570,49 +576,6 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action'])) {
         .flash-green { background-color: rgba(16, 185, 129, 0.3); }
         .flash-red   { background-color: rgba(220, 38, 38, 0.3); }
 
-        <?php // Grey container shown after all clues are found listing every phishing sign with found or missed status ?>
-        .results-section {
-            background: #f8fafc;
-            border-radius: 8px;
-            padding: 25px;
-            margin-bottom: 20px;
-            border: 1px solid #e2e8f0;
-        }
-
-        <?php // Individual result card for each phishing sign with a coloured left border ?>
-        .error-item {
-            background: white;
-            border-radius: 6px;
-            padding: 15px;
-            margin-bottom: 15px;
-            border-left: 4px solid;
-        }
-
-        <?php // Green left border for clues the user found, red for ones they missed ?>
-        .error-item.found     { border-left-color: #10b981; }
-        .error-item.not-found { border-left-color: #dc2626; }
-
-        <?php // Row inside each result card showing the error type label and the found or missed badge ?>
-        .error-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-
-        .error-type { font-weight: 600; color: #374151; }
-
-        <?php // Small pill badge showing whether the user found each clue or missed it ?>
-        .error-status {
-            padding: 3px 10px;
-            border-radius: 12px;
-            font-size: 0.85rem;
-            font-weight: 600;
-        }
-
-        .status-found  { background: #d1fae5; color: #065f46; }
-        .status-missed { background: #fee2e2; color: #991b1b; }
-
         <?php // On small screens all elements stack vertically and buttons go full width ?>
         @media (max-width: 768px) {
             .game-interface { padding: 15px; }
@@ -705,6 +668,56 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action'])) {
                         }
                         ?>
 
+                        <?php
+                        // Pull the found IDs and attempt count saved in the session when the user submitted
+                        $found_ids   = isset($_SESSION['pg2_found_ids']) ? $_SESSION['pg2_found_ids'] : [];
+                        $used_attempts = isset($_SESSION['pg2_attempts']) ? (int)$_SESSION['pg2_attempts'] : null;
+
+                        // Full clue definitions mirrored from the JS array - used to render the breakdown in PHP
+                        $all_clues = [
+                            ['id'=>1,  'category'=>'Spelling Error',                'info'=>"'exsiting' is misspelled, the correct word is 'exciting'."],
+                            ['id'=>2,  'category'=>'Spelling Error',                'info'=>"'extreamly' is misspelled, the correct word is 'extremely'."],
+                            ['id'=>3,  'category'=>'Spelling Error',                'info'=>"'appreciashion' is misspelled, the correct word is 'appreciation'."],
+                            ['id'=>4,  'category'=>'Character Substitution',        'info'=>"'F00D' uses the digit zero (0) instead of the letter O, a common phishing trick used to bypass spam filters."],
+                            ['id'=>5,  'category'=>'Character Substitution',        'info'=>"'ident!fication' replaces the letter 'i' with an exclamation mark (!), another character substitution trick."],
+                            ['id'=>6,  'category'=>'Date Error',                    'info'=>"February 29, 2026 does not exist, 2026 is not a leap year. This is a fabricated deadline designed to create urgency."],
+                            ['id'=>7,  'category'=>'Contradictory Security Notice', 'info'=>"Legitimate companies NEVER ask for banking details, passwords, or payment to release a prize. This sentence is a reverse psychology trick."],
+                            ['id'=>8,  'category'=>'Suspicious Link',               'info'=>"'rams-supermarket-prize-claim.com' is not an official Rams Supermarket domain. Phishing emails use lookalike domains to steal personal information."],
+                            ['id'=>9,  'category'=>'Spelling Error',                'info'=>"'availble' is misspelled, the correct word is 'available'."],
+                            ['id'=>10, 'category'=>'Spelling Error',                'info'=>"'transfered' is misspelled, the correct spelling is 'transferred' (double r)."],
+                        ];
+                        ?>
+
+                        <?php // Results breakdown showing which errors were found and which were missed ?>
+                        <div style="text-align:left; margin-top: 30px;">
+                            <h3 style="color:#1e40af; margin-bottom:5px; font-size:1.1rem;"></h3>
+                            <?php if($used_attempts !== null): ?>
+                                <p style="color:#6b7280; font-size:0.9rem; margin-bottom:15px;">
+                                    Attempts used: <strong><?php echo $used_attempts; ?></strong> of 15
+                                </p>
+                            <?php endif; ?>
+
+                            <?php foreach($all_clues as $clue): ?>
+                                <?php $was_found = in_array($clue['id'], $found_ids); ?>
+                                <div style="background:white; border-radius:6px; padding:14px 16px; margin-bottom:12px;
+                                            border-left:4px solid <?php echo $was_found ? '#10b981' : '#dc2626'; ?>;
+                                            border: 1px solid #e2e8f0; border-left-width:4px;
+                                            border-left-color:<?php echo $was_found ? '#10b981' : '#dc2626'; ?>;">
+                                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; flex-wrap:wrap; gap:8px;">
+                                        <span style="font-weight:600; color:#374151;"><?php echo htmlspecialchars($clue['category']); ?></span>
+                                        <span style="padding:3px 10px; border-radius:12px; font-size:0.82rem; font-weight:600;
+                                                     background:<?php echo $was_found ? '#d1fae5' : '#fee2e2'; ?>;
+                                                     color:<?php echo $was_found ? '#065f46' : '#991b1b'; ?>;">
+                                            <?php echo $was_found ? 'FOUND' : 'MISSED'; ?>
+                                        </span>
+                                    </div>
+                                    <p style="margin:0; font-size:0.88rem; color:#374151;">
+                                        <strong>Explanation:</strong> <?php echo htmlspecialchars($clue['info']); ?>
+                                    </p>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
+
                         <?php // Buttons to go back to the games list, view the certificate, or replay this game ?>
                         <div class="completion-actions">
                             <a href="game.php" class="action-btn secondary">Back to Games</a>
@@ -791,16 +804,8 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action'])) {
 
                     <?php // Yellow hints box that appears and fills with explanations as the user finds each clue ?>
                     <div id="hints-box" class="hints-box">
-                        <div class="hints-box-title">Clues Found:</div>
+                        <div class="hints-box-title">Clues Found</div>
                         <div id="hints-list"></div>
-                    </div>
-
-                    <?php // Results breakdown section shown by JavaScript once all ten scorable clues are found or attempts run out ?>
-                    <div id="results-section" class="results-section" style="display: none;">
-                        <h3 style="color: #1e40af; margin-bottom: 15px;">📋 Analysis Complete!</h3>
-                        <div id="results-message" style="margin-bottom: 20px;"></div>
-                        <h4 style="color: #374151; margin-bottom: 15px;">Phishing Signs Breakdown</h4>
-                        <div id="errors-list"></div>
                     </div>
 
                     <?php // Submit button that sends the score to the server via AJAX when clicked ?>
@@ -849,9 +854,6 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action'])) {
 
         // Get references to the key UI elements used throughout the game
         const submitBtn        = document.getElementById('submit-btn');
-        const resultsSection   = document.getElementById('results-section');
-        const resultsMessage   = document.getElementById('results-message');
-        const errorsList       = document.getElementById('errors-list');
         const flashOverlay     = document.getElementById('flash-overlay');
         const emailBody        = document.getElementById('email-body');
         const progressFill     = document.getElementById('progress-fill');
@@ -917,10 +919,9 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action'])) {
             registerAttempt(true); // counts the attempt and updates the UI
             updateProgressBar();
 
-            // If all ten scorable clues have been found, show the results breakdown and celebrate
+            // If all ten scorable clues have been found, show the celebration popup
             const scorableFound = [...foundClues].filter(id => scorableIds.has(id)).length;
             if (scorableFound === totalClues) {
-                showResults();
                 celebrateAllCluesFound();
             }
         }
@@ -978,9 +979,6 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action'])) {
 
             // Always enable the submit button once locked so the user can save whatever they got
             if (submitBtn) submitBtn.disabled = false;
-
-            // Show the full results breakdown so the user can see what they missed
-            showResults();
         }
 
         // Add an explanation entry to the hints box for the clue that was just found
@@ -1025,45 +1023,6 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action'])) {
             }
         }
 
-        // Build and display the full results breakdown once all scorable clues are found or attempts run out
-        function showResults() {
-            if (!resultsSection) return;
-            resultsSection.style.display = 'block';
-            resultsSection.scrollIntoView({ behavior: 'smooth' });
-
-            // Choose a grade and message based on how many clues were found
-            let message, grade;
-            if (score >= 10)     { message = `Perfect score! You found all ${totalClues} phishing signs.`; grade = 'A+'; }
-            else if (score >= 8) { message = `Excellent! You found ${score} out of ${totalClues} phishing signs.`; grade = 'A'; }
-            else if (score >= 6) { message = `Good job! You found ${score} out of ${totalClues} phishing signs.`; grade = 'B'; }
-            else if (score >= 4) { message = `You found ${score} out of ${totalClues} phishing signs.`; grade = 'C'; }
-            else                 { message = `You found ${score} out of ${totalClues} phishing signs. Keep practicing!`; grade = 'D'; }
-
-            // Add a note if the game was stopped by the attempt limit
-            const attemptNote = gameLocked && score < totalClues
-                ? `<br><span style="color:#dc2626; font-size:0.9rem;">You used all ${maxAttempts} attempts before finding all errors.</span>`
-                : '';
-
-            resultsMessage.innerHTML = `<strong>Grade: ${grade}</strong><br>${message}${attemptNote}`;
-
-            // Build a result card for each of the ten scorable clues showing whether the user found it or missed it
-            errorsList.innerHTML = '';
-            clues.filter(c => scorableIds.has(c.id)).forEach(clue => {
-                const item = document.createElement('div');
-                item.className = `error-item ${foundClues.has(clue.id) ? 'found' : 'not-found'}`;
-                item.innerHTML = `
-                    <div class="error-header">
-                        <div class="error-type">${clue.category}</div>
-                        <div class="error-status ${foundClues.has(clue.id) ? 'status-found' : 'status-missed'}">
-                            ${foundClues.has(clue.id) ? 'FOUND' : 'MISSED'}
-                        </div>
-                    </div>
-                    <p style="margin:0; font-size:0.9rem; color:#374151;"><strong>Explanation:</strong> ${clue.info}</p>
-                `;
-                errorsList.appendChild(item);
-            });
-        }
-
         // Show a green celebration popup when all ten clues have been found
         function celebrateAllCluesFound() {
             const msg = document.createElement('div');
@@ -1097,10 +1056,11 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action'])) {
             submitBtn.disabled = true;
             submitBtn.innerHTML = 'Saving...';
             try {
+                const foundIdsStr = [...foundClues].join(',');
                 const response = await fetch('phishing-game-2.php', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-                    body: `action=save_progress&score=${score}`
+                    body: `action=save_progress&score=${score}&found_ids=${foundIdsStr}&attempts=${attempts}`
                 });
                 const result = await response.json();
 
