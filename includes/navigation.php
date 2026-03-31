@@ -1,6 +1,6 @@
 <?php
-// MUST be the absolute first line - NO characters, spaces, or newlines before this!
-// Start output buffering to prevent any header issues
+// IMPORTANT: This file must have NO whitespace or output before the opening <?php tag
+// Start output buffering at the VERY beginning
 if (ob_get_level() == 0) {
     ob_start();
 }
@@ -9,10 +9,9 @@ if (ob_get_level() == 0) {
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
-
-// All PHP runs first — no HTML/CSS output above this line
-// The style block and HTML are now safely below after all headers are committed
+// No output should occur before this point
 ?>
+<!DOCTYPE html>
 <style>
 /* Removes default list item height and spacing for the avatar nav item */
 #avatar-li {
