@@ -12,11 +12,11 @@ if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){
 require_once "config/database.php";
 
 // Load the current score and question number from the session, defaulting to 0 and 1 if not set
-$score = isset($_SESSION['phishing_score']) ? $_SESSION['phishing_score'] : 0;
+$score            = isset($_SESSION['phishing_score'])    ? $_SESSION['phishing_score']    : 0;
 $current_question = isset($_SESSION['phishing_question']) ? $_SESSION['phishing_question'] : 1;
-$total_questions = 10;
-$feedback = "";
-$game_completed = false;
+$total_questions  = 10;
+$feedback         = "";
+$game_completed   = false;
 
 // Array of ten emails - each one has sender details, an HTML body, the correct answer and a hint explaining why
 $emails = [
@@ -328,31 +328,37 @@ $emails = [
     ]
 ];
 
-// Handle the "Next Question" action - advances to the next question
+// Handle the "Next Question" action - advances to the next question or finalises the game
 if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['action'] === 'next') {
     $next_question = $current_question + 1;
 
     if($next_question > $total_questions) {
-        // All questions answered - save score to DB and mark game complete
-        $game_completed = true;
+        // All questions answered - save the final score to a dedicated session key before clearing game state
+        $final_score = $_SESSION['phishing_score'] ?? 0;
+        $_SESSION['phishing_final_score'] = $final_score;
+
+        // Write the score to the database for this user
         $user_id = $_SESSION['id'];
         $sql = "INSERT INTO game_scores (user_id, game_type, score, total_questions, completed_at)
                 VALUES (?, 'phishing_detective_lvl1', ?, ?, NOW())
                 ON DUPLICATE KEY UPDATE score = VALUES(score), completed_at = NOW()";
 
         if($stmt = mysqli_prepare($link, $sql)) {
-            mysqli_stmt_bind_param($stmt, "iii", $user_id, $score, $total_questions);
+            mysqli_stmt_bind_param($stmt, "iii", $user_id, $final_score, $total_questions);
             mysqli_stmt_execute($stmt);
             mysqli_stmt_close($stmt);
         }
 
-        // Clear all phishing game session data
+        // Clear all in-progress game session data now that the score is safely stored separately
         unset($_SESSION['phishing_score']);
         unset($_SESSION['phishing_question']);
         unset($_SESSION['phishing_feedback']);
         unset($_SESSION['phishing_answered']);
+
+        // Set the completed flag so the page shows the results screen after the redirect
+        $_SESSION['phishing_completed'] = true;
     } else {
-        // Advance to the next question and clear the answered flag
+        // Advance to the next question and clear the answered flag for the new question
         $_SESSION['phishing_question'] = $next_question;
         unset($_SESSION['phishing_answered']);
         unset($_SESSION['phishing_feedback']);
@@ -362,15 +368,15 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['action']) && $_POST['ac
     exit;
 }
 
-// Handle an answer submission - stay on the same question, show feedback
+// Handle an answer submission - stay on the same question and show feedback
 if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['answer']) && isset($_POST['question_id'])) {
     $user_answer = $_POST['answer'];
     $question_id = (int)$_POST['question_id'];
 
-    // Only process if we haven't already answered this question
+    // Only process if this question has not already been answered this round
     if(isset($emails[$question_id]) && !isset($_SESSION['phishing_answered'])) {
         $correct_answer = $emails[$question_id]['answer'];
-        $hint = $emails[$question_id]['hint'];
+        $hint           = $emails[$question_id]['hint'];
 
         if($user_answer === $correct_answer) {
             $score++;
@@ -388,26 +394,35 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['answer']) && isset($_PO
     }
 }
 
-// If the reset parameter is in the URL, clear all game session data
+// If the reset parameter is in the URL, clear all game session data and start fresh
 if(isset($_GET['reset'])) {
     unset($_SESSION['phishing_score']);
     unset($_SESSION['phishing_question']);
     unset($_SESSION['phishing_feedback']);
     unset($_SESSION['phishing_answered']);
+    unset($_SESSION['phishing_completed']);
+    unset($_SESSION['phishing_final_score']);
     header("location: phishing-game-1.php");
     exit;
 }
 
-// Load state for rendering
+// Check if the game was completed in a previous request and we are now on the results screen
+if(isset($_SESSION['phishing_completed']) && $_SESSION['phishing_completed'] === true) {
+    $game_completed = true;
+    // Read the preserved final score so the results screen can display it correctly
+    $score = $_SESSION['phishing_final_score'] ?? 0;
+}
 
 // Re-read score and question after any session updates above
-$score = isset($_SESSION['phishing_score']) ? $_SESSION['phishing_score'] : 0;
-$current_question = isset($_SESSION['phishing_question']) ? $_SESSION['phishing_question'] : 1;
+if(!$game_completed) {
+    $score            = isset($_SESSION['phishing_score'])    ? $_SESSION['phishing_score']    : 0;
+    $current_question = isset($_SESSION['phishing_question']) ? $_SESSION['phishing_question'] : 1;
+}
 
 // Has the user already answered the current question this round?
 $already_answered = isset($_SESSION['phishing_answered']) && $_SESSION['phishing_answered'] === true;
 
-// Load feedback from session if it wasn't set during this request
+// Load feedback from the session if it was not set during this request
 if(empty($feedback) && isset($_SESSION['phishing_feedback'])) {
     $feedback = $_SESSION['phishing_feedback'];
 }
@@ -421,8 +436,8 @@ if(!$game_completed && isset($emails[$current_question])) {
     $current_email = $emails[$current_question];
 }
 
-// Safety check - if the question counter has gone past the total outside of POST, mark complete
-if($current_question > $total_questions && !$game_completed) {
+// Safety fallback - if question counter has gone past the total outside of POST, mark complete
+if(!$game_completed && $current_question > $total_questions) {
     $game_completed = true;
 }
 ?>
@@ -444,6 +459,15 @@ if($current_question > $total_questions && !$game_completed) {
             margin: 0 auto;
             padding: 20px;
             width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        <?php // Makes every direct child of the game interface take the full available width ?>
+        .game-interface > * {
+            width: 100%;
+            box-sizing: border-box;
         }
 
         <?php // Centres the game title and subtitle above the email card ?>
@@ -614,7 +638,7 @@ if($current_question > $total_questions && !$game_completed) {
 
         .sender-details { flex: 1; }
 
-        <?php // Row showing the sender display name and their email address side by side ?>
+        <?php // Row showing the sender display name and email address side by side ?>
         .sender-name-email {
             display: flex;
             align-items: baseline;
@@ -824,6 +848,8 @@ if($current_question > $total_questions && !$game_completed) {
         .action-btn.secondary:hover {
             background: #f8fafc;
             border-color: #cbd5e1;
+            transform: translateY(-2px);
+            box-shadow: none;
         }
 
         <?php // Light blue note at the bottom of the completion screen ?>
@@ -836,18 +862,6 @@ if($current_question > $total_questions && !$game_completed) {
             color: #0369a1;
             font-size: 14px;
             text-align: center;
-        }
-
-        <?php // Makes every direct child of the game interface take the full available width ?>
-        .game-interface {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .game-interface > * {
-            width: 100%;
-            box-sizing: border-box;
         }
 
         <?php // On small screens the layout adjusts so all elements stack vertically ?>
@@ -889,7 +903,9 @@ if($current_question > $total_questions && !$game_completed) {
                 <?php // Progress bar showing how far through the ten emails the user is ?>
                 <div class="progress-container">
                     <div class="progress-info">
-                        <span>Question <?php echo $display_question; ?> of <?php echo $total_questions; ?></span>
+                        <span>
+                            <?php echo $game_completed ? 'Complete' : 'Question ' . $display_question . ' of ' . $total_questions; ?>
+                        </span>
                         <span>Score: <?php echo $score; ?>/<?php echo $total_questions; ?></span>
                     </div>
                     <div class="progress-bar">
@@ -899,6 +915,7 @@ if($current_question > $total_questions && !$game_completed) {
 
                 <?php // Show the completion screen if all emails have been judged, otherwise show the current email ?>
                 <?php if($game_completed): ?>
+
                     <?php // Completion card with the final score, a performance message and action buttons ?>
                     <div class="completion-screen">
                         <h2>Assessment Complete</h2>
@@ -927,7 +944,7 @@ if($current_question > $total_questions && !$game_completed) {
 
                         <?php // Reminder telling the user which games still need to be completed for the certificate ?>
                         <div class="certificate-note">
-                            <strong>Progress:</strong> You've completed Phishing Detective - Read Emails. Complete Hunt Errors and Password Fortress to unlock your cybersecurity awareness certificate.
+                            <strong>Progress saved.</strong> Complete all games to unlock your cybersecurity awareness certificate.
                         </div>
                     </div>
 
@@ -937,6 +954,7 @@ if($current_question > $total_questions && !$game_completed) {
                         <?php // Show the correct/incorrect feedback banner above the email if already answered ?>
                         <?php if(!empty($feedback)): ?>
                             <?php
+                            // Extract only the feedback div from the stored feedback string
                             preg_match('/<div class=\'feedback[^\']*\'.*?<\/div>/s', $feedback, $topFeedback);
                             if(!empty($topFeedback)) echo $topFeedback[0];
                             ?>
@@ -989,13 +1007,14 @@ if($current_question > $total_questions && !$game_completed) {
                         <?php // Show the hint below the email body after the user has answered ?>
                         <?php if(!empty($feedback) && $already_answered): ?>
                             <?php
+                            // Extract only the hint div from the stored feedback string
                             preg_match('/<div class=\'hint-box\'.*?<\/div>/s', $feedback, $hintMatch);
                             if(!empty($hintMatch)) echo $hintMatch[0];
                             ?>
                         <?php endif; ?>
 
                         <?php if($already_answered): ?>
-                            <?php // User has answered - show the Next Question button ?>
+                            <?php // User has already answered - show the Next Question or See Results button ?>
                             <form method="POST" action="phishing-game-1.php">
                                 <input type="hidden" name="action" value="next">
                                 <div class="game-controls">
@@ -1006,7 +1025,7 @@ if($current_question > $total_questions && !$game_completed) {
                             </form>
 
                         <?php else: ?>
-                            <?php // User hasn't answered yet - show the answer form ?>
+                            <?php // User has not answered yet - show the Legitimate / Phishing choice form ?>
                             <form method="POST" action="phishing-game-1.php" id="gameForm">
                                 <?php // Hidden fields that carry the current question number and selected answer on submission ?>
                                 <input type="hidden" name="question_id" value="<?php echo $current_question; ?>">
@@ -1022,7 +1041,7 @@ if($current_question > $total_questions && !$game_completed) {
                                     </button>
                                 </div>
 
-                                <?php // Submit button - says Complete Assessment on the last email ?>
+                                <?php // Submit button - says Complete Assessment on the last question ?>
                                 <div class="game-controls">
                                     <button type="submit" class="submit-btn" id="submitBtn" disabled>
                                         <?php echo $current_question == $total_questions ? 'Complete Assessment' : 'Submit Answer'; ?>
@@ -1063,7 +1082,7 @@ if($current_question > $total_questions && !$game_completed) {
             selectedAnswer = answer;
         }
 
-        // Block form submission if the user tries to submit without selecting an answer
+        // Block form submission if the user somehow submits without selecting an answer
         document.getElementById('gameForm')?.addEventListener('submit', function(e) {
             if(!selectedAnswer) {
                 e.preventDefault();
@@ -1073,9 +1092,9 @@ if($current_question > $total_questions && !$game_completed) {
             return true;
         });
 
-        // Keyboard shortcuts - press 1 or L for Legitimate, 2 or P for Phishing, Enter to submit
+        // Keyboard shortcuts: 1 or L for Legitimate, 2 or P for Phishing, Enter to submit
         document.addEventListener('keydown', function(e) {
-            const legitBtn = document.querySelector('.legit-btn');
+            const legitBtn    = document.querySelector('.legit-btn');
             const phishingBtn = document.querySelector('.phishing-btn');
             if((e.key === '1' || e.key === 'l') && legitBtn) {
                 selectAnswer('legitimate', legitBtn);
