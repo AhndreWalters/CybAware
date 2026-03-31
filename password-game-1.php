@@ -680,7 +680,7 @@ if($current_question > $total_questions && !$game_completed) {
                                 <?php elseif($current_question == 5): ?>
                                     <?php // Question 5 is interactive - the user types a password and sees a live strength rating ?>
                                     <div class="instruction-note">
-                                        <strong>Goal:</strong> Create a password that scores "Strong" — it needs uppercase, lowercase, numbers, and symbols, and should be at least 12 characters long.
+                                        <strong>Goal:</strong> Create a password that scores "Strong", it needs uppercase, lowercase, numbers, and symbols, and should be at least 12 characters long.
                                     </div>
                                     <div class="password-test-container">
                                         <input type="text" class="password-input" id="passwordTest" placeholder="Enter a password to test its strength" autocomplete="off">
