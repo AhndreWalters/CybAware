@@ -1,8 +1,8 @@
 <?php
-// Start output buffering to prevent header issues
+// Start output buffering at the VERY beginning - before ANY output
 ob_start();
 
-// Start session at the VERY beginning before ANY output
+// Start session if not already started - this MUST happen before ANY output
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
@@ -433,8 +433,7 @@ ob_end_flush();
 <body>
     <div class="container">
         <?php 
-        // Include navigation - make sure navigation.php also has output buffering
-        // and session handling at its very beginning
+        // Include navigation
         include 'includes/navigation.php'; 
         ?>
 
