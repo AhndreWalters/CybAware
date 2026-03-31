@@ -36,7 +36,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
         $correct_answers = [
             1  => "StrongPass2024!",
             2  => "Phishing",
-            3  => "Every 3-6 months",
+            3  => "Every 3 - 6 months",
             4  => "Minimum of 12 characters in length",
             5  => "Strong",
             6  => "A password manager",
@@ -663,7 +663,7 @@ if($current_question > $total_questions && !$game_completed) {
                                 <?php elseif($current_question == 3): ?>
                                     <div class="options-container">
                                         <button type="button" class="option" onclick="selectAnswer('Every day', this)"><div class="option-letter">A</div><div class="option-text">Every day</div></button>
-                                        <button type="button" class="option" onclick="selectAnswer('Every 3-6 months', this)"><div class="option-letter">B</div><div class="option-text">Every 3–6 months</div></button>
+                                        <button type="button" class="option" onclick="selectAnswer('Every 3 - 6 months', this)"><div class="option-letter">B</div><div class="option-text">Every 3–6 months</div></button>
                                         <button type="button" class="option" onclick="selectAnswer('Never', this)"><div class="option-letter">C</div><div class="option-text">Never</div></button>
                                         <button type="button" class="option" onclick="selectAnswer('Only when hacked', this)"><div class="option-letter">D</div><div class="option-text">Only when there is evidence of compromise</div></button>
                                     </div>
@@ -851,7 +851,7 @@ if($current_question > $total_questions && !$game_completed) {
             // All possible answer values for every question in order so keyboard selection can find the right one
             const vals = ['password123','StrongPass2024!','123456','qwerty',
                           'Encryption','Phishing','Firewall','VPN',
-                          'Every day','Every 3-6 months','Never','Only when hacked',
+                          'Every day','Every 3 - 6 months','Never','Only when hacked',
                           'Minimum of 12 characters in length','Combination of uppercase letters, lowercase letters, numbers, and symbols','Not reused across multiple websites or services','Contains personal information like birth dates',
                           'Write them in a notebook','A password manager','Use the same password everywhere','Save passwords in browser notes',
                           'Incognito Mode','Antivirus Software','Two-Factor Authentication (2FA)','A VPN',
