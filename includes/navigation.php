@@ -1,8 +1,16 @@
 <?php
-// Start a new session only if one isn't already running
+// MUST be the first line - no whitespace before this!
+// Start output buffering if not already started
+if (ob_get_level() == 0) {
+    ob_start();
+}
+
+// Start session if not already started
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
+
+// Rest of your navigation code below...
 ?>
 
 <style>
