@@ -1,10 +1,127 @@
 <?php
-// Password Fortress - Deeper Security
-// Self-contained PHP page using CybAware shared nav and footer includes
+// Start the session so we can access the logged in user's data
+session_start();
 
-// Start session so navigation.php can access login state
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
+// If the user is not logged in, redirect them to the login page and stop the script
+if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){
+    header("location: login.php");
+    exit;
+}
+
+// Load the database connection
+require_once "config/database.php";
+
+// Set up the user ID and default game state variables
+$user_id         = $_SESSION['id'];
+$game_completed  = false;
+$total_questions = 10;
+$score           = 0;
+
+// If the reset parameter is in the URL, clear all saved game data and restart
+if(isset($_GET['reset'])) {
+    unset($_SESSION['pg2_score'], $_SESSION['pg2_done'], $_SESSION['pg2_dept_results']);
+    header("location: password-game-2.php");
+    exit;
+}
+
+// Initialise session variables for score and completion status if they don't exist yet
+if(!isset($_SESSION['pg2_score'])) $_SESSION['pg2_score'] = 0;
+if(!isset($_SESSION['pg2_done']))  $_SESSION['pg2_done']  = false;
+
+// Load the current score, completion flag and department results from the session
+$score         = $_SESSION['pg2_score'];
+$fortress_done = $_SESSION['pg2_done'];
+$dept_results  = $_SESSION['pg2_dept_results'] ?? [];
+
+// The five departments the user needs to create passwords for, each with a name and description
+$departments = [
+    1 => ['name' => 'IT / Cyber Department',       'desc' => 'Network infrastructure and security systems'],
+    2 => ['name' => 'Infrastructure & Operations', 'desc' => 'Physical systems and operational technology'],
+    3 => ['name' => 'HR & Legal',                  'desc' => 'Employee data and confidential documents'],
+    4 => ['name' => 'Executive Leadership',        'desc' => 'Strategic plans and executive communications'],
+    5 => ['name' => 'Sales, Finance & Marketing',  'desc' => 'Financial data, sales reports, and strategies'],
+];
+
+// Calculates a strength score out of 100 for a given password based on length, character variety and common patterns
+function scorePassword($password) {
+    $score = 0;
+
+    // Award points based on password length
+    if(strlen($password) >= 12) $score += 25;
+    elseif(strlen($password) >= 8) $score += 15;
+    elseif(strlen($password) >= 5) $score += 5;
+
+    // Award points for each character type present
+    if(preg_match('/[a-z]/', $password)) $score += 10;
+    if(preg_match('/[A-Z]/', $password)) $score += 15;
+    if(preg_match('/[0-9]/', $password)) $score += 15;
+    if(preg_match('/[^A-Za-z0-9]/', $password)) $score += 20;
+
+    // Deduct points if the same character is repeated three or more times in a row
+    if(preg_match('/(.)\1{2,}/', $password)) $score -= 15;
+
+    // Deduct points if the password starts with a common weak pattern
+    if(preg_match('/^(password|123456|admin|qwerty)/i', $password)) $score -= 30;
+
+    // Award bonus points for using a wide variety of unique characters
+    $unique = count(array_unique(str_split($password)));
+    $score += min(20, $unique * 2);
+
+    // Keep the score within the 0 to 100 range
+    return max(0, min(100, round($score)));
+}
+
+// Process the fortress form when it is submitted and the game has not already been completed
+if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['phase']) && $_POST['phase'] == 'fortress') {
+    if(!$fortress_done) {
+        $dept_results = [];
+        $total_score  = 0;
+
+        // Loop through each of the five departments and score the password the user entered for it
+        for($i = 1; $i <= 5; $i++) {
+            $pw       = isset($_POST['dept'.$i]) ? trim($_POST['dept'.$i]) : '';
+            $strength = scorePassword($pw);
+
+            // Award 2 points for a strong password, 1 for fair, and 0 for weak
+            if($strength >= 80)      $pts = 2;
+            elseif($strength >= 50)  $pts = 1;
+            else                     $pts = 0;
+
+            // Store the result for this department so it can be shown on the results screen
+            $dept_results[] = [
+                'name'     => $departments[$i]['name'],
+                'score'    => $strength,
+                'pts'      => $pts,
+                'rating'   => ($strength >= 80) ? 'Strong' : (($strength >= 50) ? 'Fair' : 'Weak'),
+            ];
+            $total_score += $pts;
+        }
+
+        // Save the final score, completion flag and department results to the session
+        $_SESSION['pg2_score']        = $total_score;
+        $_SESSION['pg2_done']         = true;
+        $_SESSION['pg2_dept_results'] = $dept_results;
+
+        $score         = $total_score;
+        $fortress_done = true;
+        $dept_results  = $dept_results;
+        $game_completed = true;
+
+        // Insert or update the score in the database for this user and game type
+        $sql = "INSERT INTO game_scores (user_id, game_type, score, total_questions, completed_at)
+                VALUES (?, 'password_fortress_2', ?, ?, NOW())
+                ON DUPLICATE KEY UPDATE score = VALUES(score), completed_at = NOW()";
+        if($stmt = mysqli_prepare($link, $sql)) {
+            mysqli_stmt_bind_param($stmt, "iii", $user_id, $score, $total_questions);
+            mysqli_stmt_execute($stmt);
+            mysqli_stmt_close($stmt);
+        }
+    }
+}
+
+// If the fortress was already completed in a previous session, mark the game as complete without re-saving
+if($fortress_done && !$game_completed) {
+    $game_completed = true;
 }
 ?>
 <!DOCTYPE html>
@@ -13,280 +130,224 @@ if (session_status() === PHP_SESSION_NONE) {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="shortcut icon" href="images/password.png" type="image/x-icon">
-    <title>Password Fortress | CybAware</title>
-    <!-- Fix navigation links by setting base URL to site root -->
-    <base href="/">
-    <?php // Load Font Awesome icons and Google Fonts ?>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <title>Password Fortress - Deeper Security | CybAware</title>
+
+    <?php // Load the main site stylesheet ?>
+    <link rel="stylesheet" href="css/styles.css">
 
     <style>
-        /* ============================================
-           CybAware Password Fortress - Deeper Security
-           Colours from css/styles.css:
-           bg: #64abd6  |  cards: #ffffff  |  blue: #1e40af
-           ============================================ */
-
-        :root {
-            --bg:         #64abd6;
-            --card:       #ffffff;
-            --card-inner: #f8fafc;
-            --blue:       #1e40af;
-            --blue-dark:  #1e3a8a;
-            --green:      #10b981;
-            --yellow:     #f59e0b;
-            --red:        #ef4444;
-            --heading:    #0f172a;
-            --body:       #374151;
-            --muted:      #64748b;
-            --border:     #e2e8f0;
-            --input-bg:   #fafafa;
-            --r:          12px;
-        }
-
-        <?php // Reset and base styles ?>
-        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-        html { scroll-behavior: smooth; }
-
-        body {
-            font-family: 'Segoe UI', 'Inter', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--bg);
-            color: var(--body);
-            min-height: 100vh;
-            line-height: 1.6;
-            overflow-y: auto;
-        }
-
-        <?php // Page wrapper — matches .container from styles.css ?>
-        .page-wrapper {
-            width: 90%;
-            max-width: 1200px;
+        <?php // Centres the game content and stacks everything vertically ?>
+        .game-interface {
+            max-width: 800px;
             margin: 0 auto;
-            padding: 0 20px;
-            min-height: 100vh;
+            padding: 20px;
+            width: 100%;
             display: flex;
             flex-direction: column;
+            align-items: center;
         }
 
-        <?php // Page header sitting on the blue background ?>
+        <?php // Makes every direct child of the game interface take the full available width ?>
+        .game-interface > * {
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        <?php // Centres the game title and subtitle above the department cards ?>
         .game-header {
             text-align: center;
-            padding: 40px 20px 36px;
+            margin-bottom: 30px;
+            width: 100%;
         }
 
         .game-header h1 {
-            font-size: clamp(1.8rem, 4vw, 2.5rem);
-            font-weight: 700;
             color: #1e40af;
+            font-size: 2rem;
             margin-bottom: 10px;
         }
 
-        .subtitle {
+        .game-header p {
             color: #64748b;
-            font-size: 1.05rem;
-            max-width: 600px;
-            margin: 0 auto 28px;
+            font-size: 1.1rem;
         }
 
-        <?php // Server rack decoration ?>
-        .header-graphic { display: flex; justify-content: center; }
+        <?php // Wrapper for the progress bar and the labels above it ?>
+        .progress-container {
+            margin-bottom: 25px;
+            width: 100%;
+            box-sizing: border-box;
+        }
 
-        .server-rack {
+        <?php // Row with the status label on the left and the score on the right ?>
+        .progress-info {
             display: flex;
-            gap: 6px;
-            padding: 12px 20px;
-            background: rgba(255,255,255,0.25);
-            border-radius: var(--r);
-            border: 1px solid rgba(255,255,255,0.4);
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 14px;
+            color: #6b7280;
         }
 
-        .server-slot {
-            width: 28px;
-            height: 42px;
-            background: rgba(255,255,255,0.3);
-            border-radius: 4px;
-            border: 1px solid rgba(255,255,255,0.5);
-            position: relative;
+        <?php // Grey track that the blue progress fill sits inside ?>
+        .progress-bar {
+            height: 6px;
+            background: #e5e7eb;
+            border-radius: 3px;
+            overflow: hidden;
         }
 
-        .server-slot::after {
-            content: '';
-            position: absolute;
-            top: 8px; left: 50%;
-            transform: translateX(-50%);
-            width: 5px; height: 5px;
-            border-radius: 50%;
-            animation: blink 2s infinite;
+        <?php // Blue fill that grows to show how far through the game the user is ?>
+        .progress-fill {
+            height: 100%;
+            background: #1e40af;
+            transition: width 0.3s ease;
         }
 
-        .server-slot:nth-child(1)::after { background: #10b981; animation-delay: 0s; }
-        .server-slot:nth-child(2)::after { background: #ffffff; animation-delay: 0.4s; }
-        .server-slot:nth-child(3)::after { background: #10b981; animation-delay: 0.8s; }
-        .server-slot:nth-child(4)::after { background: #f59e0b; animation-delay: 1.2s; }
-        .server-slot:nth-child(5)::after { background: #ef4444; animation-delay: 1.6s; }
-
-        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.2; } }
-
-        <?php // White content card — like the game cards on game.php ?>
-        .content-area {
-            background: var(--card);
-            border-radius: var(--r);
-            padding: 32px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            margin-bottom: 24px;
+        <?php // Yellow hint box used to show extra guidance to the user ?>
+        .hint-box {
+            background: #fef3c7;
+            border: 1px solid #f59e0b;
+            border-radius: 6px;
+            padding: 14px;
+            margin: 0 0 20px 0;
+            font-size: 14px;
+            color: #92400e;
         }
 
-        <?php // Mission brief box ?>
+        <?php // Blue bordered mission brief box shown above the department cards ?>
         .mission-brief {
             background: #eff6ff;
             border: 1px solid #bfdbfe;
-            border-left: 4px solid var(--blue);
+            border-left: 4px solid #1e40af;
             border-radius: 6px;
-            padding: 16px 20px;
-            margin-bottom: 28px;
+            padding: 14px 18px;
+            margin-bottom: 25px;
             font-size: 14px;
             color: #374151;
             line-height: 1.7;
         }
 
-        .mission-brief h2 {
-            font-size: 0.75rem;
-            font-weight: 700;
-            color: var(--blue);
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            margin-bottom: 10px;
+        .mission-brief strong { color: #1e40af; }
+
+        <?php // Row of three legend items explaining what Strong, Fair and Weak ratings mean ?>
+        .scoring-legend {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        <?php // Individual legend item with a coloured dot and a points label ?>
+        .legend-item {
             display: flex;
             align-items: center;
             gap: 8px;
-        }
-
-        .mission-brief p { margin-bottom: 10px; }
-        .mission-brief p:last-of-type { margin-bottom: 0; }
-        .mission-brief strong { color: var(--blue); }
-
-        .security-tip {
-            display: flex;
-            align-items: flex-start;
-            gap: 12px;
-            background: #fef3c7;
-            border: 1px solid #f59e0b;
+            background: white;
+            border: 1px solid #e2e8f0;
             border-radius: 6px;
-            padding: 12px 14px;
-            margin-top: 12px;
-            color: #92400e;
+            padding: 8px 14px;
+            font-size: 13px;
+            color: #374151;
+            flex: 1;
+            min-width: 140px;
         }
 
-        .security-tip i { font-size: 0.95rem; margin-top: 2px; flex-shrink: 0; }
-        .security-tip p { margin-bottom: 0; font-size: 13px; }
-
-        <?php // Section headings ?>
-        .section-heading {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 6px;
+        <?php // Small circular dot used in the legend items to indicate strength level by colour ?>
+        .legend-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            flex-shrink: 0;
         }
 
-        .section-heading h2 { font-size: 1.1rem; font-weight: 700; color: var(--heading); }
-        .section-heading i  { color: var(--blue); font-size: 1rem; }
+        .dot-strong { background: #10b981; }
+        .dot-fair   { background: #f59e0b; }
+        .dot-weak   { background: #ef4444; }
 
-        .section-description {
-            color: var(--muted);
-            font-size: 0.88rem;
-            margin-bottom: 24px;
-            padding-left: 26px;
-        }
-
-        <?php // Department card grid ?>
-        .department-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 16px;
-            margin-bottom: 16px;
-        }
-
-        .department-row.single {
-            grid-template-columns: 1fr;
-            max-width: 520px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        <?php // Individual department card ?>
+        <?php // White card for each department with a header showing the name and a body containing the password input ?>
         .department-card {
             background: white;
-            border: 1px solid var(--border);
             border-radius: 8px;
             padding: 0;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border: 1px solid #e2e8f0;
             overflow: hidden;
-            transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+            width: 100%;
+            box-sizing: border-box;
+            transition: border-color 0.2s;
         }
 
-        .department-card:hover {
-            border-color: #93c5fd;
-            box-shadow: 0 4px 16px rgba(30,64,175,0.1);
-            transform: translateY(-2px);
-        }
+        .department-card:hover { border-color: #93c5fd; }
 
-        <?php // Department card header bar ?>
+        <?php // Light grey header bar at the top of each department card ?>
         .dept-header {
             background: #f8fafc;
-            padding: 16px 20px;
-            border-bottom: 1px solid var(--border);
+            padding: 20px 25px;
+            border-bottom: 1px solid #e2e8f0;
             display: flex;
             align-items: center;
-            gap: 14px;
+            gap: 15px;
         }
 
-        .dept-icon {
-            width: 38px;
-            height: 38px;
+        <?php // Circular blue avatar showing the first letter of the department name ?>
+        .dept-avatar {
+            width: 40px;
+            height: 40px;
             border-radius: 50%;
             background: linear-gradient(135deg, #3b82f6, #1d4ed8);
             display: flex;
             align-items: center;
             justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 1rem;
             flex-shrink: 0;
         }
 
-        .dept-icon i { font-size: 1rem; color: #ffffff; }
+        .dept-info { flex: 1; }
 
-        .dept-header h3 {
-            font-size: 0.95rem;
-            font-weight: 600;
+        .dept-info h3 {
             color: #1f2937;
+            font-size: 1rem;
+            font-weight: 600;
+            margin: 0 0 3px 0;
+        }
+
+        .dept-info p {
+            color: #6b7280;
+            font-size: 0.9rem;
             margin: 0;
         }
 
-        .dept-description {
-            color: var(--muted);
-            font-size: 0.82rem;
-            padding: 8px 20px 0;
-            margin-bottom: 0;
+        <?php // Small blue pill badge in the top right of each card showing the points available ?>
+        .dept-points {
+            font-size: 12px;
+            font-weight: 700;
+            color: #1e40af;
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            border-radius: 12px;
+            padding: 3px 10px;
+            white-space: nowrap;
         }
 
-        <?php // Password input group ?>
-        .input-group {
-            position: relative;
-            padding: 14px 20px 6px;
-        }
+        .dept-body { padding: 20px 25px; }
 
+        <?php // Wrapper for the password input and the show/hide toggle button ?>
+        .input-group { position: relative; }
+
+        <?php // Password text input field inside each department card ?>
         .input-group input {
             width: 100%;
-            padding: 12px 42px 12px 14px;
-            background: var(--input-bg);
+            padding: 14px 44px 14px 16px;
             border: 1px solid #d1d5db;
             border-radius: 6px;
+            font-size: 15px;
             color: #111827;
-            font-size: 0.92rem;
-            font-family: inherit;
+            background: #fafafa;
             transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
             box-sizing: border-box;
         }
-
-        .input-group input::placeholder { color: #9ca3af; }
 
         .input-group input:focus {
             outline: none;
@@ -295,38 +356,47 @@ if (session_status() === PHP_SESSION_NONE) {
             box-shadow: 0 0 0 3px rgba(59,130,246,0.1);
         }
 
-        <?php // Red border on duplicate password inputs ?>
+        <?php // Red border applied to an input when the same password has been entered in another department ?>
         .input-group input.duplicate {
-            border-color: var(--red);
+            border-color: #ef4444;
             box-shadow: 0 0 0 3px rgba(239,68,68,0.1);
         }
 
+        <?php // Eye icon button that toggles the password field between hidden and visible text ?>
         .toggle-password {
             position: absolute;
-            right: 28px;
+            right: 14px;
             top: 50%;
-            transform: translateY(-20%);
+            transform: translateY(-50%);
             background: transparent;
             border: none;
             color: #9ca3af;
-            font-size: 0.9rem;
+            font-size: 15px;
             cursor: pointer;
             padding: 0;
             line-height: 1;
-            transition: color 0.2s;
         }
 
-        .toggle-password:hover { color: var(--blue); }
+        .toggle-password:hover { color: #1e40af; }
 
-        <?php // Password strength meter ?>
+        <?php // Row containing the strength bar track and the strength label text ?>
+        .strength-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-top: 10px;
+        }
+
+        <?php // Grey track that the coloured strength fill sits inside ?>
         .strength-meter {
+            flex: 1;
             height: 5px;
             background: #e5e7eb;
             border-radius: 3px;
-            margin: 8px 20px 6px;
             overflow: hidden;
         }
 
+        <?php // Coloured fill bar that changes colour and width based on password strength ?>
         .strength-bar {
             height: 100%;
             width: 0%;
@@ -334,74 +404,99 @@ if (session_status() === PHP_SESSION_NONE) {
             transition: width 0.4s ease, background-color 0.4s ease;
         }
 
-        .strength-bar.weak   { background: var(--red);    width: 25%; }
-        .strength-bar.fair   { background: var(--yellow); width: 55%; }
-        .strength-bar.good   { background: #eab308;       width: 75%; }
-        .strength-bar.strong { background: var(--green);  width: 100%; }
+        .strength-bar.weak   { background: #ef4444; width: 25%; }
+        .strength-bar.fair   { background: #f59e0b; width: 55%; }
+        .strength-bar.good   { background: #eab308; width: 75%; }
+        .strength-bar.strong { background: #10b981; width: 100%; }
 
-        .password-feedback {
-            font-size: 0.75rem;
-            min-height: 18px;
-            padding: 0 20px 14px;
-            color: var(--muted);
-            font-weight: 500;
+        <?php // Small label showing the strength rating and points to the right of the strength bar ?>
+        .strength-label {
+            font-size: 12px;
+            color: #6b7280;
+            white-space: nowrap;
+            min-width: 55px;
+            text-align: right;
         }
 
-        <?php // Form action buttons row ?>
+        <?php // Red warning box shown when two or more departments have the same password ?>
+        .dup-warning {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            border-radius: 6px;
+            padding: 12px 16px;
+            font-size: 13px;
+            color: #991b1b;
+            margin-bottom: 14px;
+            display: none;
+        }
+
+        <?php // Makes the duplicate warning visible when duplicates are detected ?>
+        .dup-warning.show { display: block; }
+
+        <?php // Yellow tip box shown above the submit button with a strong password example ?>
+        .hint-tip {
+            background: #fefce8;
+            border: 1px solid #fde68a;
+            border-radius: 6px;
+            padding: 12px 16px;
+            font-size: 14px;
+            color: #854d0e;
+            margin-bottom: 20px;
+        }
+
+        <?php // Row with the Reset All button on the left and the Submit button on the right ?>
         .form-actions {
             display: flex;
             justify-content: space-between;
             align-items: center;
             gap: 12px;
-            margin-top: 20px;
-            padding-top: 20px;
-            border-top: 1px solid var(--border);
+            margin-top: 8px;
+            width: 100%;
+            box-sizing: border-box;
         }
 
-        .btn-primary {
-            padding: 14px 40px;
-            background: var(--blue);
+        <?php // Blue submit button used to send all five department passwords for scoring ?>
+        .submit-btn {
+            padding: 16px 50px;
+            background: #1e40af;
             color: white;
             border: none;
             border-radius: 8px;
-            font-size: 1rem;
+            font-size: 1.1rem;
             font-weight: 600;
-            font-family: inherit;
             cursor: pointer;
             transition: all 0.2s ease;
-            box-shadow: 0 4px 6px rgba(30,64,175,0.2);
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
+            min-width: 250px;
+            display: inline-block;
+            box-shadow: 0 4px 6px rgba(30, 64, 175, 0.2);
+            text-align: center;
         }
 
-        .btn-primary:hover:not(:disabled) {
-            background: var(--blue-dark);
-            transform: translateY(-2px);
-            box-shadow: 0 6px 12px rgba(30,64,175,0.3);
+        .submit-btn:hover:not(:disabled) {
+            background: #1e3a8a;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(30, 64, 175, 0.3);
         }
 
-        .btn-primary:disabled {
+        <?php // Greyed out disabled state shown before all five passwords have been filled in ?>
+        .submit-btn:disabled {
             background: #94a3b8;
             cursor: not-allowed;
             transform: none;
             box-shadow: none;
         }
 
+        <?php // Outlined secondary button used for the Reset All action ?>
         .btn-secondary {
-            padding: 12px 22px;
+            padding: 14px 24px;
             background: white;
             color: #6b7280;
-            border: 2px solid var(--border);
+            border: 2px solid #e2e8f0;
             border-radius: 8px;
-            font-size: 0.95rem;
+            font-size: 1rem;
             font-weight: 500;
-            font-family: inherit;
             cursor: pointer;
-            transition: all 0.2s;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
+            transition: all 0.2s ease;
         }
 
         .btn-secondary:hover {
@@ -409,644 +504,444 @@ if (session_status() === PHP_SESSION_NONE) {
             border-color: #cbd5e1;
         }
 
-        <?php // Results section ?>
-        .results-section { margin-top: 32px; padding-top: 28px; border-top: 1px solid var(--border); }
-        .results-container { margin-top: 16px; }
-
-        .audit-summary {
-            background: #eff6ff;
-            border: 1px solid #bfdbfe;
-            border-radius: 8px;
-            padding: 16px 20px;
-            margin-bottom: 16px;
-            text-align: center;
-            color: var(--body);
-            font-size: 0.9rem;
-        }
-
-        .audit-summary h3 { font-size: 1rem; font-weight: 700; color: var(--heading); margin-bottom: 6px; }
-        .audit-summary strong { color: var(--blue); }
-
-        <?php // Results table ?>
-        .results-table {
+        <?php // White card that shows the per-department audit results after submission ?>
+        .fortress-results {
             background: white;
-            border: 1px solid var(--border);
             border-radius: 8px;
+            padding: 0;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border: 1px solid #e2e8f0;
             overflow: hidden;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
         }
 
-        .table-header {
-            display: grid;
-            grid-template-columns: 2fr 1fr 1fr 2fr;
-            padding: 12px 18px;
+        <?php // Header row at the top of the results card showing the title and total points ?>
+        .fortress-results-header {
             background: #f8fafc;
-            border-bottom: 1px solid var(--border);
-            font-size: 0.7rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            color: var(--muted);
+            padding: 16px 25px;
+            border-bottom: 1px solid #e2e8f0;
+            font-size: 14px;
+            font-weight: 600;
+            color: #374151;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
-        .table-row {
-            display: grid;
-            grid-template-columns: 2fr 1fr 1fr 2fr;
-            padding: 14px 18px;
+        <?php // Individual row showing the result for one department ?>
+        .dept-result-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 14px 25px;
             border-bottom: 1px solid #f3f4f6;
-            align-items: center;
-            font-size: 0.86rem;
-            transition: background 0.15s;
+            font-size: 14px;
         }
 
-        .table-row:last-child { border-bottom: none; }
-        .table-row:hover { background: #f8fafc; }
+        .dept-result-row:last-child { border-bottom: none; }
 
-        .table-cell { padding: 0 6px; color: var(--body); }
-        .table-cell:first-child { color: #374151; font-weight: 600; }
+        .dept-result-left { display: flex; flex-direction: column; gap: 2px; }
+        .dept-result-name { color: #374151; font-weight: 500; }
+        .dept-result-sub  { color: #9ca3af; font-size: 12px; }
 
-        .status-secure {
-            color: var(--green) !important;
+        .dept-result-right { display: flex; align-items: center; gap: 10px; }
+
+        <?php // Coloured pill badge showing the strength rating for each department in the results list ?>
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .badge-strong { background: #d1fae5; color: #065f46; }
+        .badge-fair   { background: #fef3c7; color: #92400e; }
+        .badge-weak   { background: #fee2e2; color: #991b1b; }
+
+        <?php // Points earned label shown to the right of the badge in each result row ?>
+        .pts-badge {
+            font-size: 13px;
             font-weight: 700;
-            display: flex;
-            align-items: center;
-            gap: 6px;
+            color: #1e40af;
+            min-width: 50px;
+            text-align: right;
         }
 
-        .status-compromised {
-            color: var(--red) !important;
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-
-        <?php // Victory message ?>
-        .victory-message {
-            background: #d1fae5;
-            border: 1.5px solid #6ee7b7;
-            border-radius: 8px;
-            padding: 32px;
-            margin-top: 20px;
+        <?php // Centred white card shown after the results table with the final score and action buttons ?>
+        .completion-screen {
             text-align: center;
-            display: none;
+            padding: 40px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            width: 100%;
+            box-sizing: border-box;
+            border: 1px solid #e2e8f0;
         }
 
-        .victory-message.show { display: block; animation: vp 3s ease-in-out infinite; }
-        .victory-message h3 { font-size: 1.4rem; font-weight: 700; color: #065f46; margin-bottom: 12px; }
-        .victory-message p { color: #374151; font-size: 0.92rem; margin-bottom: 6px; }
-        .victory-message p strong { color: #1f2937; }
-        .victory-icons { margin-top: 18px; display: flex; justify-content: center; gap: 16px; font-size: 1.3rem; color: var(--green); }
-
-        @keyframes vp {
-            0%, 100% { box-shadow: 0 0 0 0 rgba(16,185,129,0); }
-            50%       { box-shadow: 0 0 20px 4px rgba(16,185,129,0.15); }
+        .completion-screen h2 {
+            color: #1e40af;
+            font-size: 2rem;
+            margin-bottom: 10px;
         }
 
-        <?php // Duplicate password warning ?>
-        .duplicate-warning {
-            background: #fef2f2;
-            border: 1px solid #fecaca;
+        <?php // Bold text showing the final score on the completion screen ?>
+        .score-result {
+            font-size: 1.3rem;
+            color: #334155;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        <?php // Smaller grey text beneath the score explaining the points breakdown ?>
+        .score-sub {
+            font-size: 13px;
+            color: #9ca3af;
+            margin-bottom: 25px;
+        }
+
+        <?php // Row of action buttons at the bottom of the completion screen ?>
+        .completion-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+            flex-wrap: wrap;
+            width: 100%;
+        }
+
+        <?php // Primary blue action button on the completion screen ?>
+        .action-btn {
+            padding: 14px 35px;
+            background: #1e40af;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.2s ease;
+            box-sizing: border-box;
+            min-width: 180px;
+            text-align: center;
+        }
+
+        .action-btn:hover {
+            background: #1e3a8a;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(30, 64, 175, 0.2);
+        }
+
+        <?php // Secondary outlined button variant used for less important actions on the completion screen ?>
+        .action-btn.secondary {
+            background: white;
+            color: #64748b;
+            border: 2px solid #e2e8f0;
+        }
+
+        .action-btn.secondary:hover {
+            background: #f8fafc;
+            border-color: #cbd5e1;
+            transform: translateY(-2px);
+            box-shadow: none;
+        }
+
+        <?php // Light blue note at the bottom of the completion screen reminding the user to complete all games for the certificate ?>
+        .certificate-note {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f0f9ff;
+            border: 1px solid #0ea5e9;
             border-radius: 6px;
-            padding: 14px 18px;
-            margin-top: 14px;
-            display: none;
-            font-size: 0.85rem;
-            color: #991b1b;
+            color: #0369a1;
+            font-size: 14px;
+            text-align: center;
         }
 
-        .duplicate-warning.show { display: block; }
-        .duplicate-warning h4 { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; font-size: 0.88rem; }
-        .duplicate-warning p, .duplicate-warning li { margin-bottom: 4px; }
-        .duplicate-warning ul { padding-left: 18px; margin: 6px 0; }
-
-        <?php // Responsive styles ?>
+        <?php // On small screens the layout stacks vertically and buttons go full width ?>
         @media (max-width: 768px) {
-            .page-wrapper { width: 95%; padding: 0 12px; }
-            .content-area { padding: 20px 14px; }
-            .department-row { grid-template-columns: 1fr; }
-            .department-row.single { max-width: 100%; }
-            .table-header { display: none; }
-            .table-row {
-                grid-template-columns: 1fr;
-                gap: 4px;
-                padding: 12px 16px;
-            }
-            .table-cell::before {
-                content: attr(data-label) ': ';
-                font-size: 0.7rem;
-                color: var(--muted);
-                text-transform: uppercase;
-                letter-spacing: 0.8px;
-                font-weight: 700;
-                display: block;
-                margin-bottom: 2px;
-            }
-            .form-actions { flex-direction: column-reverse; }
-            .btn-primary, .btn-secondary { width: 100%; justify-content: center; }
-            .game-header h1 { font-size: 1.8rem; }
+            .game-interface { padding: 15px; }
+            .game-header h1 { font-size: 1.6rem; }
+            .form-actions { flex-direction: column; }
+            .submit-btn { width: 100%; min-width: unset; }
+            .btn-secondary { width: 100%; text-align: center; }
+            .completion-actions { flex-direction: column; align-items: center; }
+            .action-btn { width: 100%; max-width: 300px; margin-bottom: 10px; }
+            .scoring-legend { flex-direction: column; }
+            .dept-result-row { flex-wrap: wrap; gap: 8px; }
         }
     </style>
 </head>
 <body>
     <div class="container">
+        <?php // Load the shared navigation bar at the top of the page ?>
+        <?php include 'includes/navigation.php'; ?>
 
-        <?php 
-        // Load shared navigation and footer with absolute paths based on this file's location
-        $baseIncludeDir = __DIR__;
-        include $baseIncludeDir . '/includes/navigation.php';
-        ?>
+        <div class="main-content">
+            <div class="game-interface">
 
-        <div class="page-wrapper">
-
-            <?php // Page header displayed on the blue background ?>
-            <header class="game-header">
-                <h1>Password Fortress</h1>
-                <p class="subtitle">Complete missions and secure all departments to earn your certificate.</p>
-                <div class="header-graphic">
-                    <div class="server-rack">
-                        <div class="server-slot"></div>
-                        <div class="server-slot"></div>
-                        <div class="server-slot"></div>
-                        <div class="server-slot"></div>
-                        <div class="server-slot"></div>
-                    </div>
+                <?php // Game title and subtitle shown above the progress bar ?>
+                <div class="game-header">
+                    <h1>Password Fortress | Deeper Security</h1>
+                    <p>Create strong, unique passwords to secure each department</p>
                 </div>
-            </header>
 
-            <?php // White content card — mirrors the game cards on game.php ?>
-            <div class="content-area">
+                <?php // Show the results screen if the game is complete, otherwise show the password entry form ?>
+                <?php if($game_completed): ?>
 
-                <?php // Mission briefing shown above the password form ?>
-                <section class="mission-brief">
-                    <h2><i class="fas fa-bullhorn"></i> Mission Briefing</h2>
-                    <p>As the new <strong>Chief Security Engineer Officer</strong>, you must secure our company by creating master passwords for five critical departments. Each password must be <strong>unique</strong> and achieve a <strong>security score of 80+</strong> to pass the audit.</p>
-                    <div class="security-tip">
-                        <i class="fas fa-lightbulb"></i>
-                        <p><strong>Tip:</strong> Strong passwords include uppercase, lowercase, numbers, symbols, and are at least 12 characters long.</p>
+                    <?php // Progress bar showing 100% complete with the final score ?>
+                    <div class="progress-container">
+                        <div class="progress-info">
+                            <span>Complete</span>
+                            <span>Score: <?php echo $score; ?>/<?php echo $total_questions; ?></span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-fill" style="width:<?php echo round(($score / $total_questions) * 100); ?>%;"></div>
+                        </div>
                     </div>
-                </section>
 
-                <?php // Department password entry form ?>
-                <section class="password-section">
-                    <div class="section-heading">
-                        <i class="fas fa-key"></i>
-                        <h2>Department Passwords</h2>
+                    <?php // Table of results showing the strength rating and points for each department ?>
+                    <?php if(!empty($dept_results)): ?>
+                    <div class="fortress-results">
+                        <div class="fortress-results-header">
+                            <span>Department Audit Results</span>
+                            <span style="color:#1e40af;"><?php echo $score; ?>/<?php echo $total_questions; ?> points</span>
+                        </div>
+                        <?php // Loop through each department result and display a row with the name, strength badge and points ?>
+                        <?php foreach($dept_results as $dr): ?>
+                        <div class="dept-result-row">
+                            <div class="dept-result-left">
+                                <div class="dept-result-name"><?php echo htmlspecialchars($dr['name']); ?></div>
+                                <div class="dept-result-sub">Strength score: <?php echo $dr['score']; ?>/100</div>
+                            </div>
+                            <div class="dept-result-right">
+                                <span class="badge badge-<?php echo strtolower($dr['rating']); ?>">
+                                    <?php echo $dr['rating']; ?>
+                                </span>
+                                <span class="pts-badge"><?php echo $dr['pts']; ?>/2 pts</span>
+                            </div>
+                        </div>
+                        <?php endforeach; ?>
                     </div>
-                    <p class="section-description">Create a unique, secure password for each department below.</p>
+                    <?php endif; ?>
 
-                    <form id="passwordForm">
+                    <?php // Completion card with the final score, a performance message and action buttons ?>
+                    <div class="completion-screen">
+                        <h2>Assessment Complete</h2>
+                        <div class="score-result">You scored <?php echo $score; ?> out of <?php echo $total_questions; ?> points.</div>
+                        <div class="score-sub">Each department was worth 2 points - 2 for Strong (80+), 1 for Fair (50–79), 0 for Weak.</div>
+                        <?php
+                        // Show a different performance message depending on the percentage scored
+                        $pct = ($score / $total_questions) * 100;
+                        if($pct >= 90)     echo '<p style="color:#059669;font-weight:600;font-size:1.1rem;margin-bottom:20px;">Outstanding! All departments are well protected.</p>';
+                        elseif($pct >= 70) echo '<p style="color:#1e40af;font-weight:600;font-size:1.1rem;margin-bottom:20px;">Well done! Most of your passwords meet security standards.</p>';
+                        elseif($pct >= 50) echo '<p style="color:#d97706;font-weight:600;font-size:1.1rem;margin-bottom:20px;">Some departments need stronger passwords. Try again!</p>';
+                        else               echo '<p style="color:#dc2626;font-weight:600;font-size:1.1rem;margin-bottom:20px;">Several departments are at risk. Review password security basics and try again.</p>';
+                        ?>
+                        <?php // Buttons to go back to the games list, view the certificate, or replay this game ?>
+                        <div class="completion-actions">
+                            <a href="game.php" class="action-btn secondary">Back to Games</a>
+                            <a href="certificate.php" class="action-btn">View Certificate</a>
+                            <a href="password-game-2.php?reset=1" class="action-btn">Try Again</a>
+                        </div>
+                        <?php // Reminder that all games must be completed to unlock the full certificate ?>
+                        <div class="certificate-note">
+                            <strong>Progress saved.</strong> Complete all games to unlock your cybersecurity awareness certificate.
+                        </div>
+                    </div>
 
-                        <?php // Row 1: IT and Infrastructure ?>
-                        <div class="department-row">
-                            <div class="department-card" data-dept="it">
-                                <div class="dept-header">
-                                    <div class="dept-icon"><i class="fas fa-laptop-code"></i></div>
-                                    <h3>IT / Cyber Department</h3>
+                <?php else: ?>
+
+                    <?php // Progress bar showing 0% before any passwords have been submitted ?>
+                    <div class="progress-container">
+                        <div class="progress-info">
+                            <span>5 Departments - 2 points each</span>
+                            <span>Score: 0/<?php echo $total_questions; ?></span>
+                        </div>
+                        <div class="progress-bar"><div class="progress-fill" style="width:0%;"></div></div>
+                    </div>
+
+                    <?php // Mission brief explaining the task and the maximum score available ?>
+                    <div class="mission-brief">
+                        As <strong>Chief Security Engineer</strong>, create a unique master password for each department below.
+                        Each password is worth up to <strong>2 points</strong>, 2 for Strong, 1 for Fair, 0 for Weak, for a maximum of <strong>10 points</strong>.
+                    </div>
+
+                    <?php // Legend explaining what each strength rating means in terms of points ?>
+                    <div class="scoring-legend">
+                        <div class="legend-item"><div class="legend-dot dot-strong"></div>Strong (80+) - 2 points</div>
+                        <div class="legend-item"><div class="legend-dot dot-fair"></div>Fair (50 - 79) - 1 point</div>
+                        <div class="legend-item"><div class="legend-dot dot-weak"></div>Weak (below 50) - 0 points</div>
+                    </div>
+
+                    <?php // Form that submits all five department passwords for scoring ?>
+                    <form id="fortressForm" method="POST" action="password-game-2.php">
+                        <?php // Hidden field that tells the PHP handler this is the fortress phase submission ?>
+                        <input type="hidden" name="phase" value="fortress">
+
+                        <?php // Loop through each department and render a password input card for it ?>
+                        <?php foreach($departments as $i => $dept): ?>
+                        <div class="department-card">
+                            <div class="dept-header">
+                                <?php // Avatar showing the first letter of the department name ?>
+                                <div class="dept-avatar"><?php echo strtoupper(substr($dept['name'], 0, 1)); ?></div>
+                                <div class="dept-info">
+                                    <h3><?php echo htmlspecialchars($dept['name']); ?></h3>
+                                    <p><?php echo htmlspecialchars($dept['desc']); ?></p>
                                 </div>
-                                <p class="dept-description">Network infrastructure and security systems</p>
-                                <div class="input-group">
-                                    <input type="password" id="passwordIT" placeholder="Enter master password" required>
-                                    <button type="button" class="toggle-password" data-target="passwordIT">
-                                        <i class="fas fa-eye"></i>
-                                    </button>
-                                </div>
-                                <div class="strength-meter"><div class="strength-bar"></div></div>
-                                <div class="password-feedback"></div>
+                                <div class="dept-points">2 pts</div>
                             </div>
-
-                            <div class="department-card" data-dept="infra">
-                                <div class="dept-header">
-                                    <div class="dept-icon"><i class="fas fa-server"></i></div>
-                                    <h3>Infrastructure &amp; Operations</h3>
-                                </div>
-                                <p class="dept-description">Physical systems and operational technology</p>
+                            <div class="dept-body">
+                                <?php // Password input with a show/hide toggle button ?>
                                 <div class="input-group">
-                                    <input type="password" id="passwordInfra" placeholder="Enter master password" required>
-                                    <button type="button" class="toggle-password" data-target="passwordInfra">
-                                        <i class="fas fa-eye"></i>
-                                    </button>
+                                    <input type="password"
+                                           name="dept<?php echo $i; ?>"
+                                           id="dept<?php echo $i; ?>"
+                                           placeholder="Create a strong, unique password"
+                                           required>
+                                    <button type="button" class="toggle-password" data-target="dept<?php echo $i; ?>">&#128065;</button>
                                 </div>
-                                <div class="strength-meter"><div class="strength-bar"></div></div>
-                                <div class="password-feedback"></div>
+                                <?php // Live strength bar and label updated by JavaScript as the user types ?>
+                                <div class="strength-row">
+                                    <div class="strength-meter"><div class="strength-bar"></div></div>
+                                    <div class="strength-label"></div>
+                                </div>
                             </div>
                         </div>
+                        <?php endforeach; ?>
 
-                        <?php // Row 2: HR and Executive ?>
-                        <div class="department-row">
-                            <div class="department-card" data-dept="hr">
-                                <div class="dept-header">
-                                    <div class="dept-icon"><i class="fas fa-users"></i></div>
-                                    <h3>HR &amp; Legal</h3>
-                                </div>
-                                <p class="dept-description">Employee data and confidential documents</p>
-                                <div class="input-group">
-                                    <input type="password" id="passwordHR" placeholder="Enter master password" required>
-                                    <button type="button" class="toggle-password" data-target="passwordHR">
-                                        <i class="fas fa-eye"></i>
-                                    </button>
-                                </div>
-                                <div class="strength-meter"><div class="strength-bar"></div></div>
-                                <div class="password-feedback"></div>
-                            </div>
-
-                            <div class="department-card" data-dept="exec">
-                                <div class="dept-header">
-                                    <div class="dept-icon"><i class="fas fa-user-tie"></i></div>
-                                    <h3>Executive Leadership</h3>
-                                </div>
-                                <p class="dept-description">Strategic plans and executive communications</p>
-                                <div class="input-group">
-                                    <input type="password" id="passwordExec" placeholder="Enter master password" required>
-                                    <button type="button" class="toggle-password" data-target="passwordExec">
-                                        <i class="fas fa-eye"></i>
-                                    </button>
-                                </div>
-                                <div class="strength-meter"><div class="strength-bar"></div></div>
-                                <div class="password-feedback"></div>
-                            </div>
+                        <?php // Warning shown by JavaScript when two or more departments have the same password ?>
+                        <div class="dup-warning" id="dupWarning">
+                            Duplicate passwords detected. Each department must have a unique password.
                         </div>
 
-                        <?php // Row 3: Sales, Finance and Marketing (centred single card) ?>
-                        <div class="department-row single">
-                            <div class="department-card" data-dept="sfm">
-                                <div class="dept-header">
-                                    <div class="dept-icon"><i class="fas fa-chart-line"></i></div>
-                                    <h3>Sales, Finance &amp; Marketing</h3>
-                                </div>
-                                <p class="dept-description">Financial data, sales reports, and marketing strategies</p>
-                                <div class="input-group">
-                                    <input type="password" id="passwordSFM" placeholder="Enter master password" required>
-                                    <button type="button" class="toggle-password" data-target="passwordSFM">
-                                        <i class="fas fa-eye"></i>
-                                    </button>
-                                </div>
-                                <div class="strength-meter"><div class="strength-bar"></div></div>
-                                <div class="password-feedback"></div>
-                            </div>
+                        <?php // Tip giving the user an example of what a strong password looks like ?>
+                        <div class="hint-tip">
+                            <strong>Tip:</strong> Use at least 12 characters with uppercase, lowercase, numbers, and symbols, for example: <code>Cyber$ecure2024!</code>
                         </div>
 
-                        <?php // Reset and submit buttons ?>
+                        <?php // Row with the Reset All and Submit Assessment buttons ?>
                         <div class="form-actions">
-                            <button type="button" id="resetBtn" class="btn-secondary">
-                                <i class="fas fa-redo"></i> Reset All
-                            </button>
-                            <button type="submit" id="submitBtn" class="btn-primary" disabled>
-                                <i class="fas fa-lock"></i> Secure All Departments
-                            </button>
+                            <button type="button" id="resetBtn" class="btn-secondary">Reset All</button>
+                            <button type="submit" id="submitBtn" class="submit-btn" disabled>Submit Assessment</button>
                         </div>
-
                     </form>
-                </section>
 
-                <?php // Security audit results shown after form submission ?>
-                <section class="results-section" id="resultsSection">
-                    <div class="section-heading">
-                        <i class="fas fa-clipboard-check"></i>
-                        <h2>Security Audit Results</h2>
-                    </div>
-                    <div class="results-container">
-                        <div class="audit-summary" id="auditSummary">
-                            <p>Complete all passwords to run security audit</p>
-                        </div>
-                        <div class="results-table">
-                            <div class="table-header">
-                                <div class="table-cell">Department</div>
-                                <div class="table-cell">Score</div>
-                                <div class="table-cell">Status</div>
-                                <div class="table-cell">Feedback</div>
-                            </div>
-                            <div id="resultsBody"></div>
-                        </div>
-                        <div class="victory-message" id="victoryMessage"></div>
-                        <div class="duplicate-warning" id="duplicateWarning"></div>
-                    </div>
-                </section>
+                <?php endif; ?>
 
-            </div><?php // end content-area ?>
+            </div>
+        </div>
 
-        </div><?php // end page-wrapper ?>
-
-        <?php 
-        // Load footer using absolute path
-        include $baseIncludeDir . '/includes/footer.php'; 
-        ?>
-
-    </div><?php // end container ?>
+        <?php // Load the shared footer at the bottom of the page ?>
+        <?php include 'includes/footer.php'; ?>
+    </div>
 
     <script>
-        // ── Password strength scorer ─────────────────────────────────────────
-        function scorePassword(password) {
-            let score = 0;
+    // JavaScript version of the password scoring function - mirrors the PHP logic so strength updates live as the user types
+    function scorePassword(p) {
+        let s = 0;
 
-            // Award points for password length
-            if (password.length >= 12) score += 25;
-            else if (password.length >= 8) score += 15;
-            else if (password.length >= 5) score += 5;
+        // Award points based on password length
+        if(p.length >= 12) s += 25; else if(p.length >= 8) s += 15; else if(p.length >= 5) s += 5;
 
-            // Award points for character variety
-            if (/[a-z]/.test(password)) score += 10; // Lowercase letters
-            if (/[A-Z]/.test(password)) score += 15; // Uppercase letters
-            if (/\d/.test(password))    score += 15; // Numbers
-            if (/[^A-Za-z0-9]/.test(password)) score += 20; // Special characters
+        // Award points for each character type present
+        if(/[a-z]/.test(p)) s += 10;
+        if(/[A-Z]/.test(p)) s += 15;
+        if(/\d/.test(p))    s += 15;
+        if(/[^A-Za-z0-9]/.test(p)) s += 20;
 
-            // Deduct points for weak patterns
-            if (/(.)\1{2,}/.test(password)) score -= 15; // Repeated characters
-            if (/^(password|123456|admin|qwerty)/i.test(password)) score -= 30; // Common passwords
+        // Deduct points for repeated characters or common weak patterns
+        if(/(.)\1{2,}/.test(p)) s -= 15;
+        if(/^(password|123456|admin|qwerty)/i.test(p)) s -= 30;
 
-            // Bonus for character variety (entropy)
-            const uniqueChars = new Set(password).size;
-            score += Math.min(20, uniqueChars * 2);
+        // Award bonus points for using a wide variety of unique characters
+        s += Math.min(20, new Set(p).size * 2);
 
-            return Math.max(0, Math.min(100, Math.round(score)));
-        }
+        // Keep the score within the 0 to 100 range
+        return Math.max(0, Math.min(100, Math.round(s)));
+    }
 
-        // ── Game state ───────────────────────────────────────────────────────
-        const departments = [
-            { id: 'passwordIT',    name: 'IT / Cyber Department',       element: null, password: '', score: 0, secure: false },
-            { id: 'passwordInfra', name: 'Infrastructure & Operations', element: null, password: '', score: 0, secure: false },
-            { id: 'passwordHR',    name: 'HR & Legal',                  element: null, password: '', score: 0, secure: false },
-            { id: 'passwordExec',  name: 'Executive Leadership',        element: null, password: '', score: 0, secure: false },
-            { id: 'passwordSFM',   name: 'Sales, Finance & Marketing',  element: null, password: '', score: 0, secure: false }
-        ];
+    // Get references to all the department password inputs and the key UI elements
+    const deptInputs = document.querySelectorAll('.department-card input[type="password"]');
+    const submitBtn  = document.getElementById('submitBtn');
+    const dupWarning = document.getElementById('dupWarning');
 
-        let duplicatePasswords = [];
-        let submitBtn, resetBtn, resultsBody, auditSummary, victoryMessage, duplicateWarning;
+    // Update the strength bar and label inside a department card based on the current input value
+    function updateCard(input) {
+        const card  = input.closest('.department-card');
+        const bar   = card.querySelector('.strength-bar');
+        const label = card.querySelector('.strength-label');
+        const val   = input.value;
 
-        // ── Initialise when DOM is ready ─────────────────────────────────────
-        document.addEventListener('DOMContentLoaded', function () {
-            submitBtn        = document.getElementById('submitBtn');
-            resetBtn         = document.getElementById('resetBtn');
-            resultsBody      = document.getElementById('resultsBody');
-            auditSummary     = document.getElementById('auditSummary');
-            victoryMessage   = document.getElementById('victoryMessage');
-            duplicateWarning = document.getElementById('duplicateWarning');
+        // Reset the bar if the field is empty
+        if(!val.length) { bar.className='strength-bar'; bar.style.width='0%'; label.textContent=''; return; }
 
-            // Wire up each department input
-            departments.forEach(dept => {
-                dept.element = document.getElementById(dept.id);
+        const sc = scorePassword(val);
 
-                dept.element.addEventListener('input', function () {
-                    handlePasswordInput(dept.id);
-                    updateSubmitButton();
-                });
+        // Apply the correct colour class and points label based on the strength score
+        if(sc >= 80)      { bar.className='strength-bar strong'; label.style.color='#059669'; label.textContent='Strong - 2 pts'; }
+        else if(sc >= 50) { bar.className='strength-bar fair';   label.style.color='#f59e0b'; label.textContent='Fair - 1 pt'; }
+        else if(sc >= 25) { bar.className='strength-bar good';   label.style.color='#d97706'; label.textContent='Weak - 0 pts'; }
+        else              { bar.className='strength-bar weak';   label.style.color='#dc2626'; label.textContent='Weak - 0 pts'; }
+    }
 
-                dept.element.addEventListener('focus', checkForDuplicates);
-            });
+    // Check all inputs for duplicate values and highlight any that match another field
+    function checkDuplicates() {
+        const vals  = Array.from(deptInputs).map(i => i.value).filter(v => v.length > 0);
+        const dupes = vals.filter((v, i) => vals.indexOf(v) !== i);
 
-            // Toggle password visibility buttons
-            document.querySelectorAll('.toggle-password').forEach(button => {
-                button.addEventListener('click', function () {
-                    const targetId = this.getAttribute('data-target');
-                    const input    = document.getElementById(targetId);
-                    const icon     = this.querySelector('i');
+        // Add or remove the red duplicate border on each affected input
+        deptInputs.forEach(i => i.classList.toggle('duplicate', dupes.includes(i.value) && i.value.length > 0));
 
-                    if (input.type === 'password') {
-                        input.type = 'text';
-                        icon.classList.replace('fa-eye', 'fa-eye-slash');
-                    } else {
-                        input.type = 'password';
-                        icon.classList.replace('fa-eye-slash', 'fa-eye');
-                    }
-                });
-            });
+        // Show or hide the duplicate warning message
+        if(dupWarning) dupWarning.classList.toggle('show', dupes.length > 0);
+        return dupes.length > 0;
+    }
 
-            // Form submit
-            document.getElementById('passwordForm').addEventListener('submit', function (e) {
-                e.preventDefault();
-                evaluateAllPasswords();
-            });
+    // Enable the submit button only when all five fields are filled in and no duplicates exist
+    function updateSubmit() {
+        if(!submitBtn) return;
+        const allFilled = Array.from(deptInputs).every(i => i.value.length > 0);
+        submitBtn.disabled = !allFilled || checkDuplicates();
+    }
 
-            // Reset button
-            resetBtn.addEventListener('click', resetAllPasswords);
+    // Run the strength check and submit button update every time the user types in any password field
+    deptInputs.forEach(input => {
+        input.addEventListener('input', () => { updateCard(input); updateSubmit(); });
+    });
+
+    // Toggle each password field between hidden and visible text when the eye icon is clicked
+    document.querySelectorAll('.toggle-password').forEach(btn => {
+        btn.addEventListener('click', function() {
+            const input = document.getElementById(this.getAttribute('data-target'));
+            input.type  = input.type === 'password' ? 'text' : 'password';
+
+            // Swap the eye icon to show whether the password is currently visible or hidden
+            this.textContent = input.type === 'password' ? '\u{1F441}' : '\u{1F648}';
         });
+    });
 
-        // ── Handle input: update strength meter ──────────────────────────────
-        function handlePasswordInput(passwordId) {
-            const password = document.getElementById(passwordId).value;
-            const dept     = departments.find(d => d.id === passwordId);
-            if (!dept) return;
-
-            dept.password = password;
-
-            // Find the parent card using the data-dept attribute
-            const card = document.querySelector(`[data-dept="${dept.id.replace('password', '').toLowerCase()}"]`);
-            if (!card) return;
-
-            const strengthBar      = card.querySelector('.strength-bar');
-            const feedbackElement  = card.querySelector('.password-feedback');
-
-            if (password.length === 0) {
-                strengthBar.className    = 'strength-bar';
-                strengthBar.style.width  = '0%';
-                feedbackElement.textContent = '';
-                return;
-            }
-
-            const score = scorePassword(password);
-            dept.score  = score;
-
-            // Update the strength bar class and feedback text
-            if (score >= 80) {
-                strengthBar.className       = 'strength-bar strong';
-                feedbackElement.textContent = 'Strong password';
-                feedbackElement.style.color = '#059669';
-            } else if (score >= 60) {
-                strengthBar.className       = 'strength-bar good';
-                feedbackElement.textContent = 'Good — could be stronger';
-                feedbackElement.style.color = '#b45309';
-            } else if (score >= 40) {
-                strengthBar.className       = 'strength-bar fair';
-                feedbackElement.textContent = 'Fair — needs improvement';
-                feedbackElement.style.color = '#d97706';
-            } else {
-                strengthBar.className       = 'strength-bar weak';
-                feedbackElement.textContent = 'Weak — too vulnerable';
-                feedbackElement.style.color = '#dc2626';
-            }
-
-            checkForDuplicates();
-        }
-
-        // ── Check for duplicate passwords ────────────────────────────────────
-        function checkForDuplicates() {
-            duplicatePasswords = [];
-            const passwordMap  = {};
-
-            departments.forEach(dept => {
-                if (dept.password && dept.password.length > 0) {
-                    if (!passwordMap[dept.password]) passwordMap[dept.password] = [];
-                    passwordMap[dept.password].push(dept.name);
-                }
+    // Clear all password fields and reset the strength bars and duplicate warnings when Reset All is clicked
+    const resetBtn = document.getElementById('resetBtn');
+    if(resetBtn) {
+        resetBtn.addEventListener('click', () => {
+            deptInputs.forEach(i => {
+                i.value = '';
+                i.classList.remove('duplicate');
+                const card = i.closest('.department-card');
+                card.querySelector('.strength-bar').className = 'strength-bar';
+                card.querySelector('.strength-bar').style.width = '0%';
+                card.querySelector('.strength-label').textContent = '';
             });
 
-            for (const [password, deptNames] of Object.entries(passwordMap)) {
-                if (deptNames.length > 1) {
-                    duplicatePasswords.push({ password, departments: deptNames });
-                }
-            }
-
-            // Highlight or clear duplicate styling on each input
-            departments.forEach(dept => {
-                if (duplicatePasswords.some(dup => dup.password === dept.password)) {
-                    dept.element.classList.add('duplicate');
-                } else {
-                    dept.element.classList.remove('duplicate');
-                }
-            });
-
-            if (duplicatePasswords.length > 0) {
-                showDuplicateWarning();
-            } else {
-                duplicateWarning.classList.remove('show');
-            }
-        }
-
-        // ── Show the duplicate warning box ───────────────────────────────────
-        function showDuplicateWarning() {
-            let html = '<h4><i class="fas fa-exclamation-triangle"></i> Duplicate Passwords Detected</h4>';
-            html += '<p>The same password cannot be used for multiple departments:</p><ul>';
-            duplicatePasswords.forEach(dup => {
-                html += `<li>"${dup.password}" is used for: ${dup.departments.join(', ')}</li>`;
-            });
-            html += '</ul><p>Please create unique passwords for each department.</p>';
-            duplicateWarning.innerHTML = html;
-            duplicateWarning.classList.add('show');
-        }
-
-        // ── Enable / disable the submit button ───────────────────────────────
-        function updateSubmitButton() {
-            const allFilled    = departments.every(d => d.password && d.password.length > 0);
-            const hasDuplicates = duplicatePasswords.length > 0;
-            submitBtn.disabled = !allFilled || hasDuplicates;
-        }
-
-        // ── Evaluate all passwords and show results ───────────────────────────
-        function evaluateAllPasswords() {
-            checkForDuplicates();
-            if (duplicatePasswords.length > 0) {
-                alert('Please resolve duplicate passwords before submitting.');
-                return;
-            }
-
-            let allSecure  = true;
-            let totalScore = 0;
-
-            departments.forEach(dept => {
-                dept.score  = scorePassword(dept.password);
-                dept.secure = dept.score >= 80;
-                if (!dept.secure) allSecure = false;
-                totalScore += dept.score;
-            });
-
-            const averageScore    = Math.round(totalScore / departments.length);
-            const secureCount     = departments.filter(d => d.secure).length;
-            const compromisedCount = departments.length - secureCount;
-
-            auditSummary.innerHTML = `
-                <h3>Security Audit Complete</h3>
-                <p>Average Security Score: <strong>${averageScore}/100</strong></p>
-                <p>Secure Departments: <span class="status-secure">${secureCount}</span>
-                   &nbsp;|&nbsp;
-                   Compromised Departments: <span class="status-compromised">${compromisedCount}</span></p>
-            `;
-
-            displayResults();
-
-            if (allSecure) {
-                showVictoryMessage();
-            } else {
-                victoryMessage.classList.remove('show');
-            }
-
-            document.getElementById('resultsSection').scrollIntoView({ behavior: 'smooth' });
-        }
-
-        // ── Render results table rows ─────────────────────────────────────────
-        function displayResults() {
-            resultsBody.innerHTML = '';
-
-            departments.forEach(dept => {
-                const row        = document.createElement('div');
-                row.className    = 'table-row';
-                const statusClass = dept.secure ? 'status-secure' : 'status-compromised';
-                const statusIcon  = dept.secure
-                    ? '<i class="fas fa-check-circle"></i>'
-                    : '<i class="fas fa-exclamation-circle"></i>';
-                const statusLabel = dept.secure ? 'Secure' : 'Compromised';
-                const feedback    = generatePasswordFeedback(dept.password, dept.score);
-
-                row.innerHTML = `
-                    <div class="table-cell" data-label="Department">${dept.name}</div>
-                    <div class="table-cell" data-label="Score">${dept.score}/100</div>
-                    <div class="table-cell ${statusClass}" data-label="Status">${statusIcon} ${statusLabel}</div>
-                    <div class="table-cell" data-label="Feedback">${feedback}</div>
-                `;
-                resultsBody.appendChild(row);
-            });
-        }
-
-        // ── Generate per-password feedback text ──────────────────────────────
-        function generatePasswordFeedback(password, score) {
-            if (score >= 80) return 'Strong password — meets security requirements';
-
-            const tips = [];
-            if (password.length < 8)  tips.push('Too short (minimum 8 characters)');
-            else if (password.length < 12) tips.push('Use at least 12 characters');
-            if (!/[A-Z]/.test(password)) tips.push('Add uppercase letters');
-            if (!/[a-z]/.test(password)) tips.push('Add lowercase letters');
-            if (!/\d/.test(password))    tips.push('Add numbers');
-            if (!/[^A-Za-z0-9]/.test(password)) tips.push('Add special characters (e.g. !@#$%)');
-            if (/(.)\1{2,}/.test(password)) tips.push('Avoid repeated characters');
-            if (/(password|123456|admin|qwerty)/i.test(password)) tips.push('Avoid common patterns');
-            if (tips.length === 0) tips.push('Needs more complexity and length');
-
-            return tips.join(', ');
-        }
-
-        // ── Show the victory / mission accomplished message ───────────────────
-        function showVictoryMessage() {
-            victoryMessage.innerHTML = `
-                <h3><i class="fas fa-trophy"></i> MISSION ACCOMPLISHED!</h3>
-                <p>All departments have been secured with strong passwords.</p>
-                <p>The company's digital fortress is now protected against cyber threats.</p>
-                <p><strong>Congratulations, Chief Security Engineer!</strong></p>
-                <div class="victory-icons">
-                    <i class="fas fa-shield-alt"></i>
-                    <i class="fas fa-lock"></i>
-                    <i class="fas fa-star"></i>
-                </div>
-            `;
-            victoryMessage.classList.add('show');
-        }
-
-        // ── Reset all fields and UI state ────────────────────────────────────
-        function resetAllPasswords() {
-            departments.forEach(dept => {
-                dept.element.value = '';
-                dept.password      = '';
-                dept.score         = 0;
-                dept.secure        = false;
-                dept.element.classList.remove('duplicate');
-
-                const card = document.querySelector(`[data-dept="${dept.id.replace('password', '').toLowerCase()}"]`);
-                if (card) {
-                    const bar = card.querySelector('.strength-bar');
-                    const fb  = card.querySelector('.password-feedback');
-                    bar.className    = 'strength-bar';
-                    bar.style.width  = '0%';
-                    fb.textContent   = '';
-                }
-            });
-
-            duplicatePasswords = [];
-            duplicateWarning.classList.remove('show');
-            submitBtn.disabled    = true;
-            auditSummary.innerHTML = '<p>Complete all passwords to run security audit</p>';
-            resultsBody.innerHTML  = '';
-            victoryMessage.classList.remove('show');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
+            // Hide the duplicate warning and disable the submit button after the reset
+            if(dupWarning) dupWarning.classList.remove('show');
+            if(submitBtn) submitBtn.disabled = true;
+        });
+    }
     </script>
 </body>
 </html>
