@@ -1,20 +1,20 @@
 <?php
-// MUST be the first line - no whitespace before this!
-// Start output buffering if not already started
+// MUST be the absolute first line - NO characters, spaces, or newlines before this!
+// Start output buffering to prevent any header issues
 if (ob_get_level() == 0) {
     ob_start();
 }
 
-// Start session if not already started
+// Start session if not already started - this MUST happen before ANY output
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
-// Rest of your navigation code below...
+// No HTML output should happen before this point
 ?>
-
+<!DOCTYPE html>
 <style>
-<?php // Removes default list item height and spacing for the avatar nav item ?>
+/* Removes default list item height and spacing for the avatar nav item */
 #avatar-li {
     height: 0 !important;
     overflow: visible !important;
@@ -22,12 +22,12 @@ if (session_status() === PHP_SESSION_NONE) {
     margin-top: 0 !important;
     margin-bottom: 0 !important;
 }
-<?php // Keeps the avatar positioned correctly relative to the nav ?>
+/* Keeps the avatar positioned correctly relative to the nav */
 #nav-avatar {
     position: relative;
     top: 0;
 }
-<?php // Hides the avatar completely on mobile screens ?>
+/* Hides the avatar completely on mobile screens */
 @media (max-width: 768px) {
     #avatar-li {
         display: none !important;
@@ -35,10 +35,8 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 </style>
 
-<?php // Main navigation bar containing the logo, nav links and mobile menu button ?>
 <nav>
-
-    <?php // Logo section - clicking it takes the user back to the homepage ?>
+    <!-- Logo section - clicking it takes the user back to the homepage -->
     <div class="logo">
         <a href="index.php">
             <div class="logo-text">
@@ -47,30 +45,27 @@ if (session_status() === PHP_SESSION_NONE) {
         </a>
     </div>
     
-    <?php // List of navigation links shown across the top of every page ?>
+    <!-- List of navigation links shown across the top of every page -->
     <ul class="nav-links" id="navLinks">
         <li><a href="about.php">About</a></li>
         <li><a href="game.php">Game</a></li>
         <li><a href="contact.php">Contact</a></li>
 
-        <?php // If the user is logged in, show their first name with a logout link ?>
         <?php if(isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true): ?>
             <li><a href="logout.php" style="font-weight: 600;">
                 <span style="color: white; position: relative; display: inline-block;">
-                    <?php echo htmlspecialchars($_SESSION["first_name"]); ?> (Logout)
-                    <?php // Green curved underline drawn using an inline SVG ?>
+                    <?php echo htmlspecialchars($_SESSION["first_name"] ?? 'User'); ?> (Logout)
+                    <!-- Green curved underline drawn using an inline SVG -->
                     <svg style="position: absolute; bottom: -6px; left: 0; width: 100%; height: 8px;" viewBox="0 0 100 8" preserveAspectRatio="none">
                         <path d="M0,5 Q50,1 100,5" stroke="#4ade80" stroke-width="2.5" fill="none" stroke-linecap="round"/>
                     </svg>
                 </span>
             </a></li>
-
-        <?php // If the user is not logged in, show a Sign In link instead ?>
         <?php else: ?>
             <li><a href="login.php">
                 <span style="color: white; position: relative; display: inline-block;">
                     Sign In
-                    <?php // Green curved underline drawn using an inline SVG ?>
+                    <!-- Green curved underline drawn using an inline SVG -->
                     <svg style="position: absolute; bottom: -6px; left: 0; width: 100%; height: 8px;" viewBox="0 0 100 8" preserveAspectRatio="none">
                         <path d="M0,5 Q50,1 100,5" stroke="#4ade80" stroke-width="2.5" fill="none" stroke-linecap="round"/>
                     </svg>
@@ -78,7 +73,7 @@ if (session_status() === PHP_SESSION_NONE) {
             </a></li>
         <?php endif; ?>
 
-        <?php // Avatar icon in the nav bar - clicking it opens the character picker modal ?>
+        <!-- Avatar icon in the nav bar - clicking it opens the character picker modal -->
         <li id="avatar-li" style="display:flex; align-items:center; margin-left:-4px; line-height:0; padding:0; align-self:center;">
             <div id="nav-avatar" title="Change character" style="
                 width: 44px;
@@ -93,46 +88,48 @@ if (session_status() === PHP_SESSION_NONE) {
                 margin-top: 0;
                 vertical-align: middle;
             ">
-                <?php // Empty SVG that gets filled in by JavaScript with the selected character ?>
+                <!-- Empty SVG that gets filled in by JavaScript with the selected character -->
                 <svg id="avatar-svg" viewBox="0 0 44 44" width="40" height="40" xmlns="http://www.w3.org/2000/svg" overflow="visible" style="display:block;"></svg>
             </div>
         </li>
     </ul>
     
-    <?php // Hamburger menu button shown on mobile - toggles the nav links open and closed ?>
+    <!-- Hamburger menu button shown on mobile - toggles the nav links open and closed -->
     <div class="mobile-menu-btn" id="mobileMenuBtn">☰</div>
 </nav>
 
-<?php // Background music that loops automatically and starts playing on first user click ?>
-<audio src="music/eliveta-technology.mp3" loop autoplay></audio>
+<!-- Background music that loops automatically and starts playing on first user click -->
+<audio id="bg-music" src="music/eliveta-technology.mp3" loop></audio>
 <script>
 // Get the background music audio element
 const music = document.getElementById('bg-music');
 
 // Set the volume to 30% so it doesn't overpower the page
-music.volume = 0.3;
+if (music) {
+    music.volume = 0.3;
 
-// Wait for the user to click anywhere on the page before starting the music
-// This is required because browsers block audio from auto-playing without user interaction
-document.addEventListener('click', function startMusic() {
-    music.play().catch(() => {});
-    document.removeEventListener('click', startMusic);
-}, { once: true });
+    // Wait for the user to click anywhere on the page before starting the music
+    // This is required because browsers block audio from auto-playing without user interaction
+    document.addEventListener('click', function startMusic() {
+        music.play().catch(() => {});
+        document.removeEventListener('click', startMusic);
+    }, { once: true });
 
-// Once the audio is ready to play, restore the saved playback position from sessionStorage
-music.addEventListener('canplay', () => {
-    const saved = parseFloat(sessionStorage.getItem('music_time') || 0);
-    if (saved) music.currentTime = saved;
-});
+    // Once the audio is ready to play, restore the saved playback position from sessionStorage
+    music.addEventListener('canplay', () => {
+        const saved = parseFloat(sessionStorage.getItem('music_time') || 0);
+        if (saved) music.currentTime = saved;
+    });
 
-// Every second, save the current playback time to sessionStorage
-// This means the music continues from where it left off when navigating between pages
-setInterval(() => {
-    if (!music.paused) sessionStorage.setItem('music_time', music.currentTime);
-}, 1000);
+    // Every second, save the current playback time to sessionStorage
+    // This means the music continues from where it left off when navigating between pages
+    setInterval(() => {
+        if (!music.paused) sessionStorage.setItem('music_time', music.currentTime);
+    }, 1000);
+}
 </script>
 
-<?php // Full screen overlay modal that lets the user pick their character avatar ?>
+<!-- Full screen overlay modal that lets the user pick their character avatar -->
 <div id="char-picker" style="
     display: none;
     position: fixed;
@@ -143,7 +140,7 @@ setInterval(() => {
     align-items: center;
     justify-content: center;
 ">
-    <?php // The white modal card that sits in the centre of the overlay ?>
+    <!-- The white modal card that sits in the centre of the overlay -->
     <div style="
         background: #ffffff;
         border: 1px solid #e2e8f0;
@@ -155,14 +152,14 @@ setInterval(() => {
         max-height: 90vh;
         overflow-y: auto;
     ">
-        <?php // Modal title and subtitle shown at the top of the picker ?>
+        <!-- Modal title and subtitle shown at the top of the picker -->
         <h3 style="color:#1e293b; margin:0 0 4px; font-size:1.1rem; font-weight:700; text-align:center;">Choose Your Character</h3>
         <p style="color:#94a3b8; font-size:0.8rem; text-align:center; margin:0 0 20px;">Your avatar watches the cursor 👁</p>
 
-        <?php // Grid of character options - populated dynamically by JavaScript ?>
+        <!-- Grid of character options - populated dynamically by JavaScript -->
         <div id="char-grid" style="display:grid; grid-template-columns:repeat(5,1fr); gap:10px;"></div>
 
-        <?php // Close button at the bottom of the modal ?>
+        <!-- Close button at the bottom of the modal -->
         <button id="close-picker" style="
             margin-top: 20px;
             width: 100%;
@@ -488,13 +485,22 @@ function openPicker()  { buildGrid(); document.getElementById('char-picker').sty
 function closePicker() { document.getElementById('char-picker').style.display = 'none'; }
 
 // Open the picker when the nav avatar is clicked
-document.getElementById('nav-avatar').addEventListener('click', openPicker);
+const navAvatar = document.getElementById('nav-avatar');
+if (navAvatar) {
+    navAvatar.addEventListener('click', openPicker);
+}
 
 // Close the picker when the close button is clicked
-document.getElementById('close-picker').addEventListener('click', closePicker);
+const closePickerBtn = document.getElementById('close-picker');
+if (closePickerBtn) {
+    closePickerBtn.addEventListener('click', closePicker);
+}
 
 // Close the picker if the user clicks on the dark backdrop behind the modal
-document.getElementById('char-picker').addEventListener('click', e => { if (e.target === e.currentTarget) closePicker(); });
+const charPicker = document.getElementById('char-picker');
+if (charPicker) {
+    charPicker.addEventListener('click', e => { if (e.target === e.currentTarget) closePicker(); });
+}
 
 // Run setup tasks once the full page DOM has loaded
 document.addEventListener('DOMContentLoaded', function () {
