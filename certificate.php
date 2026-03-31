@@ -1,6 +1,13 @@
 <?php
-session_start();
+// Start output buffering to prevent header issues
+ob_start();
 
+// Start session at the VERY beginning before ANY output
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+// Check if user is logged in
 if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){
     header("location: login.php");
     exit;
@@ -9,7 +16,7 @@ if(!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true){
 require_once "config/database.php";
 
 $user_id          = $_SESSION['id'];
-$full_name        = isset($_SESSION['full_name']) ? $_SESSION['full_name'] : 'Participant'; // ← GUARD THIS
+$full_name        = isset($_SESSION['full_name']) ? $_SESSION['full_name'] : 'Participant';
 $total_completed  = 0;
 $total_games      = 4;
 
@@ -31,7 +38,11 @@ $certificate_earned = ($total_completed == $total_games);
 $date    = date('F d, Y');
 $cert_id = 'CYB-' . strtoupper(substr(md5($user_id . $date . 'cybaware'), 0, 10));
 
-session_write_close(); // ← ADD THIS - locks session before page renders, prevents corruption
+// Close session writing to prevent locking issues
+session_write_close();
+
+// End output buffering and flush any pending output
+ob_end_flush();
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -45,14 +56,12 @@ session_write_close(); // ← ADD THIS - locks session before page renders, prev
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Source+Sans+3:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
     <style>
-        <?php // Outer wrapper that centres the certificate page and adds spacing around it ?>
         .cert-page-wrapper {
             max-width: 1200px;
             margin: 36px auto;
             padding: 0 20px 56px;
         }
 
-        <?php // Page title styled to match the game-header on game.php ?>
         .page-title {
             text-align: center;
             margin-bottom: 40px;
@@ -69,7 +78,6 @@ session_write_close(); // ← ADD THIS - locks session before page renders, prev
             margin: 0 auto;
         }
 
-        <?php // Yellow warning banner shown when the user hasn't completed all games yet ?>
         .status-banner {
             background: #fffbeb;
             border: 1px solid #fcd34d;
@@ -83,11 +91,6 @@ session_write_close(); // ← ADD THIS - locks session before page renders, prev
         }
         .status-banner strong { color: #78350f; }
 
-        <?php
-        ?>
-
-        <?php
-        ?>
         .cert-stage {
             position: relative;
             width: 100%;
@@ -95,7 +98,6 @@ session_write_close(); // ← ADD THIS - locks session before page renders, prev
             margin-bottom: 32px;
         }
 
-        <?php // The outermost navy blue border frame of the certificate (fixed canvas size) ?>
         .cert-frame {
             position: absolute;
             top: 0;
@@ -108,7 +110,6 @@ session_write_close(); // ← ADD THIS - locks session before page renders, prev
             box-shadow: 0 25px 70px rgba(0,0,0,0.3), 0 0 0 1px #0f1e30;
         }
 
-        <?php // White gap between the navy outer frame and the inner navy rule ?>
         .cert-frame-gap {
             background: #fff;
             padding: 4px;
@@ -116,7 +117,6 @@ session_write_close(); // ← ADD THIS - locks session before page renders, prev
             box-sizing: border-box;
         }
 
-        <?php // Thin navy inner rule that sits just inside the white gap ?>
         .cert-frame-line {
             background: #1a2940;
             padding: 1.5px;
@@ -124,7 +124,6 @@ session_write_close(); // ← ADD THIS - locks session before page renders, prev
             box-sizing: border-box;
         }
 
-        <?php // The main white certificate surface that holds all the content ?>
         .certificate-shell {
             position: relative;
             background: #ffffff;
@@ -136,7 +135,6 @@ session_write_close(); // ← ADD THIS - locks session before page renders, prev
             overflow: hidden;
         }
 
-        <?php // Subtle noise texture layered on top of the white background to give a paper feel ?>
         .certificate-shell::before {
             content: '';
             position: absolute;
@@ -146,7 +144,6 @@ session_write_close(); // ← ADD THIS - locks session before page renders, prev
             z-index: 0;
         }
 
-        <?php // Faint large CA watermark printed behind all the certificate content ?>
         .cert-watermark {
             position: absolute;
             top: 50%;
@@ -162,15 +159,12 @@ session_write_close(); // ← ADD THIS - locks session before page renders, prev
             user-select: none;
         }
 
-        <?php // Vertical navy gradient bars running down the left and right edges of the certificate ?>
         .cert-bar-left  { position: absolute; left: 0; top: 0; bottom: 0; width: 7px; background: linear-gradient(180deg, #1a2940, #2d4a6e 50%, #1a2940); z-index: 1; }
         .cert-bar-right { position: absolute; right: 0; top: 0; bottom: 0; width: 7px; background: linear-gradient(180deg, #1a2940, #2d4a6e 50%, #1a2940); z-index: 1; }
 
-        <?php // Gold gradient rules running across the very top and bottom edges of the certificate ?>
         .cert-rule-top    { position: absolute; top: 0; left: 7px; right: 7px; height: 5px; background: linear-gradient(90deg, #c8a84c, #e8cc76, #b89030, #e8cc76, #c8a84c); z-index: 1; }
         .cert-rule-bottom { position: absolute; bottom: 0; left: 7px; right: 7px; height: 5px; background: linear-gradient(90deg, #c8a84c, #e8cc76, #b89030, #e8cc76, #c8a84c); z-index: 1; }
 
-        <?php // Inner content wrapper that sits above the decorative layers and spaces the sections evenly ?>
         .certificate-inner {
             position: relative;
             z-index: 2;
@@ -180,13 +174,11 @@ session_write_close(); // ← ADD THIS - locks session before page renders, prev
             justify-content: space-between;
         }
 
-        <?php // Horizontal divider made of a line with small diamond shapes in the centre ?>
         .rule-divider { display: flex; align-items: center; gap: 10px; margin: 4px 0; }
         .rule-line    { flex: 1; height: 1px; background: #d0d8e4; }
         .rule-diamond    { width: 6px; height: 6px; background: #1a2940; transform: rotate(45deg); flex-shrink: 0; }
         .rule-diamond-sm { width: 3px; height: 3px; background: #c8a84c; transform: rotate(45deg); flex-shrink: 0; }
 
-        <?php // Header section containing the organisation name and subtitle ?>
         .cert-header { text-align: center; }
         .cert-header-row { display: flex; align-items: center; justify-content: center; gap: 22px; }
         .cert-org {
@@ -207,7 +199,6 @@ session_write_close(); // ← ADD THIS - locks session before page renders, prev
             margin-top: 4px;
         }
 
-        <?php // Small uppercase label above the certificate title and the large italic title itself ?>
         .cert-title-eyebrow {
             font-family: 'Source Sans 3', sans-serif;
             font-size: 0.6rem;
@@ -228,7 +219,6 @@ session_write_close(); // ← ADD THIS - locks session before page renders, prev
             text-align: center;
         }
 
-        <?php // Container for the recipient name with gold top line and grey bottom line decorations ?>
         .cert-presented { text-align: center; }
         .cert-name-wrap {
             display: inline-block;
@@ -250,7 +240,6 @@ session_write_close(); // ← ADD THIS - locks session before page renders, prev
             background: linear-gradient(to right, transparent 0%, #d0d8e4 20%, #d0d8e4 80%, transparent 100%);
         }
 
-        <?php // The recipient's name displayed in large serif font ?>
         .cert-name {
             font-family: 'Playfair Display', serif;
             font-size: 2.3rem;
@@ -262,7 +251,6 @@ session_write_close(); // ← ADD THIS - locks session before page renders, prev
             word-break: break-word;
         }
 
-        <?php // The descriptive body paragraph explaining what was achieved ?>
         .cert-body { text-align: center; }
         .cert-body-text {
             font-family: 'Libre Baskerville', serif;
@@ -275,7 +263,6 @@ session_write_close(); // ← ADD THIS - locks session before page renders, prev
         }
         .cert-body-text strong { font-style: normal; font-weight: 700; color: #1a2940; }
 
-        <?php // Row of competency badges shown only when the full certificate is earned ?>
         .cert-competencies { display: flex; justify-content: center; margin-top: 9px; }
         .cert-competency {
             display: flex;
@@ -293,7 +280,6 @@ session_write_close(); // ← ADD THIS - locks session before page renders, prev
         .cert-competency:last-child { border-right: none; }
         .cert-competency svg { color: #c8a84c; flex-shrink: 0; }
 
-        <?php // Footer row with two signature blocks on the sides and the seal in the middle ?>
         .cert-footer { display: grid; grid-template-columns: 1fr auto 1fr; align-items: end; gap: 16px; }
         .sig-block { text-align: center; }
         .sig-name {
@@ -318,7 +304,6 @@ session_write_close(); // ← ADD THIS - locks session before page renders, prev
             color: #7a8fa8;
         }
 
-        <?php // Official seal in the centre of the footer built from nested circles with a gold ring ?>
         .cert-seal { text-align: center; flex-shrink: 0; }
         .seal-wrap { width: 108px; height: 108px; margin: 0 auto 8px; position: relative; }
         .seal-outer {
@@ -379,7 +364,6 @@ session_write_close(); // ← ADD THIS - locks session before page renders, prev
         }
         .seal-divider { width: 55%; height: 1px; background: rgba(200,168,76,0.5); margin: 4px 0; }
 
-        <?php // Date issued label and value displayed beneath the seal ?>
         .cert-meta { text-align: center; margin-top: 6px; }
         .cert-meta-label {
             font-family: 'Source Sans 3', sans-serif;
@@ -399,13 +383,11 @@ session_write_close(); // ← ADD THIS - locks session before page renders, prev
             display: inline-block;
         }
 
-        <?php // Row showing the unique certificate ID with fading lines on either side ?>
         .cert-id-row { display: flex; align-items: center; justify-content: center; gap: 12px; margin-top: 6px; }
         .cert-id-dash       { flex: 1; height: 1px; background: linear-gradient(to right, transparent, #d0d8e4); }
         .cert-id-dash.right { background: linear-gradient(to left, transparent, #d0d8e4); }
         .cert-id { font-family: 'Source Sans 3', sans-serif; font-size: 0.54rem; color: #a0aec0; letter-spacing: 3px; text-transform: uppercase; }
 
-        <?php // Row of action buttons shown below the certificate ?>
         .cert-actions {
             display: flex;
             justify-content: center;
@@ -431,7 +413,6 @@ session_write_close(); // ← ADD THIS - locks session before page renders, prev
             justify-content: center;
         }
 
-        <?php // Filled navy button used for the primary Save as PDF action ?>
         .cert-btn-primary {
             background: #1a2940;
             color: #fff;
@@ -440,11 +421,9 @@ session_write_close(); // ← ADD THIS - locks session before page renders, prev
         }
         .cert-btn-primary:hover { background: #243b5a; transform: translateY(-2px); box-shadow: 0 6px 18px rgba(26,41,64,0.35); }
 
-        <?php // Outlined button used for the secondary navigation actions ?>
         .cert-btn-outline { background: transparent; color: #1a2940; border: 1.5px solid #1a2940; }
         .cert-btn-outline:hover { background: rgba(26,41,64,0.05); transform: translateY(-2px); }
 
-        <?php // On small screens buttons go full width ?>
         @media (max-width: 600px) {
             .cert-actions { flex-direction: column; align-items: center; }
             .cert-btn     { width: 100%; max-width: 280px; }
@@ -453,19 +432,19 @@ session_write_close(); // ← ADD THIS - locks session before page renders, prev
 </head>
 <body>
     <div class="container">
-        <?php // Load the shared navigation bar ?>
-        <?php include 'includes/navigation.php'; ?>
+        <?php 
+        // Include navigation - make sure navigation.php also has output buffering
+        // and session handling at its very beginning
+        include 'includes/navigation.php'; 
+        ?>
 
         <div class="main-content">
             <div class="cert-page-wrapper">
-
-                <?php // Page heading shown above the certificate preview ?>
                 <div class="page-title">
                     <h1>Cybersecurity Awareness Certificate</h1>
                     <p>Complete all missions to earn your official certificate.</p>
                 </div>
 
-                <?php // Show a warning banner if the user hasn't finished all required games yet ?>
                 <?php if(!$certificate_earned): ?>
                 <div class="status-banner">
                     <strong>Certificate Pending -</strong>
@@ -473,15 +452,11 @@ session_write_close(); // ← ADD THIS - locks session before page renders, prev
                 </div>
                 <?php endif; ?>
 
-                <?php
-                ?>
                 <div class="cert-stage" id="certStage">
                     <div class="cert-frame" id="certFrame">
                         <div class="cert-frame-gap">
                             <div class="cert-frame-line">
                                 <div class="certificate-shell">
-
-                                    <?php // Decorative background watermark, side bars and gold edge rules ?>
                                     <div class="cert-watermark">CA</div>
                                     <div class="cert-bar-left"></div>
                                     <div class="cert-bar-right"></div>
@@ -489,8 +464,6 @@ session_write_close(); // ← ADD THIS - locks session before page renders, prev
                                     <div class="cert-rule-bottom"></div>
 
                                     <div class="certificate-inner">
-
-                                        <?php // Organisation name and training program subtitle at the top of the certificate ?>
                                         <div class="cert-header">
                                             <div class="cert-header-row">
                                                 <div>
@@ -500,32 +473,27 @@ session_write_close(); // ← ADD THIS - locks session before page renders, prev
                                             </div>
                                         </div>
 
-                                        <?php // First decorative divider line with diamond shapes ?>
                                         <div class="rule-divider">
                                             <div class="rule-line"></div>
                                             <div class="rule-diamond-sm"></div><div class="rule-diamond"></div><div class="rule-diamond-sm"></div>
                                             <div class="rule-line"></div>
                                         </div>
 
-                                        <?php // Label telling the reader who the certificate is presented to ?>
                                         <div style="text-align:center;">
                                             <div class="cert-title-eyebrow">This Certificate is Presented To</div>
                                         </div>
 
-                                        <?php // The logged in user's full name printed on the certificate ?>
                                         <div class="cert-presented">
                                             <div class="cert-name-wrap">
                                                 <span class="cert-name"><?php echo htmlspecialchars($full_name); ?></span>
                                             </div>
                                         </div>
 
-                                        <?php // Shows Achievement if fully completed or Participation if still in progress ?>
                                         <div style="text-align:center;">
                                             <div class="cert-title-eyebrow" style="margin-bottom:3px;">in recognition of</div>
                                             <div class="cert-title-main"><?php echo $certificate_earned ? 'Achievement' : 'Participation'; ?></div>
                                         </div>
 
-                                        <?php // Body text that changes depending on whether the certificate is fully earned or not ?>
                                         <div class="cert-body">
                                             <div class="cert-body-text">
                                                 <?php if($certificate_earned): ?>
@@ -539,7 +507,6 @@ session_write_close(); // ← ADD THIS - locks session before page renders, prev
                                                 <?php endif; ?>
                                             </div>
 
-                                            <?php // Competency badges only shown when all games are completed ?>
                                             <?php if($certificate_earned): ?>
                                             <div class="cert-competencies">
                                                 <div class="cert-competency">
@@ -558,14 +525,12 @@ session_write_close(); // ← ADD THIS - locks session before page renders, prev
                                             <?php endif; ?>
                                         </div>
 
-                                        <?php // Second decorative divider line separating the body from the footer ?>
                                         <div class="rule-divider">
                                             <div class="rule-line"></div>
                                             <div class="rule-diamond-sm"></div><div class="rule-diamond"></div><div class="rule-diamond-sm"></div>
                                             <div class="rule-line"></div>
                                         </div>
 
-                                        <?php // Footer with two developer signatures on either side and the official seal in the middle ?>
                                         <div class="cert-footer">
                                             <div class="sig-block">
                                                 <div class="sig-name">Ahndre Walters</div>
@@ -573,7 +538,6 @@ session_write_close(); // ← ADD THIS - locks session before page renders, prev
                                                 <div class="sig-title">Lead Developer</div>
                                             </div>
 
-                                            <?php // Official seal showing CERTIFIED or PENDING depending on completion status ?>
                                             <div class="cert-seal">
                                                 <div class="seal-wrap">
                                                     <div class="seal-outer">
@@ -588,7 +552,6 @@ session_write_close(); // ← ADD THIS - locks session before page renders, prev
                                                         </div>
                                                     </div>
                                                 </div>
-                                                <?php // Date the certificate was generated displayed beneath the seal ?>
                                                 <div class="cert-meta">
                                                     <div class="cert-meta-label">Date Issued</div>
                                                     <div class="cert-meta-value"><?php echo $date; ?></div>
@@ -602,13 +565,11 @@ session_write_close(); // ← ADD THIS - locks session before page renders, prev
                                             </div>
                                         </div>
 
-                                        <?php // Unique certificate ID shown at the very bottom of the certificate ?>
                                         <div class="cert-id-row">
                                             <div class="cert-id-dash"></div>
                                             <div class="cert-id"><?php echo $cert_id; ?></div>
                                             <div class="cert-id-dash right"></div>
                                         </div>
-
                                     </div>
                                 </div>
                             </div>
@@ -616,7 +577,6 @@ session_write_close(); // ← ADD THIS - locks session before page renders, prev
                     </div>
                 </div>
 
-                <?php // Action buttons below the certificate for navigating away or saving as a PDF ?>
                 <div class="cert-actions">
                     <a href="game.php" class="cert-btn cert-btn-outline">Back to Games</a>
                     <button onclick="savePDF()" id="save-btn" class="cert-btn cert-btn-primary">
@@ -625,15 +585,12 @@ session_write_close(); // ← ADD THIS - locks session before page renders, prev
                     </button>
                     <a href="index.php" class="cert-btn cert-btn-outline">Return Home</a>
                 </div>
-
             </div>
         </div>
 
-        <?php // Load the shared footer ?>
         <?php include 'includes/footer.php'; ?>
     </div>
 
-    <?php // Load the html2canvas and jsPDF libraries needed to export the certificate as a PDF ?>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script>
@@ -644,40 +601,29 @@ session_write_close(); // ← ADD THIS - locks session before page renders, prev
             var frame = document.getElementById('certFrame');
             if (!stage || !frame) return;
 
-            // Measure the true available width (no padding inset needed — overflow:hidden handles clipping)
             var availW = stage.offsetWidth;
-
-            // Never scale above 1 (don't enlarge on very wide screens)
             var scale = Math.min(0.75, availW / CERT_W);
-
-            // Scale from top-left, then shift right by half the leftover space to centre it
             var leftOffset = (availW - CERT_W * scale) / 2;
 
             frame.style.transform       = 'scale(' + scale + ')';
             frame.style.transformOrigin = 'top left';
             frame.style.left            = leftOffset + 'px';
-
-            // Set stage height to the scaled certificate height so the buttons below sit flush
             stage.style.height = (CERT_H * scale) + 'px';
         }
 
-        // Run once on load and again whenever the window is resized
         scaleCert();
         window.addEventListener('resize', scaleCert);
 
-        // Generates a PDF of the certificate and triggers a download
         async function savePDF() {
             var btn  = document.getElementById('save-btn');
             var orig = btn.innerHTML;
 
-            // Disable the button and show a loading message while the PDF is being created
             btn.disabled = true;
             btn.innerHTML = 'Generating…';
 
             try {
                 var frame = document.getElementById('certFrame');
 
-                // Temporarily reset the transform so html2canvas captures the full-size certificate
                 var savedTransform       = frame.style.transform;
                 var savedTransformOrigin = frame.style.transformOrigin;
                 var savedLeft            = frame.style.left;
@@ -685,7 +631,6 @@ session_write_close(); // ← ADD THIS - locks session before page renders, prev
                 frame.style.transformOrigin = 'top left';
                 frame.style.left            = '0px';
 
-                // Take a high-resolution screenshot of the certificate
                 var canvas = await html2canvas(frame, {
                     scale: 2, useCORS: true, allowTaint: true,
                     backgroundColor: '#ffffff',
@@ -694,12 +639,10 @@ session_write_close(); // ← ADD THIS - locks session before page renders, prev
                     logging: false
                 });
 
-                // Restore the scale transform after the screenshot is taken
                 frame.style.transform       = savedTransform;
                 frame.style.transformOrigin = savedTransformOrigin;
                 frame.style.left            = savedLeft;
 
-                // Create an A4 landscape PDF and embed the certificate image
                 var { jsPDF } = window.jspdf;
                 var pdf = new jsPDF({ orientation: 'landscape', unit: 'mm', format: 'a4' });
                 pdf.addImage(
@@ -709,7 +652,6 @@ session_write_close(); // ← ADD THIS - locks session before page renders, prev
                     pdf.internal.pageSize.getHeight()
                 );
 
-                // Trigger the download using the unique certificate ID as the filename
                 pdf.save('CybAware-Certificate-<?php echo $cert_id; ?>.pdf');
 
             } catch(err) {
@@ -717,7 +659,6 @@ session_write_close(); // ← ADD THIS - locks session before page renders, prev
                 console.error(err);
             }
 
-            // Re-enable the button and restore its label
             btn.disabled  = false;
             btn.innerHTML = orig;
         }
