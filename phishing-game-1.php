@@ -375,9 +375,9 @@ if($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['answer']) && isset($_PO
         if($user_answer === $correct_answer) {
             $score++;
             $_SESSION['phishing_score'] = $score;
-            $feedback = "<div class='feedback correct'><span style='color: #10b981;'>&#10003; Correct!</span></div>";
+            $feedback = "<div class='feedback correct'><span style='color: #10b981;'>Correct!</span></div>";
         } else {
-            $feedback = "<div class='feedback incorrect'><span style='color: #dc2626;'>&#10007; Incorrect</span></div>";
+            $feedback = "<div class='feedback incorrect'><span style='color: #dc2626;'>Incorrect</span></div>";
         }
 
         $feedback .= "<div class='hint-box'><strong>Hint:</strong> " . htmlspecialchars($hint) . "</div>";
@@ -1000,7 +1000,7 @@ if($current_question > $total_questions && !$game_completed) {
                                 <input type="hidden" name="action" value="next">
                                 <div class="game-controls">
                                     <button type="submit" class="submit-btn">
-                                        <?php echo $current_question == $total_questions ? 'See Results &#8594;' : 'Next Question &#8594;'; ?>
+                                        <?php echo $current_question == $total_questions ? 'See Results &#8594;' : 'Next Question'; ?>
                                     </button>
                                 </div>
                             </form>
