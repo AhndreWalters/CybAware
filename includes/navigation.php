@@ -1,39 +1,9 @@
 <?php
-// IMPORTANT: This file must have NO whitespace or output before the opening <?php tag
-// Start output buffering at the VERY beginning
-if (ob_get_level() == 0) {
-    ob_start();
-}
-
-// Start session if not already started - this MUST happen before ANY output
-if (session_status() === PHP_SESSION_NONE) {
-    session_start();
-}
-// No output should occur before this point
+// IMPORTANT: This file should have NO session handling or output buffering
+// Session is already started in the parent file (game.php, certificate.php, etc.)
+// This file only contains HTML and JavaScript for the navigation bar
+// No PHP code that outputs anything should be above this point
 ?>
-<!DOCTYPE html>
-<style>
-/* Removes default list item height and spacing for the avatar nav item */
-#avatar-li {
-    height: 0 !important;
-    overflow: visible !important;
-    padding: 0 !important;
-    margin-top: 0 !important;
-    margin-bottom: 0 !important;
-}
-/* Keeps the avatar positioned correctly relative to the nav */
-#nav-avatar {
-    position: relative;
-    top: 0;
-}
-/* Hides the avatar completely on mobile screens */
-@media (max-width: 768px) {
-    #avatar-li {
-        display: none !important;
-    }
-}
-</style>
-
 <nav>
     <!-- Logo section - clicking it takes the user back to the homepage -->
     <div class="logo">
@@ -100,6 +70,28 @@ if (session_status() === PHP_SESSION_NONE) {
     <!-- Hamburger menu button shown on mobile - toggles the nav links open and closed -->
     <div class="mobile-menu-btn" id="mobileMenuBtn">&#9776;</div>
 </nav>
+
+<style>
+/* Removes default list item height and spacing for the avatar nav item */
+#avatar-li {
+    height: 0 !important;
+    overflow: visible !important;
+    padding: 0 !important;
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+}
+/* Keeps the avatar positioned correctly relative to the nav */
+#nav-avatar {
+    position: relative;
+    top: 0;
+}
+/* Hides the avatar completely on mobile screens */
+@media (max-width: 768px) {
+    #avatar-li {
+        display: none !important;
+    }
+}
+</style>
 
 <!-- Background music that loops automatically and starts playing on first user click -->
 <audio id="bg-music" src="music/eliveta-technology.mp3" loop></audio>
