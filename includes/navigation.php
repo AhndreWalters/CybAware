@@ -1,9 +1,20 @@
 <?php
-if (ob_get_level() == 0) { ob_start(); }
-if (session_status() === PHP_SESSION_NONE) { session_start(); }
+// MUST be the absolute first line - NO characters, spaces, or newlines before this!
+// Start output buffering to prevent any header issues
+if (ob_get_level() == 0) {
+    ob_start();
+}
+
+// Start session if not already started - this MUST happen before ANY output
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+// All PHP runs first — no HTML/CSS output above this line
+// The style block and HTML are now safely below after all headers are committed
 ?>
-<!DOCTYPE html>
 <style>
+/* Removes default list item height and spacing for the avatar nav item */
 #avatar-li {
     height: 0 !important;
     overflow: visible !important;
@@ -33,33 +44,37 @@ if (session_status() === PHP_SESSION_NONE) { session_start(); }
             </div>
         </a>
     </div>
-    
+
     <!-- List of navigation links shown across the top of every page -->
     <ul class="nav-links" id="navLinks">
         <li><a href="about.php">About</a></li>
         <li><a href="game.php">Game</a></li>
         <li><a href="contact.php">Contact</a></li>
 
-        <?php if(isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true): ?>
-            <li><a href="logout.php" style="font-weight: 600;">
-                <span style="color: white; position: relative; display: inline-block;">
-                    <?php echo htmlspecialchars($_SESSION["first_name"] ?? 'User'); ?> (Logout)
-                    <!-- Green curved underline drawn using an inline SVG -->
-                    <svg style="position: absolute; bottom: -6px; left: 0; width: 100%; height: 8px;" viewBox="0 0 100 8" preserveAspectRatio="none">
-                        <path d="M0,5 Q50,1 100,5" stroke="#4ade80" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-                    </svg>
-                </span>
-            </a></li>
+        <?php if (isset($_SESSION["loggedin"]) && $_SESSION["loggedin"] === true): ?>
+            <li>
+                <a href="logout.php" style="font-weight: 600;">
+                    <span style="color: white; position: relative; display: inline-block;">
+                        <?php echo htmlspecialchars($_SESSION["first_name"] ?? 'User'); ?> (Logout)
+                        <!-- Green curved underline drawn using an inline SVG -->
+                        <svg style="position: absolute; bottom: -6px; left: 0; width: 100%; height: 8px;" viewBox="0 0 100 8" preserveAspectRatio="none">
+                            <path d="M0,5 Q50,1 100,5" stroke="#4ade80" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+                        </svg>
+                    </span>
+                </a>
+            </li>
         <?php else: ?>
-            <li><a href="login.php">
-                <span style="color: white; position: relative; display: inline-block;">
-                    Sign In
-                    <!-- Green curved underline drawn using an inline SVG -->
-                    <svg style="position: absolute; bottom: -6px; left: 0; width: 100%; height: 8px;" viewBox="0 0 100 8" preserveAspectRatio="none">
-                        <path d="M0,5 Q50,1 100,5" stroke="#4ade80" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-                    </svg>
-                </span>
-            </a></li>
+            <li>
+                <a href="login.php">
+                    <span style="color: white; position: relative; display: inline-block;">
+                        Sign In
+                        <!-- Green curved underline drawn using an inline SVG -->
+                        <svg style="position: absolute; bottom: -6px; left: 0; width: 100%; height: 8px;" viewBox="0 0 100 8" preserveAspectRatio="none">
+                            <path d="M0,5 Q50,1 100,5" stroke="#4ade80" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+                        </svg>
+                    </span>
+                </a>
+            </li>
         <?php endif; ?>
 
         <!-- Avatar icon in the nav bar - clicking it opens the character picker modal -->
@@ -82,9 +97,9 @@ if (session_status() === PHP_SESSION_NONE) { session_start(); }
             </div>
         </li>
     </ul>
-    
+
     <!-- Hamburger menu button shown on mobile - toggles the nav links open and closed -->
-    <div class="mobile-menu-btn" id="mobileMenuBtn">☰</div>
+    <div class="mobile-menu-btn" id="mobileMenuBtn">&#9776;</div>
 </nav>
 
 <!-- Background music that loops automatically and starts playing on first user click -->
@@ -143,7 +158,7 @@ if (music) {
     ">
         <!-- Modal title and subtitle shown at the top of the picker -->
         <h3 style="color:#1e293b; margin:0 0 4px; font-size:1.1rem; font-weight:700; text-align:center;">Choose Your Character</h3>
-        <p style="color:#94a3b8; font-size:0.8rem; text-align:center; margin:0 0 20px;">Your avatar watches the cursor 👁</p>
+        <p style="color:#94a3b8; font-size:0.8rem; text-align:center; margin:0 0 20px;">Your avatar watches the cursor &#128065;</p>
 
         <!-- Grid of character options - populated dynamically by JavaScript -->
         <div id="char-grid" style="display:grid; grid-template-columns:repeat(5,1fr); gap:10px;"></div>
@@ -509,7 +524,7 @@ document.addEventListener('DOMContentLoaded', function () {
             navLinks.classList.toggle('active');
 
             // Switch the icon between hamburger and close depending on nav state
-            mobileMenuBtn.textContent = navLinks.classList.contains('active') ? '✕' : '☰';
+            mobileMenuBtn.textContent = navLinks.classList.contains('active') ? '\u2715' : '\u2630';
         });
 
         // Close the mobile nav automatically when a link inside it is tapped
@@ -517,7 +532,7 @@ document.addEventListener('DOMContentLoaded', function () {
             link.addEventListener('click', function () {
                 if (window.innerWidth <= 768) {
                     navLinks.classList.remove('active');
-                    mobileMenuBtn.textContent = '☰';
+                    mobileMenuBtn.textContent = '\u2630';
                 }
             });
         });
@@ -529,7 +544,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 !mobileMenuBtn.contains(e.target) &&
                 window.innerWidth <= 768) {
                 navLinks.classList.remove('active');
-                mobileMenuBtn.textContent = '☰';
+                mobileMenuBtn.textContent = '\u2630';
             }
         });
     }
