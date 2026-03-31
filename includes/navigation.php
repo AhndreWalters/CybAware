@@ -1,8 +1,4 @@
 <?php
-// IMPORTANT: This file should have NO session handling or output buffering
-// Session is already started in the parent file (game.php, certificate.php, etc.)
-// This file only contains HTML and JavaScript for the navigation bar
-// No PHP code that outputs anything should be above this point
 ?>
 <nav>
     <!-- Logo section - clicking it takes the user back to the homepage -->
