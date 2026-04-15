@@ -1,6 +1,6 @@
 # CybAware
 
-<img height="75" align="right" alt="CybAware QR Code" src="https://github.com/user-attachments/assets/b07f28ac-f31d-43f3-8159-8dda8aa1c543" />
+<img height="75" align="right" alt="CybAware QR Code" src="https://github.com/user-attachments/assets/03fa4a7e-3afb-4fb7-ae65-25dc77a61610" />
 
 <p align="justify">Final project for the Project Design & Management course at T.A. Marryshow Community College. An interactive, web-based educational game developed to raise cybersecurity awareness, featuring gamified lessons on password safety and phishing detection, built with HTML5, CSS3, JavaScript, and PHP.</p>
 
