@@ -158,10 +158,6 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                     <?php // Submit button that triggers the login process ?>
                     <button type="submit" class="login-btn">Sign In</button>
 
-                    <?php // Forgot password link shown beneath the submit button ?>
-                    <div style="text-align: center; margin-top: 15px;">
-                        <a href="passwordreset.php" style="color: #1e40af; font-weight: 600; text-decoration: none;">Forgot password?</a>
-                    </div>
                 </form>
 
                 <br>
