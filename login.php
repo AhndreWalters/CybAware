@@ -154,7 +154,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                             <span class="error-message"><?php echo $password_err; ?></span>
                         <?php endif; ?>
                     </div>
-
++
                     <?php // Submit button that triggers the login process ?>
                     <button type="submit" class="login-btn">Sign In</button>
 
